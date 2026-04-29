@@ -1,0 +1,544 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { useSession, signOut } from "@/lib/auth-client";
+
+type Probleme = { statut: "ok" | "avertissement" | "erreur"; message: string };
+type Categorie = { score: number; problemes: Probleme[] };
+
+type ResultatAnalyse = {
+  score: number;
+  resume: string;
+  categories: {
+    recherchabilite: Categorie;
+    competencesTechniques: Categorie;
+    competencesSoft: Categorie;
+    conseilsRecruteur: Categorie;
+  };
+  motsClesManquants: string[];
+  motsClesPresents: string[];
+};
+
+export default function PagePrincipale() {
+  const { data: session } = useSession();
+  const [cv, setCv] = useState("");
+  const [offre, setOffre] = useState("");
+  const [resultat, setResultat] = useState<ResultatAnalyse | null>(null);
+  const [chargement, setChargement] = useState(false);
+  const [erreur, setErreur] = useState("");
+  const [modeCV, setModeCV] = useState<"upload" | "texte">("upload");
+  const [nomFichier, setNomFichier] = useState("");
+  const [extractionEnCours, setExtractionEnCours] = useState(false);
+  const [dragActif, setDragActif] = useState(false);
+  const [cvAdapte, setCvAdapte] = useState<string | null>(null);
+  const [adaptationEnCours, setAdaptationEnCours] = useState(false);
+  const [erreurAdaptation, setErreurAdaptation] = useState("");
+  const [creditsRestants, setCreditsRestants] = useState<number | null>(null);
+  const [copie, setCopie] = useState(false);
+
+  async function traiterFichier(fichier: File) {
+    const ext = fichier.name.split(".").pop()?.toLowerCase();
+    if (ext !== "pdf" && ext !== "docx") {
+      setErreur("Format non supporté. Utilisez un fichier PDF ou Word (.docx).");
+      return;
+    }
+    setErreur("");
+    setExtractionEnCours(true);
+    const formData = new FormData();
+    formData.append("fichier", fichier);
+    try {
+      const reponse = await fetch("/api/extraire-cv", { method: "POST", body: formData });
+      const data = await reponse.json();
+      if (!reponse.ok) throw new Error(data.error);
+      setCv(data.texte);
+      setNomFichier(fichier.name);
+    } catch (e) {
+      setErreur(e instanceof Error ? e.message : "Impossible d'extraire le texte du fichier.");
+    } finally {
+      setExtractionEnCours(false);
+    }
+  }
+
+  async function analyser() {
+    if (!cv.trim() || !offre.trim()) {
+      setErreur("Veuillez remplir les deux champs.");
+      return;
+    }
+    setErreur("");
+    setChargement(true);
+    setResultat(null);
+
+    try {
+      const reponse = await fetch("/api/analyser", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cv, offre }),
+      });
+      if (!reponse.ok) throw new Error("Erreur lors de l'analyse.");
+      const data = await reponse.json();
+      setResultat(data);
+    } catch {
+      setErreur("Une erreur est survenue. Veuillez réessayer.");
+    } finally {
+      setChargement(false);
+    }
+  }
+
+  async function adapterCV() {
+    if (!resultat) return;
+    setErreurAdaptation("");
+    setCvAdapte(null);
+    setAdaptationEnCours(true);
+    try {
+      const reponse = await fetch("/api/adapter-cv", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cv, offre, motsClesManquants: resultat.motsClesManquants }),
+      });
+      const data = await reponse.json();
+      if (!reponse.ok) throw new Error(data.error);
+      setCvAdapte(data.cvAdapte);
+      setCreditsRestants(data.creditsRestants);
+    } catch (e) {
+      setErreurAdaptation(e instanceof Error ? e.message : "Une erreur est survenue.");
+    } finally {
+      setAdaptationEnCours(false);
+    }
+  }
+
+  async function copierCV() {
+    if (!cvAdapte) return;
+    await navigator.clipboard.writeText(cvAdapte);
+    setCopie(true);
+    setTimeout(() => setCopie(false), 2000);
+  }
+
+  const couleurScore = (score: number) => {
+    if (score >= 75) return "text-emerald-600";
+    if (score >= 50) return "text-amber-500";
+    return "text-rose-500";
+  };
+
+  const ringScore = (score: number) => {
+    if (score >= 75) return "ring-emerald-200 bg-emerald-50";
+    if (score >= 50) return "ring-amber-200 bg-amber-50";
+    return "ring-rose-200 bg-rose-50";
+  };
+
+  const scoreLabel = (score: number) => {
+    if (score >= 75) return "Excellent";
+    if (score >= 50) return "Moyen";
+    return "Faible";
+  };
+
+  return (
+    <div className="min-h-screen flex flex-col">
+
+      {/* Header */}
+      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-1.5 group">
+            <span className="text-lg">⚡</span>
+            <span className="text-base font-bold tracking-tight text-gray-900 group-hover:text-indigo-600 transition-colors">
+              JobBoost
+            </span>
+          </Link>
+
+          <nav className="flex items-center gap-3 text-sm">
+            {session ? (
+              <>
+                <span className="text-gray-400 font-medium hidden sm:block">{session.user.email}</span>
+                <button
+                  onClick={() => signOut()}
+                  className="text-gray-500 hover:text-gray-900 font-medium transition-colors"
+                >
+                  Déconnexion
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="text-gray-500 hover:text-gray-900 font-medium transition-colors"
+                >
+                  Connexion
+                </Link>
+                <Link
+                  href="/register"
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg font-semibold transition-colors text-sm"
+                >
+                  S&apos;inscrire
+                </Link>
+              </>
+            )}
+          </nav>
+        </div>
+      </header>
+
+      <main className="flex-1">
+
+        {/* Hero */}
+        <section className="bg-gradient-to-b from-blue-50 to-white px-6 pt-20 pb-20 text-center">
+          <div className="max-w-3xl mx-auto">
+            <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight text-gray-900 leading-[1.1] mb-6">
+              Optimisez votre CV pour
+              <br />
+              <span
+                className="bg-gradient-to-r from-violet-500 via-indigo-500 to-indigo-600 bg-clip-text text-transparent animate-shimmer"
+                style={{ backgroundSize: "200% auto" }}
+              >
+                décrocher plus d&apos;entretiens
+              </span>
+            </h1>
+
+            <p className="text-gray-500 text-lg sm:text-xl max-w-lg mx-auto leading-relaxed mb-10">
+              JobBoost analyse la correspondance entre votre CV et une offre d&apos;emploi.
+            </p>
+
+            <button
+              onClick={() => document.getElementById("zones-texte")?.scrollIntoView({ behavior: "smooth" })}
+              className="relative group overflow-hidden bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl shadow-indigo-200 hover:shadow-indigo-300 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+            >
+              <span className="relative z-10">⚡ Analyser mon CV gratuitement</span>
+              <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-200 rounded-xl" />
+            </button>
+          </div>
+        </section>
+
+        {/* Zones de texte */}
+        <section id="zones-texte" className="max-w-6xl mx-auto px-6 pb-6 pt-12">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+            {/* CV */}
+            <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm hover:shadow-md hover:ring-indigo-200 transition-all duration-200 overflow-hidden">
+              <div className="flex items-center justify-between px-5 py-3.5 border-b border-gray-100 bg-gray-50/50">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-indigo-400" />
+                  <span className="text-xs font-semibold text-gray-600 uppercase tracking-widest">Votre CV</span>
+                </div>
+                {modeCV === "texte" && (
+                  <button
+                    onClick={() => setModeCV("upload")}
+                    className="text-xs text-indigo-500 hover:text-indigo-700 font-medium transition-colors"
+                  >
+                    ← Upload de fichier
+                  </button>
+                )}
+              </div>
+
+              {modeCV === "upload" ? (
+                <div className="p-5 flex flex-col gap-4">
+                  <label
+                    className={`flex flex-col items-center justify-center min-h-40 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 ${
+                      dragActif
+                        ? "border-indigo-400 bg-indigo-50"
+                        : "border-gray-200 bg-gray-50/50 hover:border-indigo-300 hover:bg-indigo-50/40"
+                    }`}
+                    onDragOver={(e) => { e.preventDefault(); setDragActif(true); }}
+                    onDragLeave={() => setDragActif(false)}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      setDragActif(false);
+                      const f = e.dataTransfer.files[0];
+                      if (f) traiterFichier(f);
+                    }}
+                  >
+                    <input
+                      type="file"
+                      accept=".pdf,.docx"
+                      className="hidden"
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) traiterFichier(f); }}
+                    />
+                    {extractionEnCours ? (
+                      <div className="flex flex-col items-center gap-2 text-indigo-500">
+                        <svg className="animate-spin w-6 h-6" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                        </svg>
+                        <span className="text-sm font-medium">Extraction en cours...</span>
+                      </div>
+                    ) : nomFichier ? (
+                      <div className="flex flex-col items-center gap-2 text-emerald-600">
+                        <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span className="text-sm font-semibold">{nomFichier}</span>
+                        <span className="text-xs text-gray-400">Cliquez pour changer de fichier</span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2 text-gray-400 px-4 text-center">
+                        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        <span className="text-sm font-semibold text-gray-600">Glissez votre CV ici</span>
+                        <span className="text-xs">ou cliquez pour choisir</span>
+                        <span className="text-xs text-gray-300">Formats acceptés : PDF, Word (.docx)</span>
+                      </div>
+                    )}
+                  </label>
+
+                  <button
+                    onClick={() => setModeCV("texte")}
+                    className="text-xs text-indigo-500 hover:text-indigo-700 font-medium text-center transition-colors"
+                  >
+                    Ou coller le texte →
+                  </button>
+                </div>
+              ) : (
+                <textarea
+                  value={cv}
+                  onChange={(e) => setCv(e.target.value)}
+                  placeholder="Collez ici le contenu de votre CV..."
+                  className="w-full min-h-56 p-5 text-sm text-gray-700 placeholder-gray-300 resize-none focus:outline-none bg-transparent leading-relaxed"
+                />
+              )}
+            </div>
+
+            {/* Offre */}
+            <div className="group bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm hover:shadow-md hover:ring-violet-200 transition-all duration-200 overflow-hidden">
+              <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100 bg-gray-50/50">
+                <div className="w-2 h-2 rounded-full bg-violet-400" />
+                <span className="text-xs font-semibold text-gray-600 uppercase tracking-widest">Offre d&apos;emploi</span>
+              </div>
+              <textarea
+                value={offre}
+                onChange={(e) => setOffre(e.target.value)}
+                placeholder="Collez ici le texte de l'offre d'emploi..."
+                className="w-full min-h-56 p-5 text-sm text-gray-700 placeholder-gray-300 resize-none focus:outline-none bg-transparent leading-relaxed"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* Bouton + erreur */}
+        <section className="max-w-6xl mx-auto px-6 pb-14 flex flex-col items-center gap-3">
+          {erreur && (
+            <p className="text-rose-500 text-sm font-medium">{erreur}</p>
+          )}
+          <button
+            onClick={analyser}
+            disabled={chargement}
+            className="relative group overflow-hidden bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 text-white px-10 py-3.5 rounded-xl font-bold text-base shadow-lg shadow-indigo-200 hover:shadow-indigo-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:scale-100 transition-all duration-200"
+          >
+            <span className="relative z-10 flex items-center gap-2">
+              {chargement ? (
+                <>
+                  <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                  </svg>
+                  Analyse en cours...
+                </>
+              ) : (
+                <>
+                  ⚡ Analyser gratuitement
+                </>
+              )}
+            </span>
+            <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-200 rounded-xl" />
+          </button>
+        </section>
+
+        {/* Résultats */}
+        {resultat && (
+          <section className="max-w-6xl mx-auto px-6 pb-20">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+              {/* Score */}
+              <div className={`bg-white rounded-2xl ring-2 shadow-sm p-8 flex flex-col items-center justify-center text-center ${ringScore(resultat.score)}`}>
+                <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Score de correspondance</p>
+                <p className={`text-7xl font-extrabold tabular-nums ${couleurScore(resultat.score)}`}>
+                  {resultat.score}
+                  <span className="text-3xl">%</span>
+                </p>
+                <span className={`mt-3 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full ${
+                  resultat.score >= 75 ? "bg-emerald-100 text-emerald-700" :
+                  resultat.score >= 50 ? "bg-amber-100 text-amber-700" :
+                  "bg-rose-100 text-rose-700"
+                }`}>
+                  {scoreLabel(resultat.score)}
+                </span>
+              </div>
+
+              {/* Analyse */}
+              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6 lg:col-span-2 flex flex-col justify-between gap-4">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Analyse</p>
+                  <p className="text-gray-700 text-sm leading-relaxed">{resultat.resume}</p>
+                </div>
+
+                {/* CTA */}
+                <div className="pt-4 border-t border-gray-100 flex flex-col gap-2">
+                  {session ? (
+                    <>
+                      <button
+                        onClick={adapterCV}
+                        disabled={adaptationEnCours}
+                        className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      >
+                        {adaptationEnCours ? (
+                          <>
+                            <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                            </svg>
+                            Adaptation en cours...
+                          </>
+                        ) : (
+                          "Adapter mon CV automatiquement →"
+                        )}
+                      </button>
+                      {erreurAdaptation && (
+                        <p className="text-rose-500 text-xs font-medium text-center">{erreurAdaptation}</p>
+                      )}
+                      {creditsRestants !== null && (
+                        <p className="text-gray-400 text-xs text-center">{creditsRestants} crédit{creditsRestants !== 1 ? "s" : ""} restant{creditsRestants !== 1 ? "s" : ""}</p>
+                      )}
+                    </>
+                  ) : (
+                    <div className="flex flex-col sm:flex-row items-center gap-3">
+                      <Link
+                        href="/register"
+                        className="w-full sm:w-auto flex-1 bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 px-5 rounded-xl font-bold text-sm text-center hover:opacity-90 transition-opacity shadow-md shadow-indigo-100"
+                      >
+                        Adapter mon CV →
+                      </Link>
+                      <p className="text-gray-400 text-xs whitespace-nowrap">3 adaptations gratuites à l&apos;inscription</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Catégories détaillées */}
+              {resultat.categories && (() => {
+                const cats: { cle: keyof typeof resultat.categories; label: string }[] = [
+                  { cle: "recherchabilite", label: "Recherchabilité" },
+                  { cle: "competencesTechniques", label: "Compétences techniques" },
+                  { cle: "competencesSoft", label: "Compétences comportementales" },
+                  { cle: "conseilsRecruteur", label: "Conseils recruteur" },
+                ];
+                return cats.map(({ cle, label }) => {
+                  const cat = resultat.categories[cle];
+                  return (
+                    <div key={cle} className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6">
+                      <div className="flex items-center justify-between mb-4">
+                        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">{label}</p>
+                        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                          cat.score >= 75 ? "bg-emerald-100 text-emerald-700" :
+                          cat.score >= 50 ? "bg-amber-100 text-amber-700" :
+                          "bg-rose-100 text-rose-700"
+                        }`}>{cat.score}%</span>
+                      </div>
+                      <ul className="flex flex-col gap-2">
+                        {cat.problemes.map((p, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm">
+                            <span className="mt-0.5 shrink-0">
+                              {p.statut === "ok" ? "✅" : p.statut === "avertissement" ? "⚠️" : "❌"}
+                            </span>
+                            <span className={
+                              p.statut === "ok" ? "text-emerald-700" :
+                              p.statut === "avertissement" ? "text-amber-700" :
+                              "text-rose-600"
+                            }>{p.message}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                });
+              })()}
+
+              {/* Mots-clés manquants */}
+              {resultat.motsClesManquants.length > 0 && (
+                <div className="bg-white rounded-2xl ring-1 ring-rose-100 shadow-sm p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-2 h-2 rounded-full bg-rose-400" />
+                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+                      Manquants <span className="text-rose-500 font-bold">({resultat.motsClesManquants.length})</span>
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {resultat.motsClesManquants.map((mot) => (
+                      <span
+                        key={mot}
+                        className="bg-rose-50 text-rose-600 border border-rose-100 px-3 py-1 rounded-full text-xs font-semibold"
+                      >
+                        {mot}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Mots-clés présents */}
+              {resultat.motsClesPresents.length > 0 && (
+                <div className="bg-white rounded-2xl ring-1 ring-emerald-100 shadow-sm p-6 lg:col-span-2">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">
+                      Présents <span className="text-emerald-600 font-bold">({resultat.motsClesPresents.length})</span>
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {resultat.motsClesPresents.map((mot) => (
+                      <span
+                        key={mot}
+                        className="bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1 rounded-full text-xs font-semibold"
+                      >
+                        {mot}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+            </div>
+
+            {/* CV adapté */}
+            {cvAdapte && (
+              <div className="mt-5 bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-indigo-400" />
+                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">CV adapté</p>
+                  </div>
+                  <button
+                    onClick={copierCV}
+                    className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
+                  >
+                    {copie ? (
+                      <>
+                        <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="text-emerald-600">Copié !</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                        </svg>
+                        Copier
+                      </>
+                    )}
+                  </button>
+                </div>
+                <textarea
+                  readOnly
+                  value={cvAdapte}
+                  className="w-full min-h-64 p-4 text-sm text-gray-700 bg-gray-50 rounded-xl resize-y focus:outline-none leading-relaxed font-mono"
+                />
+              </div>
+            )}
+
+          </section>
+        )}
+      </main>
+
+      <footer className="border-t border-gray-100 py-6 text-center text-xs text-gray-300 font-medium tracking-wide">
+        © 2026 JobBoost — L&apos;alternative française à Jobscan
+      </footer>
+    </div>
+  );
+}
