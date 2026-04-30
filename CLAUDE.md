@@ -9,24 +9,31 @@ L'utilisateur colle son CV + une offre d'emploi. L'outil analyse la correspondan
 - Auth: Better-Auth + Supabase
 - IA: Anthropic Claude API
 - Paiement: Stripe (Phase 2)
-- Export: PDF + Word .docx (Phase 2)
+- Export PDF : @react-pdf/renderer (server-side, `renderToBuffer`)
+- Export DOCX : docx + `Packer.toBuffer`
 
 ## Project Structure
 ```
 src/
 ├── app/
 │   ├── api/
-│   │   ├── analyser/route.ts        # Analyse CV vs offre (Claude Haiku)
+│   │   ├── analyser/route.ts        # Analyse CV vs offre (Claude Haiku) → JSON structuré
 │   │   ├── extraire-cv/route.ts     # Extraction texte PDF/DOCX
-│   │   ├── adapter-cv/route.ts      # Adaptation CV avec décompte crédits
+│   │   ├── adapter-cv/route.ts      # Adaptation CV → retourne CVStructure JSON
+│   │   ├── exporter-cv/route.ts     # Génère PDF ou DOCX depuis CVStructure
 │   │   └── auth/[...all]/route.ts   # Better-Auth handler
 │   ├── login/page.tsx
 │   ├── register/page.tsx
 │   └── page.tsx                     # Page principale
 ├── middleware.ts                     # Redirige login/register si déjà connecté
+├── components/
+│   └── CVPreview.tsx                # Preview visuelle ATS (utilisé dans page.tsx)
+├── types/
+│   └── cv.ts                        # Type CVStructure partagé
 └── lib/
     ├── auth.ts          # Config serveur better-auth (NE PAS importer côté client)
-    └── auth-client.ts   # Config client (hooks React uniquement)
+    ├── auth-client.ts   # Config client (hooks React uniquement)
+    └── cv-pdf.tsx       # Composant React PDF (@react-pdf/renderer) — JSX séparé du route handler
 ```
 
 ## Deployment & Repository
@@ -79,3 +86,11 @@ npm run lint   # Vérifier le code
 - La réponse JSON de Claude peut être enveloppée en backticks markdown — toujours nettoyer avant `JSON.parse`
 - Ne jamais utiliser `npx @better-auth/cli migrate` sur une DB existante — génère un CREATE TABLE complet qui crashe sur les tables déjà présentes. Utiliser ALTER TABLE direct via Node + pg : `node -e "const {Pool}=require('pg'); const p=new Pool({connectionString:'...'}); p.query('ALTER TABLE ...')"`
 - `session.user.credits` n'est pas exposé par `useSession()` sans config supplémentaire — récupérer les crédits restants depuis la réponse des routes API (`creditsRestants` dans `/api/adapter-cv`)
+
+## PDF Generation (@react-pdf/renderer)
+- Ne jamais mettre du JSX dans un fichier `.ts` — isoler les composants React PDF dans un fichier `.tsx` séparé (ex: `src/lib/cv-pdf.tsx`)
+- `renderToBuffer` attend `ReactElement<DocumentProps>` — caster avec `as React.ReactElement<DocumentProps>` si nécessaire
+- `Buffer` n'est pas assignable à `BodyInit` dans Next.js — envelopper avec `new Uint8Array(buffer)` avant de passer à `NextResponse`
+- `letterSpacing` insère des espaces réels entre les caractères (ex: "P R O F I L") — ne pas utiliser
+- `alignItems: center` sur un parent flex écrase `height` d'un enfant `View` sans contenu — pour un trait séparateur, utiliser une colonne : titre puis `<View style={{ height: 1, backgroundColor: "#AAAAAA" }} />`
+- Pour changer la police, utiliser `Font.register()` — les polices système ne sont pas disponibles
