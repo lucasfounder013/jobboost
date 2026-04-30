@@ -3,6 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "@/lib/auth-client";
+import CVPreview from "@/components/CVPreview";
+import { CVStructure } from "@/types/cv";
 
 type Probleme = { statut: "ok" | "avertissement" | "erreur"; message: string };
 type Categorie = { score: number; problemes: Probleme[] };
@@ -31,11 +33,11 @@ export default function PagePrincipale() {
   const [nomFichier, setNomFichier] = useState("");
   const [extractionEnCours, setExtractionEnCours] = useState(false);
   const [dragActif, setDragActif] = useState(false);
-  const [cvAdapte, setCvAdapte] = useState<string | null>(null);
+  const [cvAdapte, setCvAdapte] = useState<CVStructure | null>(null);
   const [adaptationEnCours, setAdaptationEnCours] = useState(false);
   const [erreurAdaptation, setErreurAdaptation] = useState("");
   const [creditsRestants, setCreditsRestants] = useState<number | null>(null);
-  const [copie, setCopie] = useState(false);
+  const [exportEnCours, setExportEnCours] = useState<"pdf" | "docx" | null>(null);
 
   async function traiterFichier(fichier: File) {
     const ext = fichier.name.split(".").pop()?.toLowerCase();
@@ -107,11 +109,29 @@ export default function PagePrincipale() {
     }
   }
 
-  async function copierCV() {
+  async function exporterCV(format: "pdf" | "docx") {
     if (!cvAdapte) return;
-    await navigator.clipboard.writeText(cvAdapte);
-    setCopie(true);
-    setTimeout(() => setCopie(false), 2000);
+    setExportEnCours(format);
+    try {
+      const reponse = await fetch("/api/exporter-cv", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cv: cvAdapte, format }),
+      });
+      if (!reponse.ok) throw new Error("Erreur lors de l'export.");
+      const blob = await reponse.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      const nom = (cvAdapte.nom || "cv").toLowerCase().replace(/\s+/g, "_");
+      a.href = url;
+      a.download = `${nom}_cv.${format}`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch {
+      // silencieux — l'utilisateur voit que le bouton se débloque
+    } finally {
+      setExportEnCours(null);
+    }
   }
 
   const couleurScore = (score: number) => {
@@ -497,38 +517,52 @@ export default function PagePrincipale() {
 
             {/* CV adapté */}
             {cvAdapte && (
-              <div className="mt-5 bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm p-6">
-                <div className="flex items-center justify-between mb-4">
+              <div className="mt-5 bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-indigo-100 bg-indigo-50/40">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-indigo-400" />
-                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">CV adapté</p>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">CV adapté ATS</p>
                   </div>
-                  <button
-                    onClick={copierCV}
-                    className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
-                  >
-                    {copie ? (
-                      <>
-                        <svg className="w-4 h-4 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => exporterCV("pdf")}
+                      disabled={exportEnCours !== null}
+                      className="flex items-center gap-1.5 text-xs font-semibold bg-gray-900 text-white px-3 py-1.5 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {exportEnCours === "pdf" ? (
+                        <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
                         </svg>
-                        <span className="text-emerald-600">Copié !</span>
-                      </>
-                    ) : (
-                      <>
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      ) : (
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                         </svg>
-                        Copier
-                      </>
-                    )}
-                  </button>
+                      )}
+                      PDF
+                    </button>
+                    <button
+                      onClick={() => exporterCV("docx")}
+                      disabled={exportEnCours !== null}
+                      className="flex items-center gap-1.5 text-xs font-semibold bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {exportEnCours === "docx" ? (
+                        <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                        </svg>
+                      ) : (
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                        </svg>
+                      )}
+                      Word
+                    </button>
+                  </div>
                 </div>
-                <textarea
-                  readOnly
-                  value={cvAdapte}
-                  className="w-full min-h-64 p-4 text-sm text-gray-700 bg-gray-50 rounded-xl resize-y focus:outline-none leading-relaxed font-mono"
-                />
+                <div className="p-4">
+                  <CVPreview cv={cvAdapte} />
+                </div>
               </div>
             )}
 

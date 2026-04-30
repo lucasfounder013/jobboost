@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
   const motsClesListe =
     Array.isArray(motsClesManquants) && motsClesManquants.length > 0
-      ? `\n\nMots-clés importants à intégrer : ${motsClesManquants.join(", ")}`
+      ? `\n\nMots-clés importants à intégrer naturellement : ${motsClesManquants.join(", ")}`
       : "";
 
   const message = await anthropic.messages.create({
@@ -48,7 +48,50 @@ export async function POST(req: NextRequest) {
     messages: [
       {
         role: "user",
-        content: `Tu es un expert en rédaction de CV. Réécris ce CV pour maximiser sa correspondance avec l'offre d'emploi fournie, en intégrant naturellement les mots-clés manquants dans les sections pertinentes. Conserve le style, le ton et la structure originale. Ne fabrique pas d'expériences — reformule et mets en valeur ce qui existe. Retourne UNIQUEMENT le texte du CV réécrit, sans commentaires ni explications.${motsClesListe}
+        content: `Tu es un expert en rédaction de CV ATS-friendly. Réécris ce CV pour maximiser sa correspondance avec l'offre d'emploi, en intégrant naturellement les mots-clés manquants. Ne fabrique pas d'expériences ni de diplômes — reformule et mets en valeur ce qui existe déjà. Les concours, compétitions et hackathons vont dans "projets", pas dans "certifications". Les certifications sont uniquement des diplômes ou titres officiels (ex : TOEIC, certifications professionnelles).${motsClesListe}
+
+Retourne UNIQUEMENT un objet JSON valide, sans markdown ni backticks, respectant exactement ce schéma (n'inclure que les champs présents dans le CV original — ne pas inventer ni laisser de tableaux vides) :
+
+{
+  "nom": "string",
+  "titre": "string (titre professionnel court)",
+  "contact": {
+    "email": "string?",
+    "telephone": "string?",
+    "localisation": "string?",
+    "linkedin": "string?",
+    "site": "string?"
+  },
+  "resume": "string? (accroche professionnelle, 2-4 phrases)",
+  "experiences": [{
+    "poste": "string",
+    "entreprise": "string",
+    "dates": "string",
+    "lieu": "string?",
+    "missions": ["string (maximum 3 bullet points par expérience, concis)"]
+  }]?,
+  "formation": [{
+    "diplome": "string",
+    "etablissement": "string",
+    "dates": "string",
+    "details": "string?"
+  }]?,
+  "competences": {
+    "techniques": ["string"]?,
+    "langues": ["string"]?,
+    "autres": ["string"]?
+  }?,
+  "projets": [{
+    "nom": "string",
+    "description": "string (1 phrase max)",
+    "technologies": "string?"
+  }]? (maximum 2 projets),
+  "certifications": [{
+    "nom": "string",
+    "organisme": "string?",
+    "date": "string?"
+  }]?
+}
 
 CV ORIGINAL :
 ${cv}
@@ -64,5 +107,15 @@ ${offre}`,
     return NextResponse.json({ error: "Réponse inattendue de l'IA." }, { status: 500 });
   }
 
-  return NextResponse.json({ cvAdapte: contenu.text, creditsRestants });
+  // Nettoyer les backticks markdown éventuels avant le parse
+  const texteNettoye = contenu.text.replace(/^```(?:json)?\n?/i, "").replace(/\n?```$/i, "").trim();
+
+  let cvAdapte;
+  try {
+    cvAdapte = JSON.parse(texteNettoye);
+  } catch {
+    return NextResponse.json({ error: "Format de réponse invalide. Veuillez réessayer." }, { status: 500 });
+  }
+
+  return NextResponse.json({ cvAdapte, creditsRestants });
 }

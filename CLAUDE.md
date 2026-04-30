@@ -1,5 +1,5 @@
 ## Project Overview
-JobBoost (jobboost.fr) est une alternative française à Jobscan.co.
+JobBoost (https://www.jobboost.fr) est une alternative française à Jobscan.co.
 L'utilisateur colle son CV + une offre d'emploi. L'outil analyse la correspondance gratuitement (score + mots-clés manquants), puis propose d'adapter le CV via un compte (3 essais gratuits, ensuite payant).
 
 ## Tech Stack
@@ -18,14 +18,22 @@ src/
 │   ├── api/
 │   │   ├── analyser/route.ts        # Analyse CV vs offre (Claude Haiku)
 │   │   ├── extraire-cv/route.ts     # Extraction texte PDF/DOCX
+│   │   ├── adapter-cv/route.ts      # Adaptation CV avec décompte crédits
 │   │   └── auth/[...all]/route.ts   # Better-Auth handler
 │   ├── login/page.tsx
 │   ├── register/page.tsx
 │   └── page.tsx                     # Page principale
+├── middleware.ts                     # Redirige login/register si déjà connecté
 └── lib/
     ├── auth.ts          # Config serveur better-auth (NE PAS importer côté client)
     └── auth-client.ts   # Config client (hooks React uniquement)
 ```
+
+## Deployment & Repository
+- Production : https://www.jobboost.fr (Vercel)
+- GitHub : https://github.com/lucasfounder013/jobboost
+- Git config : user.name = Lucas Ledonne, user.email = lucasledonne@live.fr
+- **Toujours commiter depuis le terminal de Lucas** — les commits faits par Claude Code utilisent noreply@anthropic.com ce qui peut bloquer Vercel
 
 ## Commands
 npm run dev    # Lancer le serveur en local
