@@ -2,24 +2,24 @@ import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { CVStructure } from "@/types/cv";
 
 const styles = StyleSheet.create({
-  page: { padding: 28, fontFamily: "Helvetica", fontSize: 9.5, color: "#111111", lineHeight: 1.4 },
-  nom: { fontSize: 15, fontFamily: "Helvetica-Bold", marginBottom: 8 },
+  page: { padding: 28, fontFamily: "Times-Roman", fontSize: 9.5, color: "#111111", lineHeight: 1.4 },
+  nom: { fontSize: 15, fontFamily: "Times-Bold", marginBottom: 8 },
   titre: { fontSize: 9.5, color: "#444444", marginBottom: 5 },
   contact: { fontSize: 8, color: "#666666", marginBottom: 2 },
   // titre en colonne + trait pleine largeur en dessous (alignItems: center écrase height sur View sans contenu)
   sectionHeader: { marginTop: 8, marginBottom: 4 },
-  sectionTitre: { fontSize: 7.5, fontFamily: "Helvetica-Bold", color: "#222222", marginBottom: 3 },
+  sectionTitre: { fontSize: 7.5, fontFamily: "Times-Bold", color: "#222222", marginBottom: 3 },
   sectionLigne: { height: 1, backgroundColor: "#AAAAAA" },
-  poste: { fontFamily: "Helvetica-Bold", fontSize: 10 },
+  poste: { fontFamily: "Times-Bold", fontSize: 10 },
   entreprise: { fontSize: 9, color: "#555555", fontStyle: "italic", marginBottom: 2 },
   dateRange: { fontSize: 8.5, color: "#777777" },
   rowBetween: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" },
   mission: { fontSize: 8.5, color: "#333333", marginLeft: 6, marginBottom: 1 },
-  competenceLabel: { fontFamily: "Helvetica-Bold", fontSize: 8, color: "#666666", marginRight: 4 },
+  competenceLabel: { fontFamily: "Times-Bold", fontSize: 8, color: "#666666", marginRight: 4 },
   competenceValeur: { fontSize: 8.5, color: "#333333" },
   competenceRow: { flexDirection: "row", marginBottom: 1, flexWrap: "wrap" },
   resume: { fontSize: 8.5, color: "#444444", marginBottom: 2 },
-  projetNom: { fontFamily: "Helvetica-Bold", fontSize: 10 },
+  projetNom: { fontFamily: "Times-Bold", fontSize: 10 },
   projetTech: { fontSize: 8.5, color: "#666666" },
   projetDesc: { fontSize: 9, color: "#333333", marginTop: 1 },
 });

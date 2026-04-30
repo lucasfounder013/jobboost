@@ -27,13 +27,13 @@ src/
 │   └── page.tsx                     # Page principale
 ├── middleware.ts                     # Redirige login/register si déjà connecté
 ├── components/
-│   └── CVPreview.tsx                # Preview visuelle ATS (utilisé dans page.tsx)
+│   └── CVPreview.tsx                # Preview HTML du CV adapté (Georgia serif, ATS)
 ├── types/
 │   └── cv.ts                        # Type CVStructure partagé
 └── lib/
     ├── auth.ts          # Config serveur better-auth (NE PAS importer côté client)
     ├── auth-client.ts   # Config client (hooks React uniquement)
-    └── cv-pdf.tsx       # Composant React PDF (@react-pdf/renderer) — JSX séparé du route handler
+    └── cv-pdf.tsx       # Composant React PDF ATS (Times-Roman/Times-Bold)
 ```
 
 ## Deployment & Repository
@@ -93,4 +93,7 @@ npm run lint   # Vérifier le code
 - `Buffer` n'est pas assignable à `BodyInit` dans Next.js — envelopper avec `new Uint8Array(buffer)` avant de passer à `NextResponse`
 - `letterSpacing` insère des espaces réels entre les caractères (ex: "P R O F I L") — ne pas utiliser
 - `alignItems: center` sur un parent flex écrase `height` d'un enfant `View` sans contenu — pour un trait séparateur, utiliser une colonne : titre puis `<View style={{ height: 1, backgroundColor: "#AAAAAA" }} />`
-- Pour changer la police, utiliser `Font.register()` — les polices système ne sont pas disponibles
+- Polices built-in react-pdf : `Times-Roman`, `Times-Bold`, `Helvetica`, `Helvetica-Bold` — Georgia n'existe pas, utiliser Times-Roman comme équivalent serif
+- Pour d'autres polices, utiliser `Font.register()` — les polices système ne sont pas disponibles
+- `cv-pdf.tsx` utilise **Times-Roman / Times-Bold** (police serif built-in) — ne pas revenir à Helvetica
+- Fichiers orphelins à supprimer si présents : `cv-pdf-creatif.tsx`, `cv-pdf-moderne.tsx`, `cv-pdf-elegant.tsx`
