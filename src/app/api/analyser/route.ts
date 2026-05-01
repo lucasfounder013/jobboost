@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
+import { headers } from "next/headers";
+import { Pool } from "pg";
 import Anthropic from "@anthropic-ai/sdk";
+import { auth } from "@/lib/auth";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
 export async function POST(req: NextRequest) {
+  // Authentification obligatoire
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) {
+    return NextResponse.json({ error: "Authentification requise." }, { status: 401 });
+  }
+
   const { cv, offre } = await req.json();
 
   if (!cv || !offre || typeof cv !== "string" || typeof offre !== "string") {
@@ -12,6 +22,30 @@ export async function POST(req: NextRequest) {
 
   if (cv.length > 20000 || offre.length > 10000) {
     return NextResponse.json({ error: "Texte trop long." }, { status: 400 });
+  }
+
+  // Vérification et décompte des scans (source de vérité : DB)
+  const { rows } = await pool.query(
+    'SELECT scans, is_subscribed FROM "user" WHERE id = $1',
+    [session.user.id]
+  );
+  const utilisateur = rows[0];
+  const estAbonne: boolean = utilisateur?.is_subscribed ?? false;
+  let scansRestants: number | null = null;
+
+  if (!estAbonne) {
+    // Décrémenter atomiquement — échoue si scans = 0
+    const { rowCount, rows: rowsMaj } = await pool.query(
+      'UPDATE "user" SET scans = scans - 1 WHERE id = $1 AND scans > 0 RETURNING scans',
+      [session.user.id]
+    );
+    if (rowCount === 0) {
+      return NextResponse.json(
+        { error: "Vous avez utilisé vos 5 analyses gratuites. Passez à un abonnement pour continuer." },
+        { status: 403 }
+      );
+    }
+    scansRestants = rowsMaj[0].scans;
   }
 
   const message = await anthropic.messages.create({
@@ -79,5 +113,5 @@ Génère 3 à 5 points par catégorie.`,
     return NextResponse.json({ error: "Impossible de parser la réponse de l'IA." }, { status: 500 });
   }
 
-  return NextResponse.json(resultat);
+  return NextResponse.json({ ...resultat, scansRestants });
 }

@@ -5,7 +5,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { auth } from "@/lib/auth";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
 export async function POST(req: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -22,20 +22,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Texte trop long." }, { status: 400 });
   }
 
-  // Décrémentation atomique : échoue si credits = 0
-  const { rowCount, rows } = await pool.query(
-    'UPDATE "user" SET credits = credits - 1 WHERE id = $1 AND credits > 0 RETURNING credits',
+  // Vérifier si l'utilisateur est abonné (bypass total des crédits)
+  const { rows: rowsUser } = await pool.query(
+    'SELECT is_subscribed FROM "user" WHERE id = $1',
     [session.user.id]
   );
+  const estAbonne: boolean = rowsUser[0]?.is_subscribed ?? false;
 
-  if (rowCount === 0) {
-    return NextResponse.json(
-      { error: "Vous n'avez plus de crédits disponibles." },
-      { status: 403 }
+  let creditsRestants: number | null = null;
+
+  if (!estAbonne) {
+    // Décrémentation atomique : échoue si credits = 0
+    const { rowCount, rows } = await pool.query(
+      'UPDATE "user" SET credits = credits - 1 WHERE id = $1 AND credits > 0 RETURNING credits',
+      [session.user.id]
     );
-  }
 
-  const creditsRestants: number = rows[0].credits;
+    if (rowCount === 0) {
+      return NextResponse.json(
+        { error: "Vous n'avez plus de crédits disponibles. Passez à un abonnement pour des adaptations illimitées." },
+        { status: 403 }
+      );
+    }
+    creditsRestants = rows[0].credits;
+  }
 
   const motsClesListe =
     Array.isArray(motsClesManquants) && motsClesManquants.length > 0

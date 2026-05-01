@@ -19,6 +19,24 @@ export const auth = betterAuth({
         defaultValue: 1,
         fieldName: "credits",
       },
+      scans: {
+        type: "number",
+        defaultValue: 5,
+        fieldName: "scans",
+      },
+      isSubscribed: {
+        type: "boolean",
+        defaultValue: false,
+        fieldName: "is_subscribed",
+      },
+      stripeCustomerId: {
+        type: "string",
+        fieldName: "stripe_customer_id",
+      },
+      stripeSubscriptionId: {
+        type: "string",
+        fieldName: "stripe_subscription_id",
+      },
     },
   },
   plugins: [nextCookies()],

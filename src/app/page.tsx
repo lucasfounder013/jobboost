@@ -39,14 +39,16 @@ export default function PagePrincipale() {
   const [adaptationEnCours, setAdaptationEnCours] = useState(false);
   const [erreurAdaptation, setErreurAdaptation] = useState("");
   const [creditsRestants, setCreditsRestants] = useState<number | null>(null);
+  const [scansRestants, setScansRestants] = useState<number | null>(null);
+  const [estAbonne, setEstAbonne] = useState(false);
   const [exportEnCours, setExportEnCours] = useState<"pdf" | "docx" | null>(null);
   const [autoAnalyse, setAutoAnalyse] = useState(false);
 
-  // Restaure le CV et l'offre sauvegardés avant une redirection vers /login
+  // Restaure le CV et l'offre sauvegardés avant une redirection (login ou Stripe)
   useEffect(() => {
-    const raw = sessionStorage.getItem("pendingAnalysis");
+    const raw = localStorage.getItem("pendingAnalysis");
     if (!raw) return;
-    sessionStorage.removeItem("pendingAnalysis");
+    localStorage.removeItem("pendingAnalysis");
     try {
       const { cv: c, offre: o, nomFichier: n } = JSON.parse(raw);
       if (c) setCv(c);
@@ -90,7 +92,7 @@ export default function PagePrincipale() {
 
   async function analyser() {
     if (!session) {
-      sessionStorage.setItem("pendingAnalysis", JSON.stringify({ cv, offre, nomFichier }));
+      localStorage.setItem("pendingAnalysis", JSON.stringify({ cv, offre, nomFichier }));
       router.push("/login");
       return;
     }
@@ -108,9 +110,17 @@ export default function PagePrincipale() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cv, offre }),
       });
-      if (!reponse.ok) throw new Error("Erreur lors de l'analyse.");
       const data = await reponse.json();
+      if (reponse.status === 403) {
+        // Sauvegarder pour restaurer après abonnement (survit à la redirection Stripe)
+        localStorage.setItem("pendingAnalysis", JSON.stringify({ cv, offre, nomFichier }));
+        setErreur(data.error);
+        return;
+      }
+      if (!reponse.ok) throw new Error("Erreur lors de l'analyse.");
       setResultat(data);
+      setScansRestants(data.scansRestants ?? null);
+      if (data.scansRestants === null) setEstAbonne(true);
     } catch {
       setErreur("Une erreur est survenue. Veuillez réessayer.");
     } finally {
@@ -197,8 +207,14 @@ export default function PagePrincipale() {
           </Link>
 
           <nav className="flex items-center gap-3 text-sm">
+            <Link href="/pricing" className="text-gray-500 hover:text-gray-900 font-medium transition-colors">
+              Tarifs
+            </Link>
             {session ? (
               <>
+                <Link href="/abonnement" className="text-gray-500 hover:text-gray-900 font-medium transition-colors hidden sm:block">
+                  Mon abonnement
+                </Link>
                 <span className="text-gray-400 font-medium hidden sm:block">{session.user.email}</span>
                 <button
                   onClick={() => signOut()}
@@ -251,7 +267,7 @@ export default function PagePrincipale() {
               onClick={() => document.getElementById("zones-texte")?.scrollIntoView({ behavior: "smooth" })}
               className="relative group overflow-hidden bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl shadow-indigo-200 hover:shadow-indigo-300 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
             >
-              <span className="relative z-10">⚡ Analyser mon CV gratuitement</span>
+              <span className="relative z-10">⚡ {estAbonne ? "Analyser mon CV" : "Analyser mon CV gratuitement"}</span>
               <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-200 rounded-xl" />
             </button>
           </div>
@@ -365,7 +381,16 @@ export default function PagePrincipale() {
         {/* Bouton + erreur */}
         <section className="max-w-6xl mx-auto px-6 pb-14 flex flex-col items-center gap-3">
           {erreur && (
-            <p className="text-rose-500 text-sm font-medium">{erreur}</p>
+            erreur.includes("analyses gratuites") ? (
+              <p className="text-rose-500 text-sm font-medium text-center">
+                {erreur}{" "}
+                <Link href="/pricing" className="underline text-indigo-500 hover:text-indigo-700">
+                  Voir les abonnements →
+                </Link>
+              </p>
+            ) : (
+              <p className="text-rose-500 text-sm font-medium">{erreur}</p>
+            )
           )}
           <button
             onClick={analyser}
@@ -383,12 +408,20 @@ export default function PagePrincipale() {
                 </>
               ) : (
                 <>
-                  ⚡ Analyser gratuitement
+                  ⚡ {estAbonne ? "Analyser" : "Analyser gratuitement"}
                 </>
               )}
             </span>
             <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-200 rounded-xl" />
           </button>
+          {session && scansRestants !== null && scansRestants > 0 && (
+            <p className="text-gray-400 text-xs text-center">
+              {scansRestants} analyse{scansRestants !== 1 ? "s" : ""} gratuite{scansRestants !== 1 ? "s" : ""} restante{scansRestants !== 1 ? "s" : ""}
+            </p>
+          )}
+          {session && scansRestants === null && resultat && (
+            <p className="text-emerald-600 text-xs text-center font-medium">Analyses illimitées ✓</p>
+          )}
         </section>
 
         {/* Résultats */}
@@ -423,28 +456,44 @@ export default function PagePrincipale() {
                 <div className="pt-4 border-t border-gray-100 flex flex-col gap-2">
                   {session ? (
                     <>
-                      <button
-                        onClick={adapterCV}
-                        disabled={adaptationEnCours}
-                        className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                      >
-                        {adaptationEnCours ? (
-                          <>
-                            <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                            </svg>
-                            Adaptation en cours...
-                          </>
-                        ) : (
-                          "Adapter mon CV automatiquement →"
-                        )}
-                      </button>
-                      {erreurAdaptation && (
-                        <p className="text-rose-500 text-xs font-medium text-center">{erreurAdaptation}</p>
-                      )}
-                      {creditsRestants !== null && (
-                        <p className="text-gray-400 text-xs text-center">{creditsRestants} crédit{creditsRestants !== 1 ? "s" : ""} restant{creditsRestants !== 1 ? "s" : ""}</p>
+                      {creditsRestants === 0 ? (
+                        <div className="flex flex-col gap-2">
+                          <Link
+                            href="/pricing"
+                            className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm text-center hover:opacity-90 transition-opacity shadow-md shadow-indigo-100"
+                          >
+                            S&apos;abonner pour des adaptations illimitées →
+                          </Link>
+                          <p className="text-gray-400 text-xs text-center">Votre crédit gratuit a été utilisé</p>
+                        </div>
+                      ) : (
+                        <>
+                          <button
+                            onClick={adapterCV}
+                            disabled={adaptationEnCours}
+                            className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                          >
+                            {adaptationEnCours ? (
+                              <>
+                                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                                </svg>
+                                Adaptation en cours...
+                              </>
+                            ) : (
+                              "Adapter mon CV automatiquement →"
+                            )}
+                          </button>
+                          {erreurAdaptation && (
+                            <p className="text-rose-500 text-xs font-medium text-center">{erreurAdaptation}</p>
+                          )}
+                          {creditsRestants !== null && creditsRestants > 0 ? (
+                            <p className="text-gray-400 text-xs text-center">{creditsRestants} crédit{creditsRestants !== 1 ? "s" : ""} restant{creditsRestants !== 1 ? "s" : ""}</p>
+                          ) : creditsRestants === null && cvAdapte ? (
+                            <p className="text-emerald-600 text-xs text-center font-medium">Adaptations illimitées ✓</p>
+                          ) : null}
+                        </>
                       )}
                     </>
                   ) : (
