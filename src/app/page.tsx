@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession, signOut } from "@/lib/auth-client";
 import CVPreview from "@/components/CVPreview";
@@ -24,6 +25,7 @@ type ResultatAnalyse = {
 
 export default function PagePrincipale() {
   const { data: session } = useSession();
+  const router = useRouter();
   const [cv, setCv] = useState("");
   const [offre, setOffre] = useState("");
   const [resultat, setResultat] = useState<ResultatAnalyse | null>(null);
@@ -63,6 +65,10 @@ export default function PagePrincipale() {
   }
 
   async function analyser() {
+    if (!session) {
+      router.push("/login");
+      return;
+    }
     if (!cv.trim() || !offre.trim()) {
       setErreur("Veuillez remplir les deux champs.");
       return;
