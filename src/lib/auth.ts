@@ -7,6 +7,7 @@ export const auth = betterAuth({
     connectionString: process.env.DATABASE_URL,
     ssl: { rejectUnauthorized: false },
   }),
+  trustedOrigins: ["https://www.jobboost.fr", "https://jobboost.fr"],
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
