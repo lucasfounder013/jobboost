@@ -430,7 +430,7 @@ export default function PagePrincipale() {
                       >
                         Adapter mon CV →
                       </Link>
-                      <p className="text-gray-400 text-xs whitespace-nowrap">3 adaptations gratuites à l&apos;inscription</p>
+                      <p className="text-gray-400 text-xs whitespace-nowrap">1 adaptation gratuite à l&apos;inscription</p>
                     </div>
                   )}
                 </div>

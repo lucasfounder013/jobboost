@@ -11,7 +11,7 @@ export const auth = betterAuth({
   }),
   emailAndPassword: {
     enabled: true,
-    requireEmailVerification: true,
+    requireEmailVerification: false,
   },
   emailVerification: {
     sendVerificationEmail: async ({ user, url }) => {
@@ -27,7 +27,7 @@ export const auth = betterAuth({
     additionalFields: {
       credits: {
         type: "number",
-        defaultValue: 3,
+        defaultValue: 1,
         fieldName: "credits",
       },
     },

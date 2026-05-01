@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { signUp } from "@/lib/auth-client";
 
@@ -9,8 +10,8 @@ export default function PageInscription() {
   const [email, setEmail] = useState("");
   const [motDePasse, setMotDePasse] = useState("");
   const [erreur, setErreur] = useState("");
-  const [succes, setSucces] = useState(false);
   const [chargement, setChargement] = useState(false);
+  const router = useRouter();
 
   async function soumettreFormulaire(e: React.FormEvent) {
     e.preventDefault();
@@ -37,28 +38,8 @@ export default function PageInscription() {
       );
       setChargement(false);
     } else {
-      setSucces(true);
+      router.push("/");
     }
-  }
-
-  if (succes) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
-        <Link href="/" className="text-2xl font-bold text-blue-600 mb-8">
-          JobBoost
-        </Link>
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 w-full max-w-sm text-center">
-          <div className="text-4xl mb-4">✉️</div>
-          <h1 className="text-xl font-semibold text-gray-900 mb-2">Vérifiez votre email</h1>
-          <p className="text-gray-500 text-sm">
-            Un lien de confirmation a été envoyé à <strong>{email}</strong>. Cliquez dessus pour activer votre compte.
-          </p>
-          <Link href="/login" className="inline-block mt-6 text-blue-600 hover:underline text-sm font-medium">
-            Retour à la connexion
-          </Link>
-        </div>
-      </div>
-    );
   }
 
   return (
@@ -69,7 +50,7 @@ export default function PageInscription() {
 
       <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 w-full max-w-sm">
         <h1 className="text-xl font-semibold text-gray-900 mb-1 text-center">Créer un compte</h1>
-        <p className="text-center text-sm text-gray-500 mb-6">3 adaptations de CV gratuites</p>
+        <p className="text-center text-sm text-gray-500 mb-6">1 adaptation de CV gratuite</p>
 
         <form onSubmit={soumettreFormulaire} className="space-y-4">
           <div>
