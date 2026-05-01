@@ -32,16 +32,12 @@ export default function PageInscription() {
       });
 
       if (error) {
-        setErreur(
-          error.code === "USER_ALREADY_EXISTS"
-            ? "Un compte avec cet email existe déjà."
-            : "Une erreur est survenue. Veuillez réessayer."
-        );
+        setErreur(`[${error.code}] ${error.message}`);
       } else {
         router.push("/");
       }
-    } catch {
-      setErreur("Une erreur est survenue. Veuillez réessayer.");
+    } catch (e) {
+      setErreur(`Exception: ${e instanceof Error ? e.message : JSON.stringify(e)}`);
     } finally {
       setChargement(false);
     }
