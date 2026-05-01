@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession, signOut } from "@/lib/auth-client";
@@ -40,6 +40,30 @@ export default function PagePrincipale() {
   const [erreurAdaptation, setErreurAdaptation] = useState("");
   const [creditsRestants, setCreditsRestants] = useState<number | null>(null);
   const [exportEnCours, setExportEnCours] = useState<"pdf" | "docx" | null>(null);
+  const [autoAnalyse, setAutoAnalyse] = useState(false);
+
+  // Restaure le CV et l'offre sauvegardés avant une redirection vers /login
+  useEffect(() => {
+    const raw = sessionStorage.getItem("pendingAnalysis");
+    if (!raw) return;
+    sessionStorage.removeItem("pendingAnalysis");
+    try {
+      const { cv: c, offre: o, nomFichier: n } = JSON.parse(raw);
+      if (c) setCv(c);
+      if (o) setOffre(o);
+      if (n) { setNomFichier(n); setModeCV("upload"); }
+      setAutoAnalyse(true);
+    } catch {}
+  }, []);
+
+  // Lance l'analyse automatiquement une fois la session disponible
+  useEffect(() => {
+    if (autoAnalyse && session) {
+      setAutoAnalyse(false);
+      analyser(); // eslint-disable-line react-hooks/exhaustive-deps
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoAnalyse, session]);
 
   async function traiterFichier(fichier: File) {
     const ext = fichier.name.split(".").pop()?.toLowerCase();
@@ -66,6 +90,7 @@ export default function PagePrincipale() {
 
   async function analyser() {
     if (!session) {
+      sessionStorage.setItem("pendingAnalysis", JSON.stringify({ cv, offre, nomFichier }));
       router.push("/login");
       return;
     }

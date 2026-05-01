@@ -24,21 +24,26 @@ export default function PageInscription() {
       return;
     }
 
-    const { error } = await signUp.email({
-      name: nom,
-      email,
-      password: motDePasse,
-    });
+    try {
+      const { error } = await signUp.email({
+        name: nom,
+        email,
+        password: motDePasse,
+      });
 
-    if (error) {
-      setErreur(
-        error.code === "USER_ALREADY_EXISTS"
-          ? "Un compte avec cet email existe déjà."
-          : "Une erreur est survenue. Veuillez réessayer."
-      );
+      if (error) {
+        setErreur(
+          error.code === "USER_ALREADY_EXISTS"
+            ? "Un compte avec cet email existe déjà."
+            : "Une erreur est survenue. Veuillez réessayer."
+        );
+      } else {
+        router.push("/");
+      }
+    } catch {
+      setErreur("Une erreur est survenue. Veuillez réessayer.");
+    } finally {
       setChargement(false);
-    } else {
-      router.push("/");
     }
   }
 
