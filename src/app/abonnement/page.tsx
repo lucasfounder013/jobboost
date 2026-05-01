@@ -54,9 +54,14 @@ export default function PageAbonnement() {
         body: JSON.stringify({ plan }),
       });
       const data = await res.json();
+      if (!res.ok) {
+        setErreur(data.error ?? "Erreur lors de la création du paiement.");
+        setChargementPlan(null);
+        return;
+      }
       if (data.url) window.location.href = data.url;
     } catch {
-      setErreur("Impossible de contacter le serveur.");
+      setErreur("Erreur lors de la connexion au serveur de paiement.");
       setChargementPlan(null);
     }
   }

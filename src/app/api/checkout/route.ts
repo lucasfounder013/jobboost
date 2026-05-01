@@ -43,14 +43,36 @@ export async function POST(req: NextRequest) {
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL;
-  const checkoutSession = await stripe.checkout.sessions.create({
-    customer: customerId,
-    mode: "subscription",
-    line_items: [{ price: priceId, quantity: 1 }],
-    success_url: `${baseUrl}/success`,
-    cancel_url: `${baseUrl}/pricing`,
-    metadata: { userId: session.user.id },
-  });
+
+  // Si le customer_id est invalide (ex: créé en mode test, utilisé en mode live), on en crée un nouveau
+  let checkoutSession;
+  try {
+    checkoutSession = await stripe.checkout.sessions.create({
+      customer: customerId,
+      mode: "subscription",
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${baseUrl}/success`,
+      cancel_url: `${baseUrl}/pricing`,
+      metadata: { userId: session.user.id },
+    });
+  } catch {
+    const newCustomer = await stripe.customers.create({
+      email: session.user.email,
+      metadata: { userId: session.user.id },
+    });
+    await pool.query(
+      'UPDATE "user" SET stripe_customer_id = $1 WHERE id = $2',
+      [newCustomer.id, session.user.id]
+    );
+    checkoutSession = await stripe.checkout.sessions.create({
+      customer: newCustomer.id,
+      mode: "subscription",
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${baseUrl}/success`,
+      cancel_url: `${baseUrl}/pricing`,
+      metadata: { userId: session.user.id },
+    });
+  }
 
   return NextResponse.json({ url: checkoutSession.url });
 }
