@@ -5,14 +5,64 @@ import Link from "next/link";
 import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
+const FEATURES_GRATUIT = [
+  "5 analyses CV gratuites",
+  "1 adaptation CV gratuite",
+  "Export PDF ATS",
+  "Export Word (.docx)",
+];
+
+const FEATURES_PREMIUM = [
+  "Analyses CV illimitées",
+  "Adaptations CV illimitées",
+  "Export PDF ATS",
+  "Export Word (.docx)",
+  "Score de correspondance détaillé",
+];
+
+function Check({ color = "emerald" }: { color?: "emerald" | "gray" }) {
+  return (
+    <svg
+      className={`w-4 h-4 shrink-0 ${color === "emerald" ? "text-emerald-500" : "text-gray-300"}`}
+      fill="none" stroke="currentColor" viewBox="0 0 24 24"
+    >
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
+    </svg>
+  );
+}
+
 export default function PageAbonnement() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
-  const [chargement, setChargement] = useState(false);
+  const [chargementPlan, setChargementPlan] = useState<"hebdo" | "mensuel" | null>(null);
+  const [chargementPortail, setChargementPortail] = useState(false);
   const [erreur, setErreur] = useState("");
 
+  const estAbonne = (session?.user as { isSubscribed?: boolean } | undefined)?.isSubscribed ?? false;
+
+  async function souscrire(plan: "hebdo" | "mensuel") {
+    if (!session) {
+      router.push("/register");
+      return;
+    }
+    setChargementPlan(plan);
+    setErreur("");
+    try {
+      const res = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
+      const data = await res.json();
+      if (data.url) window.location.href = data.url;
+    } catch {
+      setErreur("Impossible de contacter le serveur.");
+      setChargementPlan(null);
+    }
+  }
+
   async function ouvrirPortail() {
-    setChargement(true);
+    setChargementPortail(true);
     setErreur("");
     try {
       const res = await fetch("/api/portal", { method: "POST" });
@@ -25,7 +75,7 @@ export default function PageAbonnement() {
     } catch {
       setErreur("Impossible de contacter le serveur.");
     } finally {
-      setChargement(false);
+      setChargementPortail(false);
     }
   }
 
@@ -56,56 +106,136 @@ export default function PageAbonnement() {
         </div>
       </header>
 
-      <main className="max-w-lg mx-auto px-6 py-16">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Mon abonnement</h1>
-        <p className="text-gray-500 text-sm mb-10">{session.user.email}</p>
+      <main className="max-w-3xl mx-auto px-6 py-14">
+        <h1 className="text-2xl font-bold text-gray-900 mb-1">Mon abonnement</h1>
+        <p className="text-gray-400 text-sm mb-10">{session.user.email}</p>
 
-        <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-8">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
-              <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-              </svg>
-            </div>
+        {erreur && <p className="text-red-500 text-sm mb-6">{erreur}</p>}
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+
+          {/* Plan Gratuit */}
+          <div className={`relative bg-white rounded-2xl p-6 flex flex-col gap-4 ${
+            !estAbonne ? "ring-2 ring-emerald-400" : "ring-1 ring-gray-200"
+          }`}>
+            {!estAbonne && (
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-xs font-bold px-3 py-0.5 rounded-full">
+                Plan actuel
+              </span>
+            )}
             <div>
-              <p className="font-semibold text-gray-900 text-sm">Abonnement JobBoost</p>
-              <p className="text-gray-400 text-xs">Analyses et adaptations CV illimitées</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Gratuit</p>
+              <div className="flex items-end gap-1">
+                <span className="text-3xl font-extrabold text-gray-900">0€</span>
+              </div>
+            </div>
+            <ul className="flex flex-col gap-2 flex-1">
+              {FEATURES_GRATUIT.map((f) => (
+                <li key={f} className="flex items-center gap-2 text-xs text-gray-500">
+                  <Check color="gray" />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            <div className={`w-full py-2.5 rounded-xl text-xs font-bold text-center ${
+              !estAbonne
+                ? "bg-emerald-50 text-emerald-600"
+                : "bg-gray-100 text-gray-400"
+            }`}>
+              {!estAbonne ? "Actif" : "Plan de base"}
             </div>
           </div>
 
-          <p className="text-gray-600 text-sm leading-relaxed mb-8">
-            Gérez votre abonnement directement depuis le portail sécurisé Stripe : changez de plan, mettez à jour votre moyen de paiement ou annulez à tout moment.
-          </p>
-
-          {erreur && (
-            <p className="text-red-500 text-sm mb-4">{erreur}</p>
-          )}
-
-          <button
-            onClick={ouvrirPortail}
-            disabled={chargement}
-            className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-3 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100 disabled:opacity-60 flex items-center justify-center gap-2"
-          >
-            {chargement ? (
-              <>
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                Chargement…
-              </>
+          {/* Plan Hebdomadaire */}
+          <div className={`relative bg-white rounded-2xl p-6 flex flex-col gap-4 ${
+            estAbonne ? "ring-1 ring-gray-200" : "ring-1 ring-gray-200"
+          }`}>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Hebdomadaire</p>
+              <div className="flex items-end gap-1">
+                <span className="text-3xl font-extrabold text-gray-900">4,99€</span>
+                <span className="text-gray-400 text-xs mb-1">/sem</span>
+              </div>
+            </div>
+            <ul className="flex flex-col gap-2 flex-1">
+              {FEATURES_PREMIUM.map((f) => (
+                <li key={f} className="flex items-center gap-2 text-xs text-gray-600">
+                  <Check />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            {estAbonne ? (
+              <button
+                onClick={ouvrirPortail}
+                disabled={chargementPortail}
+                className="w-full py-2.5 rounded-xl text-xs font-bold bg-gray-900 text-white hover:bg-gray-700 transition-colors disabled:opacity-60"
+              >
+                {chargementPortail ? "Chargement…" : "Gérer →"}
+              </button>
             ) : (
-              "Gérer mon abonnement →"
+              <button
+                onClick={() => souscrire("hebdo")}
+                disabled={chargementPlan !== null}
+                className="w-full py-2.5 rounded-xl text-xs font-bold bg-gray-900 text-white hover:bg-gray-700 transition-colors disabled:opacity-60"
+              >
+                {chargementPlan === "hebdo" ? "Redirection…" : "Choisir ce plan"}
+              </button>
             )}
-          </button>
+          </div>
 
-          <p className="text-gray-400 text-xs text-center mt-4">
-            Vous serez redirigé vers le portail sécurisé Stripe
+          {/* Plan Mensuel */}
+          <div className="relative bg-white rounded-2xl p-6 flex flex-col gap-4 ring-2 ring-indigo-500">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs font-bold px-3 py-0.5 rounded-full">
+              Recommandé
+            </span>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-indigo-400 mb-1">Mensuel</p>
+              <div className="flex items-end gap-1">
+                <span className="text-3xl font-extrabold text-gray-900">9,99€</span>
+                <span className="text-gray-400 text-xs mb-1">/mois</span>
+              </div>
+            </div>
+            <ul className="flex flex-col gap-2 flex-1">
+              {FEATURES_PREMIUM.map((f) => (
+                <li key={f} className="flex items-center gap-2 text-xs text-gray-600">
+                  <Check />
+                  {f}
+                </li>
+              ))}
+            </ul>
+            {estAbonne ? (
+              <button
+                onClick={ouvrirPortail}
+                disabled={chargementPortail}
+                className="w-full py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-500 to-violet-500 text-white hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
+              >
+                {chargementPortail ? "Chargement…" : "Gérer →"}
+              </button>
+            ) : (
+              <button
+                onClick={() => souscrire("mensuel")}
+                disabled={chargementPlan !== null}
+                className="w-full py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-500 to-violet-500 text-white hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
+              >
+                {chargementPlan === "mensuel" ? "Redirection…" : "Choisir ce plan"}
+              </button>
+            )}
+          </div>
+
+        </div>
+
+        {estAbonne && (
+          <p className="text-center text-xs text-gray-400 mt-8">
+            Paiement sécurisé par Stripe · Résiliation en 1 clic depuis le portail
           </p>
-        </div>
+        )}
 
-        <div className="mt-6 text-center">
-          <Link href="/pricing" className="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
-            Voir les formules disponibles
-          </Link>
-        </div>
+        {!estAbonne && (
+          <p className="text-center text-xs text-gray-400 mt-8">
+            Paiement sécurisé par Stripe · Sans engagement · Résiliation en 1 clic
+          </p>
+        )}
       </main>
     </div>
   );
