@@ -267,13 +267,13 @@ export default function PagePrincipale() {
               <>
                 <Link
                   href="/login"
-                  className="text-gray-500 hover:text-gray-900 font-medium transition-colors"
+                  className="border border-gray-200 hover:border-indigo-300 text-gray-600 hover:text-indigo-600 px-4 py-1.5 rounded-lg font-semibold transition-colors text-sm"
                 >
                   Connexion
                 </Link>
                 <Link
                   href="/register"
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg font-semibold transition-colors text-sm"
+                  className="bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white px-4 py-1.5 rounded-lg font-semibold transition-all text-sm shadow-md shadow-indigo-100"
                 >
                   S&apos;inscrire
                 </Link>
