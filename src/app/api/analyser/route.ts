@@ -65,6 +65,7 @@ ${offre}
 Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans backticks) avec cette structure exacte :
 {
   "score": <nombre entier de 0 à 100>,
+  "nomPoste": "<titre du poste extrait de l'offre d'emploi, ex: 'Développeur React Senior'>",
   "resume": "<2-3 phrases d'analyse globale en français>",
   "categories": {
     "recherchabilite": {
