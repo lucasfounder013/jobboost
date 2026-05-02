@@ -20,7 +20,7 @@ export default function PageConnexion() {
     const { error } = await signIn.email({
       email,
       password: motDePasse,
-      callbackURL: "/",
+      callbackURL: Boolean(localStorage.getItem("pendingAnalysis")) ? "/dashboard" : "/",
     });
 
     if (error) {
@@ -31,7 +31,8 @@ export default function PageConnexion() {
       );
       setChargement(false);
     } else {
-      router.push("/");
+      const hasPending = Boolean(localStorage.getItem("pendingAnalysis"));
+      router.push(hasPending ? "/dashboard" : "/");
     }
   }
 

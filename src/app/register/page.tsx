@@ -38,7 +38,8 @@ export default function PageInscription() {
             : "Une erreur est survenue. Veuillez réessayer."
         );
       } else {
-        router.push("/");
+        const hasPending = Boolean(localStorage.getItem("pendingAnalysis"));
+        router.push(hasPending ? "/dashboard" : "/");
       }
     } catch {
       setErreur("Une erreur est survenue. Veuillez réessayer.");

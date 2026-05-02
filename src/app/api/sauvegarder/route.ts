@@ -13,18 +13,37 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json() as {
+    analyseId?: string;
     nomOffre: string;
-    score: number;
-    resume: string;
-    motsClesManquants: string[];
-    motsClesPresents: string[];
+    score?: number;
+    resume?: string;
+    motsClesManquants?: string[];
+    motsClesPresents?: string[];
     cvAdapte?: CVStructure;
   };
 
-  const { nomOffre, score, resume, motsClesManquants, motsClesPresents, cvAdapte } = body;
+  const { analyseId, nomOffre, score, resume, motsClesManquants, motsClesPresents, cvAdapte } = body;
 
-  if (!nomOffre || typeof score !== "number") {
+  if (!nomOffre) {
     return NextResponse.json({ error: "Paramètres manquants." }, { status: 400 });
+  }
+
+  // Cas B : ajouter un CV adapté à une analyse existante
+  if (analyseId && typeof score === "undefined") {
+    if (!cvAdapte) {
+      return NextResponse.json({ error: "CV adapté manquant." }, { status: 400 });
+    }
+    await pool.query(
+      `INSERT INTO cv_adapte (user_id, analyse_id, nom_offre, cv_data)
+       VALUES ($1, $2, $3, $4)`,
+      [session.user.id, analyseId, nomOffre, JSON.stringify(cvAdapte)]
+    );
+    return NextResponse.json({ analyseId });
+  }
+
+  // Cas A : créer une nouvelle analyse (+ optionnellement un CV adapté)
+  if (typeof score !== "number") {
+    return NextResponse.json({ error: "Score manquant." }, { status: 400 });
   }
 
   const { rows } = await pool.query(
@@ -33,15 +52,15 @@ export async function POST(req: NextRequest) {
      RETURNING id`,
     [session.user.id, nomOffre, score, resume ?? "", JSON.stringify(motsClesManquants ?? []), JSON.stringify(motsClesPresents ?? [])]
   );
-  const analyseId: string = rows[0].id;
+  const nouvelAnalyseId: string = rows[0].id;
 
   if (cvAdapte) {
     await pool.query(
       `INSERT INTO cv_adapte (user_id, analyse_id, nom_offre, cv_data)
        VALUES ($1, $2, $3, $4)`,
-      [session.user.id, analyseId, nomOffre, JSON.stringify(cvAdapte)]
+      [session.user.id, nouvelAnalyseId, nomOffre, JSON.stringify(cvAdapte)]
     );
   }
 
-  return NextResponse.json({ analyseId });
+  return NextResponse.json({ analyseId: nouvelAnalyseId });
 }

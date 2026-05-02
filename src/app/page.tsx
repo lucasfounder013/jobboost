@@ -43,9 +43,8 @@ export default function PagePrincipale() {
   const [estAbonne, setEstAbonne] = useState(false);
   const [exportEnCours, setExportEnCours] = useState<"pdf" | "docx" | null>(null);
   const [autoAnalyse, setAutoAnalyse] = useState(false);
-  const [nomPoste, setNomPoste] = useState("");
-  const [panneauSauvegarde, setPanneauSauvegarde] = useState(false);
-  const [sauvegardEnCours, setSauvegardeEnCours] = useState(false);
+  const [analyseId, setAnalyseId] = useState<string | null>(null);
+  const [nomPosteEnregistre, setNomPosteEnregistre] = useState("");
 
   // Restaure le CV et l'offre sauvegardés avant une redirection (login ou Stripe)
   useEffect(() => {
@@ -124,8 +123,7 @@ export default function PagePrincipale() {
       setResultat(data);
       setScansRestants(data.scansRestants ?? null);
       if (data.scansRestants === null) setEstAbonne(true);
-      setNomPoste(data.nomPoste ?? "");
-      setPanneauSauvegarde(false);
+      sauvegarderAnalyse(data).catch(() => {});
     } catch {
       setErreur("Une erreur est survenue. Veuillez réessayer.");
     } finally {
@@ -148,6 +146,7 @@ export default function PagePrincipale() {
       if (!reponse.ok) throw new Error(data.error);
       setCvAdapte(data.cvAdapte);
       setCreditsRestants(data.creditsRestants);
+      sauvegarderCvAdapte(data.cvAdapte).catch(() => {});
     } catch (e) {
       setErreurAdaptation(e instanceof Error ? e.message : "Une erreur est survenue.");
     } finally {
@@ -155,29 +154,37 @@ export default function PagePrincipale() {
     }
   }
 
-  async function sauvegarder() {
-    if (!resultat) return;
-    setSauvegardeEnCours(true);
-    try {
-      const reponse = await fetch("/api/sauvegarder", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nomOffre: nomPoste.trim() || "Offre sans titre",
-          score: resultat.score,
-          resume: resultat.resume,
-          motsClesManquants: resultat.motsClesManquants,
-          motsClesPresents: resultat.motsClesPresents,
-          cvAdapte: cvAdapte ?? undefined,
-        }),
-      });
-      if (!reponse.ok) throw new Error();
-      router.push("/dashboard");
-    } catch {
-      // silencieux — le bouton se débloque
-    } finally {
-      setSauvegardeEnCours(false);
+  async function sauvegarderAnalyse(data: ResultatAnalyse & { nomPoste?: string }) {
+    const nomOffre = data.nomPoste || nomFichier || "Analyse sans titre";
+    setNomPosteEnregistre(nomOffre);
+    const reponse = await fetch("/api/sauvegarder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nomOffre,
+        score: data.score,
+        resume: data.resume,
+        motsClesManquants: data.motsClesManquants,
+        motsClesPresents: data.motsClesPresents,
+      }),
+    });
+    if (reponse.ok) {
+      const json = await reponse.json();
+      setAnalyseId(json.analyseId);
     }
+  }
+
+  async function sauvegarderCvAdapte(cv: CVStructure) {
+    const nomOffre = nomPosteEnregistre || nomFichier || "Analyse sans titre";
+    await fetch("/api/sauvegarder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(
+        analyseId
+          ? { analyseId, nomOffre, cvAdapte: cv }
+          : { nomOffre, score: resultat?.score ?? 0, resume: resultat?.resume ?? "", motsClesManquants: resultat?.motsClesManquants ?? [], motsClesPresents: resultat?.motsClesPresents ?? [], cvAdapte: cv }
+      ),
+    });
   }
 
   async function exporterCV(format: "pdf" | "docx") {
@@ -628,59 +635,18 @@ export default function PagePrincipale() {
 
             </div>
 
-            {/* Bouton Sauvegarder */}
-            {session && (
-              <div className="mt-5 flex flex-col items-end gap-3">
-                {!panneauSauvegarde ? (
-                  <button
-                    onClick={() => setPanneauSauvegarde(true)}
-                    className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-xl transition-colors"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                    </svg>
-                    Sauvegarder cette analyse
-                  </button>
-                ) : (
-                  <div className="w-full bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm p-5 flex flex-col gap-4">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Sauvegarder l&apos;analyse</p>
-                    <div className="flex flex-col gap-1.5">
-                      <label className="text-xs font-medium text-gray-600">Nom du poste</label>
-                      <input
-                        type="text"
-                        value={nomPoste}
-                        onChange={(e) => setNomPoste(e.target.value)}
-                        placeholder="Ex : Développeur React — Doctolib"
-                        className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-300 transition"
-                      />
-                    </div>
-                    <div className="flex gap-2 justify-end">
-                      <button
-                        onClick={() => setPanneauSauvegarde(false)}
-                        className="text-sm font-medium text-gray-400 hover:text-gray-700 px-4 py-2 rounded-xl transition-colors"
-                      >
-                        Annuler
-                      </button>
-                      <button
-                        onClick={sauvegarder}
-                        disabled={sauvegardEnCours}
-                        className="flex items-center gap-2 text-sm font-semibold bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
-                      >
-                        {sauvegardEnCours ? (
-                          <>
-                            <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                            </svg>
-                            Sauvegarde...
-                          </>
-                        ) : (
-                          "Confirmer la sauvegarde →"
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                )}
+            {/* Lien vers le dashboard */}
+            {session && analyseId && (
+              <div className="mt-5 flex justify-end">
+                <Link
+                  href="/dashboard"
+                  className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-xl transition-colors"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                  </svg>
+                  Revenir au dashboard →
+                </Link>
               </div>
             )}
 
