@@ -12,7 +12,9 @@ export async function GET() {
   }
 
   const { rows: analyses } = await pool.query(
-    `SELECT a.id, a.nom_offre, a.score, a.created_at, cv.id AS cv_adapte_id
+    `SELECT a.id, a.nom_offre, a.score, a.created_at,
+            a.resume, a.mots_cles_manquants, a.mots_cles_presents,
+            cv.id AS cv_adapte_id
      FROM analyses a
      LEFT JOIN cv_adapte cv ON cv.analyse_id = a.id
      WHERE a.user_id = $1
