@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession, signOut } from "@/lib/auth-client";
 import CVPreview from "@/components/CVPreview";
+import Footer from "@/components/Footer";
 import { CVStructure } from "@/types/cv";
 
 type Probleme = { statut: "ok" | "avertissement" | "erreur"; message: string };
@@ -719,11 +720,7 @@ export default function PagePrincipale() {
         )}
       </main>
 
-      <footer className="border-t border-gray-100 py-6 text-center text-xs text-gray-300 font-medium tracking-wide">
-        © 2026 JobBoost — L&apos;alternative française à Jobscan
-        <span className="mx-2">·</span>
-        <a href="mailto:contact@jobboost.fr" className="hover:text-gray-500 transition-colors">contact@jobboost.fr</a>
-      </footer>
+      <Footer />
 
     </div>
   );

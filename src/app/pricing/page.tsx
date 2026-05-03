@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Footer from "@/components/Footer";
 import { useSession, signOut } from "@/lib/auth-client";
 
 const FEATURES_GRATUIT = [
@@ -177,11 +178,7 @@ export default function PagePricing() {
         </section>
       </main>
 
-      <footer className="border-t border-gray-100 py-6 text-center text-xs text-gray-300 font-medium tracking-wide">
-        © 2026 JobBoost — L&apos;alternative française à Jobscan
-        <span className="mx-2">·</span>
-        Une question ? <a href="mailto:contact@jobboost.fr" className="hover:text-gray-500 transition-colors">contact@jobboost.fr</a>
-      </footer>
+      <Footer />
     </div>
   );
 }
