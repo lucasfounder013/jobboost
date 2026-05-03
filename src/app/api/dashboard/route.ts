@@ -30,5 +30,17 @@ export async function GET() {
     [session.user.id]
   );
 
-  return NextResponse.json({ analyses, cvsAdaptes });
+  const { rows: userRows } = await pool.query(
+    'SELECT scans, credits, is_subscribed FROM "user" WHERE id = $1',
+    [session.user.id]
+  );
+  const utilisateur = userRows[0] ?? { scans: 0, credits: 0, is_subscribed: false };
+
+  return NextResponse.json({
+    analyses,
+    cvsAdaptes,
+    scans: utilisateur.scans,
+    credits: utilisateur.credits,
+    estAbonne: utilisateur.is_subscribed,
+  });
 }

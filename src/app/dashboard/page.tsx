@@ -89,6 +89,7 @@ export default function Dashboard() {
   const [analyseId, setAnalyseId] = useState<string | null>(null);
   const [nomPosteEnregistre, setNomPosteEnregistre] = useState("");
   const [autoAnalyse, setAutoAnalyse] = useState(false);
+  const [modaleUpgrade, setModaleUpgrade] = useState<"scans" | "credits" | null>(null);
 
   // ── Auth redirect
   useEffect(() => {
@@ -102,6 +103,14 @@ export default function Dashboard() {
       .then((data) => {
         setAnalyses(data.analyses ?? []);
         setCvsAdaptes(data.cvsAdaptes ?? []);
+        if (data.estAbonne) {
+          setEstAbonne(true);
+          setScansRestants(null);
+          setCreditsRestants(null);
+        } else {
+          setScansRestants(data.scans ?? 0);
+          setCreditsRestants(data.credits ?? 0);
+        }
       })
       .finally(() => setChargementHistorique(false));
   };
@@ -190,7 +199,7 @@ export default function Dashboard() {
         body: JSON.stringify({ cv, offre }),
       });
       const data = await reponse.json();
-      if (reponse.status === 403) { setErreur(data.error); return; }
+      if (reponse.status === 403) { setModaleUpgrade("scans"); return; }
       if (!reponse.ok) throw new Error("Erreur lors de l'analyse.");
       setResultat(data);
       setScansRestants(data.scansRestants ?? null);
@@ -216,6 +225,7 @@ export default function Dashboard() {
         body: JSON.stringify({ cv, offre, motsClesManquants: resultat.motsClesManquants }),
       });
       const data = await reponse.json();
+      if (reponse.status === 403) { setModaleUpgrade("credits"); return; }
       if (!reponse.ok) throw new Error(data.error);
       setCvAdapte(data.cvAdapte);
       setCreditsRestants(data.creditsRestants);
@@ -307,7 +317,7 @@ export default function Dashboard() {
           </Link>
         </div>
 
-        <div className="px-4 pt-5">
+        <div className="px-4 pt-5 flex flex-col gap-2">
           <button
             onClick={() => { setVue("nouvelle-analyse"); setResultat(null); setCvAdapte(null); setErreur(""); setCv(""); setOffre(""); setNomFichier(""); setModeCV("upload"); setAnalyseId(null); }}
             className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold text-sm py-2.5 px-4 rounded-xl transition-all shadow-lg shadow-indigo-900/40"
@@ -317,6 +327,36 @@ export default function Dashboard() {
             </svg>
             Nouvelle analyse
           </button>
+          {!chargementHistorique && (
+            estAbonne ? (
+              <div className="flex items-center justify-center gap-1.5 text-xs text-emerald-400 font-medium py-1">
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                Analyses illimitées
+              </div>
+            ) : (
+              <div className="bg-indigo-900/50 rounded-xl px-3 py-2 flex flex-col gap-1">
+                <div className="flex items-center justify-between text-xs">
+                  <span className="text-indigo-300">Analyses</span>
+                  <span className={`font-bold ${(scansRestants ?? 0) === 0 ? "text-rose-400" : "text-white"}`}>{scansRestants ?? 0}/5</span>
+                </div>
+                <div className="w-full bg-indigo-800 rounded-full h-1.5">
+                  <div
+                    className={`h-1.5 rounded-full transition-all ${(scansRestants ?? 0) === 0 ? "bg-rose-400" : "bg-indigo-400"}`}
+                    style={{ width: `${Math.max(0, Math.min(100, ((scansRestants ?? 0) / 5) * 100))}%` }}
+                  />
+                </div>
+                <div className="flex items-center justify-between text-xs mt-0.5">
+                  <span className="text-indigo-300">Adaptation CV</span>
+                  <span className={`font-bold ${(creditsRestants ?? 0) === 0 ? "text-rose-400" : "text-white"}`}>{(creditsRestants ?? 0) > 0 ? `${creditsRestants} crédit` : "0 crédit"}</span>
+                </div>
+                {((scansRestants ?? 0) <= 2 || (creditsRestants ?? 0) === 0) && (
+                  <Link href="/pricing" className="mt-1 text-center text-xs font-semibold text-indigo-300 hover:text-white bg-indigo-800/60 hover:bg-indigo-700/60 rounded-lg py-1.5 transition-colors">
+                    Passer à l&apos;abonnement →
+                  </Link>
+                )}
+              </div>
+            )
+          )}
         </div>
 
         <nav className="flex-1 px-3 pt-6 flex flex-col gap-1">
@@ -826,6 +866,46 @@ export default function Dashboard() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modale upgrade freemium */}
+      {modaleUpgrade && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setModaleUpgrade(null)} />
+          <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 flex flex-col items-center text-center gap-5">
+            <button onClick={() => setModaleUpgrade(null)} className="absolute top-4 right-4 text-gray-300 hover:text-gray-500 transition-colors">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-3xl">
+              {modaleUpgrade === "scans" ? "⚡" : "✨"}
+            </div>
+            <div>
+              <h2 className="text-xl font-extrabold text-gray-900 mb-2">
+                {modaleUpgrade === "scans" ? "Limite d'analyses atteinte" : "Plus de crédits disponibles"}
+              </h2>
+              <p className="text-gray-500 text-sm leading-relaxed">
+                {modaleUpgrade === "scans"
+                  ? "Vous avez utilisé vos 5 analyses gratuites. Passez à un abonnement pour analyser autant de CV que vous le souhaitez."
+                  : "Votre crédit d'adaptation CV gratuit a été utilisé. Passez à un abonnement pour adapter votre CV en illimité."}
+              </p>
+            </div>
+            <div className="w-full flex flex-col gap-2.5">
+              <Link
+                href="/pricing"
+                className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-3 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100"
+                onClick={() => setModaleUpgrade(null)}
+              >
+                Voir les abonnements →
+              </Link>
+              <button
+                onClick={() => setModaleUpgrade(null)}
+                className="w-full text-gray-400 hover:text-gray-600 text-sm font-medium py-2 transition-colors"
+              >
+                Fermer
+              </button>
             </div>
           </div>
         </div>
