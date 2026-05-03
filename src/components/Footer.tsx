@@ -15,8 +15,6 @@ export default function Footer() {
         <Link href="/politique-cookies" className="hover:text-gray-500 transition-colors">Cookies</Link>
       </div>
       <div>
-        © 2026 JobBoost — L&apos;alternative française à Jobscan
-        <span className="mx-2">·</span>
         <a href="mailto:contact@jobboost.fr" className="hover:text-gray-500 transition-colors">contact@jobboost.fr</a>
       </div>
     </footer>
