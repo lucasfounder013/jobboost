@@ -37,6 +37,8 @@ type AnalyseSauvegardee = {
   cv_adapte_id: string | null;
   cv_texte?: string | null;
   offre_texte?: string | null;
+  cv_fichier_nom?: string | null;
+  cv_fichier_type?: string | null;
 };
 
 type CvAdapteSauvegarde = {
@@ -75,6 +77,7 @@ export default function Dashboard() {
   const [cv, setCv] = useState("");
   const [offre, setOffre] = useState("");
   const [nomFichier, setNomFichier] = useState("");
+  const [fichierOriginal, setFichierOriginal] = useState<File | null>(null);
   const [modeCV, setModeCV] = useState<"upload" | "texte">("upload");
   const [extractionEnCours, setExtractionEnCours] = useState(false);
   const [dragActif, setDragActif] = useState(false);
@@ -184,6 +187,7 @@ export default function Dashboard() {
       if (!reponse.ok) throw new Error(data.error);
       setCv(data.texte);
       setNomFichier(fichier.name);
+      setFichierOriginal(fichier);
     } catch (e) {
       setErreur(e instanceof Error ? e.message : "Impossible d'extraire le texte du fichier.");
     } finally {
@@ -267,6 +271,13 @@ export default function Dashboard() {
     if (reponse.ok) {
       const json = await reponse.json();
       setAnalyseId(json.analyseId);
+      // Sauvegarder le fichier original si l'utilisateur avait uploadé un PDF/DOCX
+      if (fichierOriginal) {
+        const fd = new FormData();
+        fd.append("fichier", fichierOriginal);
+        fd.append("analyseId", json.analyseId);
+        fetch("/api/sauvegarder-fichier", { method: "POST", body: fd }).catch(() => {});
+      }
     }
   }
 
@@ -671,7 +682,7 @@ export default function Dashboard() {
                         </div>
                       )}
                     </label>
-                    <button onClick={() => setModeCV("texte")} className="text-xs text-indigo-500 hover:text-indigo-700 font-medium text-center transition-colors">Ou coller le texte →</button>
+                    <button onClick={() => { setModeCV("texte"); setFichierOriginal(null); }} className="text-xs text-indigo-500 hover:text-indigo-700 font-medium text-center transition-colors">Ou coller le texte →</button>
                   </div>
                 ) : (
                   <textarea value={cv} onChange={(e) => setCv(e.target.value)} placeholder="Collez ici le contenu de votre CV..." className="w-full min-h-56 p-5 text-sm text-gray-700 placeholder-gray-300 resize-none focus:outline-none bg-transparent leading-relaxed" />
@@ -974,8 +985,27 @@ export default function Dashboard() {
 
               {/* Onglet CV original */}
               {ongletAnalyse === "cv" && (
-                <div className="p-6">
-                  {analyseOuverte.cv_texte ? (
+                <div className="p-6 flex flex-col gap-4">
+                  {analyseOuverte.cv_fichier_nom ? (
+                    /* Fichier original disponible → bouton de téléchargement */
+                    <div className="flex items-center gap-4 bg-gray-50 rounded-xl p-4 ring-1 ring-gray-100">
+                      <div className="w-10 h-10 rounded-lg bg-white ring-1 ring-gray-200 flex items-center justify-center shrink-0">
+                        <span className="text-xs font-bold uppercase text-gray-500">{analyseOuverte.cv_fichier_type}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 truncate">{analyseOuverte.cv_fichier_nom}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">Fichier original</p>
+                      </div>
+                      <a
+                        href={`/api/telecharger-cv/${analyseOuverte.id}`}
+                        download={analyseOuverte.cv_fichier_nom}
+                        className="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-2 rounded-lg transition-colors shrink-0"
+                      >
+                        Télécharger
+                      </a>
+                    </div>
+                  ) : analyseOuverte.cv_texte ? (
+                    /* Texte collé → afficher le texte brut */
                     <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed bg-gray-50 rounded-xl p-4 ring-1 ring-gray-100">
                       {analyseOuverte.cv_texte}
                     </pre>
