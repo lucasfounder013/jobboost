@@ -35,6 +35,8 @@ type AnalyseSauvegardee = {
   mots_cles_manquants?: string[];
   mots_cles_presents?: string[];
   cv_adapte_id: string | null;
+  cv_texte?: string | null;
+  offre_texte?: string | null;
 };
 
 type CvAdapteSauvegarde = {
@@ -92,11 +94,17 @@ export default function Dashboard() {
   const [modaleUpgrade, setModaleUpgrade] = useState<"scans" | "credits" | null>(null);
   const [suppressionEnCours, setSuppressionEnCours] = useState<string | null>(null);
   const [editionPoste, setEditionPoste] = useState<{ id: string; valeur: string } | null>(null);
+  const [ongletAnalyse, setOngletAnalyse] = useState<"resultats" | "offre" | "cv">("resultats");
 
   // ── Auth redirect
   useEffect(() => {
     if (!isPending && !session) router.push("/login");
   }, [session, isPending, router]);
+
+  // ── Réinitialiser l'onglet du drawer à chaque ouverture
+  useEffect(() => {
+    if (analyseOuverte) setOngletAnalyse("resultats");
+  }, [analyseOuverte]);
 
   // ── Chargement historique
   const chargerHistorique = () => {
@@ -252,6 +260,8 @@ export default function Dashboard() {
         resume: data.resume,
         motsClesManquants: data.motsClesManquants,
         motsClesPresents: data.motsClesPresents,
+        cvTexte: cv,
+        offreTexte: offre,
       }),
     });
     if (reponse.ok) {
@@ -871,54 +881,112 @@ export default function Dashboard() {
                 </button>
               </div>
             </div>
-            <div className="flex-1 overflow-y-auto p-6 flex flex-col gap-6">
-              {/* Score */}
-              <div className="flex items-center gap-5">
-                <div className={`w-20 h-20 rounded-full ring-4 shrink-0 flex flex-col items-center justify-center ${ringScore(analyseOuverte.score)}`}>
-                  <span className={`text-2xl font-extrabold tabular-nums leading-none ${couleurScore(analyseOuverte.score)}`}>{analyseOuverte.score}</span>
-                  <span className={`text-xs font-bold ${couleurScore(analyseOuverte.score)}`}>%</span>
-                </div>
-                <div>
-                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full ring-1 ${bgScore(analyseOuverte.score)}`}>{labelScore(analyseOuverte.score)}</span>
-                  <p className="text-xs text-gray-400 mt-2">{formaterDate(analyseOuverte.created_at)}</p>
-                </div>
-              </div>
+            {/* Barre d'onglets */}
+            <div className="flex border-b border-gray-100 px-6 shrink-0">
+              {([
+                { key: "resultats", label: "Résultats" },
+                { key: "offre", label: "Offre d'emploi" },
+                { key: "cv", label: "CV original" },
+              ] as const).map(({ key, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setOngletAnalyse(key)}
+                  className={`text-sm font-medium px-4 py-3 border-b-2 -mb-px transition-colors ${
+                    ongletAnalyse === key
+                      ? "border-indigo-500 text-indigo-600"
+                      : "border-transparent text-gray-400 hover:text-gray-600"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
 
-              {/* Résumé */}
-              {analyseOuverte.resume && (
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">Analyse</p>
-                  <p className="text-sm text-gray-700 leading-relaxed">{analyseOuverte.resume}</p>
-                </div>
-              )}
+            <div className="flex-1 overflow-y-auto">
 
-              {/* Mots-clés manquants */}
-              {analyseOuverte.mots_cles_manquants && analyseOuverte.mots_cles_manquants.length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">
-                    Mots-clés manquants <span className="text-rose-500">({analyseOuverte.mots_cles_manquants.length})</span>
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {analyseOuverte.mots_cles_manquants.map((mot) => (
-                      <span key={mot} className="bg-rose-50 text-rose-600 border border-rose-100 px-3 py-1 rounded-full text-xs font-semibold">{mot}</span>
-                    ))}
+              {/* Onglet Résultats */}
+              {ongletAnalyse === "resultats" && (
+                <div className="p-6 flex flex-col gap-6">
+                  {/* Score */}
+                  <div className="flex items-center gap-5">
+                    <div className={`w-20 h-20 rounded-full ring-4 shrink-0 flex flex-col items-center justify-center ${ringScore(analyseOuverte.score)}`}>
+                      <span className={`text-2xl font-extrabold tabular-nums leading-none ${couleurScore(analyseOuverte.score)}`}>{analyseOuverte.score}</span>
+                      <span className={`text-xs font-bold ${couleurScore(analyseOuverte.score)}`}>%</span>
+                    </div>
+                    <div>
+                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ring-1 ${bgScore(analyseOuverte.score)}`}>{labelScore(analyseOuverte.score)}</span>
+                      <p className="text-xs text-gray-400 mt-2">{formaterDate(analyseOuverte.created_at)}</p>
+                    </div>
                   </div>
+
+                  {/* Résumé */}
+                  {analyseOuverte.resume && (
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">Analyse</p>
+                      <p className="text-sm text-gray-700 leading-relaxed">{analyseOuverte.resume}</p>
+                    </div>
+                  )}
+
+                  {/* Mots-clés manquants */}
+                  {analyseOuverte.mots_cles_manquants && analyseOuverte.mots_cles_manquants.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">
+                        Mots-clés manquants <span className="text-rose-500">({analyseOuverte.mots_cles_manquants.length})</span>
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {analyseOuverte.mots_cles_manquants.map((mot) => (
+                          <span key={mot} className="bg-rose-50 text-rose-600 border border-rose-100 px-3 py-1 rounded-full text-xs font-semibold">{mot}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Mots-clés présents */}
+                  {analyseOuverte.mots_cles_presents && analyseOuverte.mots_cles_presents.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">
+                        Mots-clés présents <span className="text-emerald-600">({analyseOuverte.mots_cles_presents.length})</span>
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {analyseOuverte.mots_cles_presents.map((mot) => (
+                          <span key={mot} className="bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1 rounded-full text-xs font-semibold">{mot}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
-              {/* Mots-clés présents */}
-              {analyseOuverte.mots_cles_presents && analyseOuverte.mots_cles_presents.length > 0 && (
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-2">
-                    Mots-clés présents <span className="text-emerald-600">({analyseOuverte.mots_cles_presents.length})</span>
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {analyseOuverte.mots_cles_presents.map((mot) => (
-                      <span key={mot} className="bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1 rounded-full text-xs font-semibold">{mot}</span>
-                    ))}
-                  </div>
+              {/* Onglet Offre d'emploi */}
+              {ongletAnalyse === "offre" && (
+                <div className="p-6">
+                  {analyseOuverte.offre_texte ? (
+                    <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed bg-gray-50 rounded-xl p-4 ring-1 ring-gray-100">
+                      {analyseOuverte.offre_texte}
+                    </pre>
+                  ) : (
+                    <p className="text-sm text-gray-400 italic">
+                      Offre non disponible — analysée avant l&apos;activation de cette fonctionnalité.
+                    </p>
+                  )}
                 </div>
               )}
+
+              {/* Onglet CV original */}
+              {ongletAnalyse === "cv" && (
+                <div className="p-6">
+                  {analyseOuverte.cv_texte ? (
+                    <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed bg-gray-50 rounded-xl p-4 ring-1 ring-gray-100">
+                      {analyseOuverte.cv_texte}
+                    </pre>
+                  ) : (
+                    <p className="text-sm text-gray-400 italic">
+                      CV non disponible — analysé avant l&apos;activation de cette fonctionnalité.
+                    </p>
+                  )}
+                </div>
+              )}
+
             </div>
           </div>
         </div>

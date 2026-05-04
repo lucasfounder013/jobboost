@@ -20,9 +20,11 @@ export async function POST(req: NextRequest) {
     motsClesManquants?: string[];
     motsClesPresents?: string[];
     cvAdapte?: CVStructure;
+    cvTexte?: string;
+    offreTexte?: string;
   };
 
-  const { analyseId, nomOffre, score, resume, motsClesManquants, motsClesPresents, cvAdapte } = body;
+  const { analyseId, nomOffre, score, resume, motsClesManquants, motsClesPresents, cvAdapte, cvTexte, offreTexte } = body;
 
   if (!nomOffre) {
     return NextResponse.json({ error: "Paramètres manquants." }, { status: 400 });
@@ -47,10 +49,10 @@ export async function POST(req: NextRequest) {
   }
 
   const { rows } = await pool.query(
-    `INSERT INTO analyses (user_id, nom_offre, score, resume, mots_cles_manquants, mots_cles_presents)
-     VALUES ($1, $2, $3, $4, $5, $6)
+    `INSERT INTO analyses (user_id, nom_offre, score, resume, mots_cles_manquants, mots_cles_presents, cv_texte, offre_texte)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
      RETURNING id`,
-    [session.user.id, nomOffre, score, resume ?? "", JSON.stringify(motsClesManquants ?? []), JSON.stringify(motsClesPresents ?? [])]
+    [session.user.id, nomOffre, score, resume ?? "", JSON.stringify(motsClesManquants ?? []), JSON.stringify(motsClesPresents ?? []), cvTexte ?? null, offreTexte ?? null]
   );
   const nouvelAnalyseId: string = rows[0].id;
 
