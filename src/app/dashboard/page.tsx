@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession, signOut } from "@/lib/auth-client";
@@ -78,6 +78,7 @@ export default function Dashboard() {
   const [offre, setOffre] = useState("");
   const [nomFichier, setNomFichier] = useState("");
   const [fichierOriginal, setFichierOriginal] = useState<File | null>(null);
+  const fichierOriginalRef = useRef<File | null>(null);
   const [modeCV, setModeCV] = useState<"upload" | "texte">("upload");
   const [extractionEnCours, setExtractionEnCours] = useState(false);
   const [dragActif, setDragActif] = useState(false);
@@ -188,6 +189,7 @@ export default function Dashboard() {
       setCv(data.texte);
       setNomFichier(fichier.name);
       setFichierOriginal(fichier);
+      fichierOriginalRef.current = fichier;
     } catch (e) {
       setErreur(e instanceof Error ? e.message : "Impossible d'extraire le texte du fichier.");
     } finally {
@@ -272,12 +274,19 @@ export default function Dashboard() {
       const json = await reponse.json();
       setAnalyseId(json.analyseId);
       // Sauvegarder le fichier original si l'utilisateur avait uploadé un PDF/DOCX
-      if (fichierOriginal) {
-        const fd = new FormData();
-        fd.append("fichier", fichierOriginal);
-        fd.append("analyseId", json.analyseId);
-        fetch("/api/sauvegarder-fichier", { method: "POST", body: fd }).catch(() => {});
+      // Utilise une ref pour éviter le problème de stale closure
+      const fichier = fichierOriginalRef.current;
+      if (fichier) {
+        try {
+          const fd = new FormData();
+          fd.append("fichier", fichier);
+          fd.append("analyseId", json.analyseId);
+          await fetch("/api/sauvegarder-fichier", { method: "POST", body: fd });
+        } catch {
+          // Erreur silencieuse — le texte extrait est toujours disponible en fallback
+        }
       }
+      chargerHistorique();
     }
   }
 
@@ -682,7 +691,7 @@ export default function Dashboard() {
                         </div>
                       )}
                     </label>
-                    <button onClick={() => { setModeCV("texte"); setFichierOriginal(null); }} className="text-xs text-indigo-500 hover:text-indigo-700 font-medium text-center transition-colors">Ou coller le texte →</button>
+                    <button onClick={() => { setModeCV("texte"); setFichierOriginal(null); fichierOriginalRef.current = null; }} className="text-xs text-indigo-500 hover:text-indigo-700 font-medium text-center transition-colors">Ou coller le texte →</button>
                   </div>
                 ) : (
                   <textarea value={cv} onChange={(e) => setCv(e.target.value)} placeholder="Collez ici le contenu de votre CV..." className="w-full min-h-56 p-5 text-sm text-gray-700 placeholder-gray-300 resize-none focus:outline-none bg-transparent leading-relaxed" />
