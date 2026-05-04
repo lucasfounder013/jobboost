@@ -20,7 +20,7 @@ export async function GET() {
             f.fichier_type AS cv_fichier_type
      FROM analyses a
      LEFT JOIN cv_adapte cv ON cv.analyse_id = a.id
-     LEFT JOIN cv_fichier_original f ON f.analyse_id = a.id AND f.user_id = a.user_id
+     LEFT JOIN cv_fichier_original f ON f.analyse_id = a.id::text
      WHERE a.user_id = $1
      ORDER BY a.created_at DESC`,
     [session.user.id]
