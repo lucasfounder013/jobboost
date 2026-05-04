@@ -32,9 +32,14 @@ export default function PageInscription() {
       });
 
       if (error) {
+        const emailPris =
+          error.code === "USER_ALREADY_EXISTS" ||
+          error.code === "EMAIL_ALREADY_IN_USE" ||
+          error.message?.toLowerCase().includes("already") ||
+          error.message?.toLowerCase().includes("exist");
         setErreur(
-          error.code === "USER_ALREADY_EXISTS"
-            ? "Un compte avec cet email existe déjà."
+          emailPris
+            ? "Un compte avec cet email existe déjà. Connectez-vous ou utilisez un autre email."
             : "Une erreur est survenue. Veuillez réessayer."
         );
       } else {
