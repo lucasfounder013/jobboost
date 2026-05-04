@@ -520,52 +520,29 @@ export default function Dashboard() {
                   return (
                     <div
                       key={analyse.id}
-                      className={`grid grid-cols-[1fr_auto_auto] sm:grid-cols-[2fr_1fr_1fr_auto] items-center px-5 py-4 gap-4 transition-colors duration-150
+                      onClick={() => setAnalyseOuverte(analyse)}
+                      className={`grid grid-cols-[1fr_auto_auto] sm:grid-cols-[2fr_1fr_1fr_auto] items-center px-5 py-4 gap-4 transition-colors duration-150 cursor-pointer
                         ${index !== analyses.length - 1 ? "border-b border-gray-100" : ""}
-                        ${enSuppression ? "opacity-40 pointer-events-none" : "hover:bg-gray-50/80"}
+                        ${enSuppression ? "opacity-40 pointer-events-none" : "hover:bg-indigo-50/40"}
                       `}
                     >
-                      {/* Colonne 1 : Poste visé — éditable au clic */}
+                      {/* Colonne 1 : Poste visé */}
                       <div className="flex flex-col gap-0.5 min-w-0">
-                        {editionPoste?.id === analyse.id ? (
-                          <input
-                            autoFocus
-                            value={editionPoste.valeur}
-                            onChange={(e) => setEditionPoste({ id: analyse.id, valeur: e.target.value })}
-                            onBlur={() => enregistrerNomPoste(analyse.id, editionPoste.valeur)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") enregistrerNomPoste(analyse.id, editionPoste.valeur);
-                              if (e.key === "Escape") setEditionPoste(null);
-                            }}
-                            className="text-sm font-semibold text-gray-900 bg-white border border-indigo-300 rounded-md px-2 py-0.5 outline-none ring-2 ring-indigo-100 w-full max-w-xs"
-                          />
-                        ) : (
-                          <button
-                            onClick={() => setEditionPoste({ id: analyse.id, valeur: analyse.nom_offre })}
-                            className="text-sm font-semibold text-gray-900 truncate text-left hover:text-indigo-600 transition-colors group flex items-center gap-1.5"
-                            title="Cliquer pour renommer"
-                          >
-                            <span className="truncate">{analyse.nom_offre}</span>
-                            <svg className="w-3 h-3 text-gray-300 group-hover:text-indigo-400 shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                            </svg>
-                          </button>
-                        )}
+                        <p className="text-sm font-semibold text-gray-900 truncate">{analyse.nom_offre}</p>
                         <p className="text-xs text-gray-400">{formaterDate(analyse.created_at)}</p>
                       </div>
 
-                      {/* Colonne 2 : Analyse CV — badge cliquable */}
-                      <button
-                        onClick={() => setAnalyseOuverte(analyse)}
-                        className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full ring-1 transition-all hover:ring-2 cursor-pointer w-fit ${bgScore(analyse.score)}`}
-                        title="Voir le détail de l'analyse"
+                      {/* Colonne 2 : Analyse CV — badge */}
+                      <div
+                        onClick={(e) => e.stopPropagation()}
+                        className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full ring-1 w-fit ${bgScore(analyse.score)}`}
                       >
                         <span className="tabular-nums">{analyse.score}%</span>
                         <span>{labelScore(analyse.score)}</span>
-                      </button>
+                      </div>
 
                       {/* Colonne 3 : CV adapté */}
-                      <div className="hidden sm:flex items-center gap-1.5">
+                      <div className="hidden sm:flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
                         {cvLie ? (
                           <>
                             <button
@@ -600,7 +577,7 @@ export default function Dashboard() {
                       </div>
 
                       {/* Colonne 4 : Supprimer */}
-                      <div className="flex items-center justify-end">
+                      <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
                         <button
                           onClick={() => supprimerAnalyse(analyse.id)}
                           disabled={suppressionEnCours !== null}
@@ -883,9 +860,38 @@ export default function Dashboard() {
           <div className="flex-1 bg-black/40" onClick={() => setAnalyseOuverte(null)} />
           <div className="w-full max-w-xl bg-white shadow-2xl flex flex-col overflow-hidden">
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gray-50 shrink-0">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Analyse</p>
-                <p className="text-sm font-bold text-gray-900 mt-0.5 truncate max-w-xs">{analyseOuverte.nom_offre}</p>
+              <div className="flex-1 min-w-0 mr-4">
+                <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-0.5">Analyse</p>
+                {editionPoste?.id === analyseOuverte.id ? (
+                  <input
+                    autoFocus
+                    value={editionPoste.valeur}
+                    onChange={(e) => setEditionPoste({ id: analyseOuverte.id, valeur: e.target.value })}
+                    onBlur={() => {
+                      enregistrerNomPoste(analyseOuverte.id, editionPoste.valeur);
+                      setAnalyseOuverte({ ...analyseOuverte, nom_offre: editionPoste.valeur });
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        enregistrerNomPoste(analyseOuverte.id, editionPoste.valeur);
+                        setAnalyseOuverte({ ...analyseOuverte, nom_offre: editionPoste.valeur });
+                      }
+                      if (e.key === "Escape") setEditionPoste(null);
+                    }}
+                    className="text-sm font-bold text-gray-900 bg-white border border-indigo-300 rounded-md px-2 py-0.5 outline-none ring-2 ring-indigo-100 w-full"
+                  />
+                ) : (
+                  <button
+                    onClick={() => setEditionPoste({ id: analyseOuverte.id, valeur: analyseOuverte.nom_offre })}
+                    className="text-sm font-bold text-gray-900 text-left hover:text-indigo-600 transition-colors group flex items-center gap-1.5 max-w-xs"
+                    title="Cliquer pour renommer"
+                  >
+                    <span className="truncate">{analyseOuverte.nom_offre}</span>
+                    <svg className="w-3 h-3 text-gray-300 group-hover:text-indigo-400 shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </button>
+                )}
               </div>
               <div className="flex items-center gap-2">
                 {analyseOuverte.cv_adapte_id && (
