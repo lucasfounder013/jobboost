@@ -91,6 +91,7 @@ export default function Dashboard() {
   const [autoAnalyse, setAutoAnalyse] = useState(false);
   const [modaleUpgrade, setModaleUpgrade] = useState<"scans" | "credits" | null>(null);
   const [suppressionEnCours, setSuppressionEnCours] = useState<string | null>(null);
+  const [editionPoste, setEditionPoste] = useState<{ id: string; valeur: string } | null>(null);
 
   // ── Auth redirect
   useEffect(() => {
@@ -314,6 +315,18 @@ export default function Dashboard() {
     }
   }
 
+  async function enregistrerNomPoste(id: string, nomOffre: string) {
+    const nom = nomOffre.trim();
+    if (!nom) { setEditionPoste(null); return; }
+    setAnalyses((prev) => prev.map((a) => a.id === id ? { ...a, nom_offre: nom } : a));
+    setEditionPoste(null);
+    await fetch("/api/renommer-analyse", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, nom_offre: nom }),
+    });
+  }
+
   const prenom = session?.user.name?.split(" ")[0] ?? "vous";
 
   if (isPending || !session) return null;
@@ -482,9 +495,32 @@ export default function Dashboard() {
                         ${enSuppression ? "opacity-40 pointer-events-none" : "hover:bg-gray-50/80"}
                       `}
                     >
-                      {/* Colonne 1 : Poste visé */}
+                      {/* Colonne 1 : Poste visé — éditable au clic */}
                       <div className="flex flex-col gap-0.5 min-w-0">
-                        <p className="text-sm font-semibold text-gray-900 truncate">{analyse.nom_offre}</p>
+                        {editionPoste?.id === analyse.id ? (
+                          <input
+                            autoFocus
+                            value={editionPoste.valeur}
+                            onChange={(e) => setEditionPoste({ id: analyse.id, valeur: e.target.value })}
+                            onBlur={() => enregistrerNomPoste(analyse.id, editionPoste.valeur)}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") enregistrerNomPoste(analyse.id, editionPoste.valeur);
+                              if (e.key === "Escape") setEditionPoste(null);
+                            }}
+                            className="text-sm font-semibold text-gray-900 bg-white border border-indigo-300 rounded-md px-2 py-0.5 outline-none ring-2 ring-indigo-100 w-full max-w-xs"
+                          />
+                        ) : (
+                          <button
+                            onClick={() => setEditionPoste({ id: analyse.id, valeur: analyse.nom_offre })}
+                            className="text-sm font-semibold text-gray-900 truncate text-left hover:text-indigo-600 transition-colors group flex items-center gap-1.5"
+                            title="Cliquer pour renommer"
+                          >
+                            <span className="truncate">{analyse.nom_offre}</span>
+                            <svg className="w-3 h-3 text-gray-300 group-hover:text-indigo-400 shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                            </svg>
+                          </button>
+                        )}
                         <p className="text-xs text-gray-400">{formaterDate(analyse.created_at)}</p>
                       </div>
 
