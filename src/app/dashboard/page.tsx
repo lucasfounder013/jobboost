@@ -30,6 +30,7 @@ type AnalyseSauvegardee = {
   id: string;
   nom_offre: string;
   score: number;
+  score_apres?: number | null;
   created_at: string;
   resume?: string;
   mots_cles_manquants?: string[];
@@ -49,6 +50,39 @@ type CvAdapteSauvegarde = {
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
+
+function cvStructureVersTexte(cv: CVStructure): string {
+  const lignes: string[] = [];
+  lignes.push(cv.nom ?? "");
+  lignes.push(cv.titre ?? "");
+  if (cv.contact) {
+    lignes.push(cv.contact.email ?? "");
+    lignes.push(cv.contact.telephone ?? "");
+    lignes.push(cv.contact.localisation ?? "");
+  }
+  if (cv.resume) lignes.push(cv.resume);
+  for (const exp of cv.experiences ?? []) {
+    lignes.push(`${exp.poste} - ${exp.entreprise} (${exp.dates})`);
+    lignes.push(...exp.missions);
+  }
+  for (const form of cv.formation ?? []) {
+    lignes.push(`${form.diplome} - ${form.etablissement} (${form.dates})`);
+    if (form.details) lignes.push(form.details);
+  }
+  if (cv.competences) {
+    if (cv.competences.techniques) lignes.push(cv.competences.techniques.join(", "));
+    if (cv.competences.langues) lignes.push(cv.competences.langues.join(", "));
+    if (cv.competences.autres) lignes.push(cv.competences.autres.join(", "));
+  }
+  for (const p of cv.projets ?? []) {
+    lignes.push(`${p.nom}: ${p.description}`);
+    if (p.technologies) lignes.push(p.technologies);
+  }
+  for (const c of cv.certifications ?? []) {
+    lignes.push(`${c.nom}${c.organisme ? ` - ${c.organisme}` : ""}`);
+  }
+  return lignes.filter(Boolean).join("\n");
+}
 
 const couleurScore = (s: number) => s >= 75 ? "text-emerald-600" : s >= 50 ? "text-amber-500" : "text-rose-500";
 const bgScore = (s: number) => s >= 75 ? "bg-emerald-50 text-emerald-700 ring-emerald-200" : s >= 50 ? "bg-amber-50 text-amber-700 ring-amber-200" : "bg-rose-50 text-rose-700 ring-rose-200";
@@ -246,11 +280,33 @@ export default function Dashboard() {
       setCvAdapte(data.cvAdapte);
       setCreditsRestants(data.creditsRestants);
       sauvegarderCvAdapte(data.cvAdapte).catch(() => {});
+      // Calcul du score après adaptation (sans décompter de scans)
+      calculerScoreApresAdaptation(data.cvAdapte).catch(() => {});
     } catch (e) {
       setErreurAdaptation(e instanceof Error ? e.message : "Une erreur est survenue.");
     } finally {
       setAdaptationEnCours(false);
     }
+  }
+
+  // ── Score après adaptation (route interne, sans décompte scans)
+  async function calculerScoreApresAdaptation(cvAdapteData: CVStructure) {
+    const idAnalyse = analyseId;
+    if (!idAnalyse || !offre) return;
+    const cvTexteApres = cvStructureVersTexte(cvAdapteData);
+    const resScore = await fetch("/api/analyser-interne", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ cv: cvTexteApres, offre }),
+    });
+    if (!resScore.ok) return;
+    const dataScore = await resScore.json();
+    await fetch(`/api/analyses/${idAnalyse}/score-apres`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ scoreApres: dataScore.score }),
+    });
+    chargerHistorique();
   }
 
   // ── Auto-save analyse
@@ -532,13 +588,20 @@ export default function Dashboard() {
                         <p className="text-xs text-gray-400">{formaterDate(analyse.created_at)}</p>
                       </div>
 
-                      {/* Colonne 2 : Analyse CV — badge */}
-                      <div
-                        onClick={(e) => e.stopPropagation()}
-                        className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full ring-1 w-fit ${bgScore(analyse.score)}`}
-                      >
-                        <span className="tabular-nums">{analyse.score}%</span>
-                        <span>{labelScore(analyse.score)}</span>
+                      {/* Colonne 2 : Analyse CV — badge ou comparatif avant/après */}
+                      <div onClick={(e) => e.stopPropagation()} className="flex items-center">
+                        {analyse.score_apres != null ? (
+                          <span className="inline-flex items-center gap-1 text-xs font-semibold">
+                            <span className={`px-2.5 py-1.5 rounded-full ring-1 ${bgScore(analyse.score)}`}>{analyse.score}%</span>
+                            <span className="text-gray-300 mx-0.5">→</span>
+                            <span className="bg-emerald-50 text-emerald-700 ring-emerald-200 ring-1 px-2.5 py-1.5 rounded-full font-bold">{analyse.score_apres}%</span>
+                          </span>
+                        ) : (
+                          <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full ring-1 ${bgScore(analyse.score)}`}>
+                            <span className="tabular-nums">{analyse.score}%</span>
+                            <span>{labelScore(analyse.score)}</span>
+                          </span>
+                        )}
                       </div>
 
                       {/* Colonne 3 : CV adapté */}
@@ -933,6 +996,17 @@ export default function Dashboard() {
               {/* Onglet Résultats */}
               {ongletAnalyse === "resultats" && (
                 <div className="p-6 flex flex-col gap-6">
+                  {/* Comparatif avant/après si score_apres disponible */}
+                  {analyseOuverte.score_apres != null && (
+                    <div className="flex items-center gap-3 bg-emerald-50 ring-1 ring-emerald-100 rounded-xl px-4 py-3">
+                      <span className="text-2xl font-extrabold tabular-nums text-gray-400">{analyseOuverte.score}%</span>
+                      <span className="text-gray-300 text-lg">→</span>
+                      <span className="text-2xl font-extrabold tabular-nums text-emerald-600">{analyseOuverte.score_apres}%</span>
+                      <span className="text-sm text-emerald-700 font-semibold ml-1">
+                        +{analyseOuverte.score_apres - analyseOuverte.score} pts après adaptation
+                      </span>
+                    </div>
+                  )}
                   {/* Score */}
                   <div className="flex items-center gap-5">
                     <div className={`w-20 h-20 rounded-full ring-4 shrink-0 flex flex-col items-center justify-center ${ringScore(analyseOuverte.score)}`}>

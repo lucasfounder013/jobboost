@@ -12,7 +12,7 @@ export async function GET() {
   }
 
   const { rows: analyses } = await pool.query(
-    `SELECT a.id, a.nom_offre, a.score, a.created_at,
+    `SELECT a.id, a.nom_offre, a.score, a.score_apres, a.created_at,
             a.resume, a.mots_cles_manquants, a.mots_cles_presents,
             a.cv_texte, a.offre_texte,
             cv.id AS cv_adapte_id,
