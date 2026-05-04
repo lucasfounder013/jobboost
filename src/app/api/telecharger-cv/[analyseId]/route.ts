@@ -10,11 +10,12 @@ const MIME_TYPES: Record<string, string> = {
   docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 };
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ analyseId: string }> }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ analyseId: string }> }) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return NextResponse.json({ error: "Non autorisé." }, { status: 401 });
 
   const { analyseId } = await params;
+  const preview = new URL(req.url).searchParams.get("preview") === "1";
 
   const { rows } = await pool.query(
     `SELECT fichier_data, fichier_type, fichier_nom
@@ -28,11 +29,14 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ ana
 
   const { fichier_data, fichier_type, fichier_nom } = rows[0];
   const mimeType = MIME_TYPES[fichier_type] ?? "application/octet-stream";
+  const disposition = preview
+    ? `inline; filename="${encodeURIComponent(fichier_nom)}"`
+    : `attachment; filename="${encodeURIComponent(fichier_nom)}"`;
 
   return new NextResponse(fichier_data, {
     headers: {
       "Content-Type": mimeType,
-      "Content-Disposition": `attachment; filename="${encodeURIComponent(fichier_nom)}"`,
+      "Content-Disposition": disposition,
     },
   });
 }
