@@ -90,6 +90,7 @@ export default function Dashboard() {
   const [nomPosteEnregistre, setNomPosteEnregistre] = useState("");
   const [autoAnalyse, setAutoAnalyse] = useState(false);
   const [modaleUpgrade, setModaleUpgrade] = useState<"scans" | "credits" | null>(null);
+  const [suppressionEnCours, setSuppressionEnCours] = useState<string | null>(null);
 
   // ── Auth redirect
   useEffect(() => {
@@ -296,12 +297,26 @@ export default function Dashboard() {
     }
   }
 
+  async function supprimerAnalyse(id: string) {
+    if (suppressionEnCours) return;
+    if (!window.confirm("Supprimer cette candidature ? Cette action est irréversible.")) return;
+    setSuppressionEnCours(id);
+    const cvAdapteId = analyses.find((a) => a.id === id)?.cv_adapte_id ?? null;
+    try {
+      const reponse = await fetch(`/api/supprimer-analyse?id=${id}`, { method: "DELETE" });
+      if (!reponse.ok) throw new Error();
+      setAnalyses((prev) => prev.filter((a) => a.id !== id));
+      if (cvAdapteId) setCvsAdaptes((prev) => prev.filter((c) => c.id !== cvAdapteId));
+    } catch {
+      // Erreur silencieuse
+    } finally {
+      setSuppressionEnCours(null);
+    }
+  }
+
   const prenom = session?.user.name?.split(" ")[0] ?? "vous";
 
   if (isPending || !session) return null;
-
-  const derniereAnalyse = analyses[0] ?? null;
-  const analysesRecentes = analyses.slice(1, 5);
 
   // ─── RENDER ───────────────────────────────────────────────────────────────
 
@@ -373,23 +388,13 @@ export default function Dashboard() {
           </button>
 
           <button
-            onClick={() => { setVue("historique"); setTimeout(() => document.getElementById("historique")?.scrollIntoView({ behavior: "smooth" }), 100); }}
+            onClick={() => setVue("historique")}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-indigo-200 hover:bg-indigo-800/60 hover:text-white font-medium text-sm transition-colors text-left"
           >
             <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
-            Mon historique
-          </button>
-
-          <button
-            onClick={() => { setVue("historique"); setTimeout(() => document.getElementById("mes-cv")?.scrollIntoView({ behavior: "smooth" }), 100); }}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-indigo-200 hover:bg-indigo-800/60 hover:text-white font-medium text-sm transition-colors text-left"
-          >
-            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-            Mes CV
+            Mes candidatures
           </button>
 
           <Link
@@ -444,106 +449,114 @@ export default function Dashboard() {
               <div className="flex flex-col items-center justify-center py-32 text-center gap-5">
                 <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-2xl">⚡</div>
                 <div>
-                  <p className="text-gray-800 font-semibold text-lg">Aucune analyse sauvegardée</p>
-                  <p className="text-gray-400 text-sm mt-1">Lancez votre première analyse depuis le bouton ci-dessus.</p>
+                  <p className="text-gray-800 font-semibold text-lg">Aucune candidature pour l&apos;instant</p>
+                  <p className="text-gray-400 text-sm mt-1">Analysez votre CV face à une offre pour commencer à suivre vos candidatures.</p>
                 </div>
                 <button
                   onClick={() => setVue("nouvelle-analyse")}
                   className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white px-6 py-2.5 rounded-xl font-semibold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-200"
                 >
-                  Faire ma première analyse →
+                  Commencez votre première analyse →
                 </button>
               </div>
             ) : (
-              <div className="flex flex-col gap-10">
+              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden">
 
-                {/* Dernière analyse */}
-                {derniereAnalyse && (
-                  <section>
-                    <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Dernière analyse</h2>
-                    <button
-                      onClick={() => setAnalyseOuverte(derniereAnalyse)}
-                      className="w-full bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6 flex items-center gap-6 hover:ring-indigo-300 hover:shadow-md transition-all duration-200 text-left cursor-pointer"
+                {/* En-tête tableau */}
+                <div className="grid grid-cols-[1fr_auto_auto] sm:grid-cols-[2fr_1fr_1fr_auto] border-b border-gray-100 bg-gray-50/60 px-5 py-3 gap-4">
+                  <span className="text-xs font-semibold uppercase tracking-widest text-gray-400">Poste visé</span>
+                  <span className="text-xs font-semibold uppercase tracking-widest text-gray-400">Analyse</span>
+                  <span className="text-xs font-semibold uppercase tracking-widest text-gray-400 hidden sm:block">CV adapté</span>
+                  <span className="sr-only">Actions</span>
+                </div>
+
+                {/* Lignes */}
+                {analyses.map((analyse, index) => {
+                  const cvLie = cvsAdaptes.find((c) => c.id === analyse.cv_adapte_id) ?? null;
+                  const enSuppression = suppressionEnCours === analyse.id;
+                  return (
+                    <div
+                      key={analyse.id}
+                      className={`grid grid-cols-[1fr_auto_auto] sm:grid-cols-[2fr_1fr_1fr_auto] items-center px-5 py-4 gap-4 transition-colors duration-150
+                        ${index !== analyses.length - 1 ? "border-b border-gray-100" : ""}
+                        ${enSuppression ? "opacity-40 pointer-events-none" : "hover:bg-gray-50/80"}
+                      `}
                     >
-                      <div className={`w-20 h-20 rounded-full ring-4 shrink-0 flex flex-col items-center justify-center ${ringScore(derniereAnalyse.score)}`}>
-                        <span className={`text-2xl font-extrabold tabular-nums leading-none ${couleurScore(derniereAnalyse.score)}`}>{derniereAnalyse.score}</span>
-                        <span className={`text-xs font-bold ${couleurScore(derniereAnalyse.score)}`}>%</span>
+                      {/* Colonne 1 : Poste visé */}
+                      <div className="flex flex-col gap-0.5 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900 truncate">{analyse.nom_offre}</p>
+                        <p className="text-xs text-gray-400">{formaterDate(analyse.created_at)}</p>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-lg font-bold text-gray-900 truncate">{derniereAnalyse.nom_offre}</p>
-                        <p className="text-sm text-gray-400 mt-0.5">{formaterDate(derniereAnalyse.created_at)}</p>
-                        <span className={`inline-flex mt-2 text-xs font-bold px-2.5 py-1 rounded-full ring-1 ${bgScore(derniereAnalyse.score)}`}>{labelScore(derniereAnalyse.score)}</span>
-                      </div>
-                      <svg className="w-5 h-5 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                    <div className="flex items-center gap-3 mt-3">
+
+                      {/* Colonne 2 : Analyse CV — badge cliquable */}
                       <button
-                        onClick={() => setVue("nouvelle-analyse")}
-                        className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-xl transition-colors"
+                        onClick={() => setAnalyseOuverte(analyse)}
+                        className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full ring-1 transition-all hover:ring-2 cursor-pointer w-fit ${bgScore(analyse.score)}`}
+                        title="Voir le détail de l'analyse"
                       >
-                        + Nouvelle analyse
+                        <span className="tabular-nums">{analyse.score}%</span>
+                        <span>{labelScore(analyse.score)}</span>
                       </button>
-                      {derniereAnalyse.cv_adapte_id && (
-                        <button
-                          onClick={() => { const cv = cvsAdaptes.find((c) => c.id === derniereAnalyse.cv_adapte_id); if (cv) setCvOuvert(cv); }}
-                          className="text-xs font-semibold text-gray-600 hover:text-gray-900 bg-gray-100 hover:bg-gray-200 px-4 py-2 rounded-xl transition-colors"
-                        >
-                          Voir le CV adapté
-                        </button>
-                      )}
-                    </div>
-                  </section>
-                )}
 
-                {/* Analyses récentes */}
-                {analysesRecentes.length > 0 && (
-                  <section id="historique">
-                    <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Analyses récentes</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                      {analysesRecentes.map((a) => (
-                        <button
-                          key={a.id}
-                          onClick={() => setAnalyseOuverte(a)}
-                          className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-5 flex flex-col gap-3 hover:ring-indigo-300 hover:shadow-md transition-all duration-200 text-left cursor-pointer"
-                        >
-                          <div className="flex items-center justify-between">
-                            <span className={`text-2xl font-extrabold tabular-nums ${couleurScore(a.score)}`}>{a.score}%</span>
-                            <span className={`text-xs font-bold px-2.5 py-1 rounded-full ring-1 ${bgScore(a.score)}`}>{labelScore(a.score)}</span>
-                          </div>
-                          <div>
-                            <p className="font-semibold text-gray-900 text-sm truncate">{a.nom_offre}</p>
-                            <p className="text-xs text-gray-400 mt-0.5">{formaterDate(a.created_at)}</p>
-                          </div>
-                          <span className="text-xs font-semibold text-indigo-600 mt-auto">Consulter →</span>
-                        </button>
-                      ))}
-                    </div>
-                  </section>
-                )}
+                      {/* Colonne 3 : CV adapté */}
+                      <div className="hidden sm:flex items-center gap-1.5">
+                        {cvLie ? (
+                          <>
+                            <button
+                              onClick={() => exporterCV(cvLie.cv_data, "pdf", "drawer")}
+                              disabled={exportEnCoursDrawer !== null}
+                              className="text-xs font-semibold text-white bg-gray-800 hover:bg-gray-700 px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-40"
+                            >
+                              PDF
+                            </button>
+                            <button
+                              onClick={() => exporterCV(cvLie.cv_data, "docx", "drawer")}
+                              disabled={exportEnCoursDrawer !== null}
+                              className="text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-40"
+                            >
+                              Word
+                            </button>
+                            <button
+                              onClick={() => setCvOuvert(cvLie)}
+                              className="text-xs font-medium text-gray-500 hover:text-gray-800 px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                            >
+                              Aperçu
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => setVue("nouvelle-analyse")}
+                            className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors"
+                          >
+                            Adapter mon CV →
+                          </button>
+                        )}
+                      </div>
 
-                {/* CV adaptés */}
-                {cvsAdaptes.length > 0 && (
-                  <section id="mes-cv">
-                    <h2 className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Mes CV adaptés ({cvsAdaptes.length})</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {cvsAdaptes.map((cv) => (
-                        <div key={cv.id} className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-5 flex flex-col gap-4">
-                          <div>
-                            <p className="font-semibold text-gray-900 text-sm truncate">{cv.nom_offre}</p>
-                            <p className="text-xs text-gray-400 mt-0.5">{formaterDate(cv.created_at)}</p>
-                          </div>
-                          <div className="flex gap-2 mt-auto">
-                            <button onClick={() => setCvOuvert(cv)} className="flex-1 text-xs font-semibold text-gray-700 bg-gray-100 hover:bg-gray-200 py-2 rounded-lg transition-colors">Aperçu</button>
-                            <button onClick={() => exporterCV(cv.cv_data, "pdf", "drawer")} disabled={exportEnCoursDrawer !== null} className="flex-1 text-xs font-semibold text-white bg-gray-900 hover:bg-gray-700 py-2 rounded-lg transition-colors disabled:opacity-50">{exportEnCoursDrawer === "pdf" ? "..." : "PDF"}</button>
-                            <button onClick={() => exporterCV(cv.cv_data, "docx", "drawer")} disabled={exportEnCoursDrawer !== null} className="flex-1 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 py-2 rounded-lg transition-colors disabled:opacity-50">{exportEnCoursDrawer === "docx" ? "..." : "Word"}</button>
-                          </div>
-                        </div>
-                      ))}
+                      {/* Colonne 4 : Supprimer */}
+                      <div className="flex items-center justify-end">
+                        <button
+                          onClick={() => supprimerAnalyse(analyse.id)}
+                          disabled={suppressionEnCours !== null}
+                          className="text-gray-300 hover:text-rose-400 transition-colors disabled:opacity-30 p-1.5 rounded-lg hover:bg-rose-50"
+                          title="Supprimer cette candidature"
+                          aria-label="Supprimer"
+                        >
+                          {enSuppression ? (
+                            <svg className="animate-spin w-4 h-4 text-rose-400" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                            </svg>
+                          ) : (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                            </svg>
+                          )}
+                        </button>
+                      </div>
                     </div>
-                  </section>
-                )}
+                  );
+                })}
               </div>
             )}
           </div>
