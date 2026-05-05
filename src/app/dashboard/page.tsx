@@ -35,6 +35,8 @@ type AnalyseSauvegardee = {
   resume?: string;
   mots_cles_manquants?: string[];
   mots_cles_presents?: string[];
+  mots_cles_apres_manquants?: string[] | null;
+  mots_cles_apres_presents?: string[] | null;
   cv_adapte_id: string | null;
   cv_texte?: string | null;
   offre_texte?: string | null;
@@ -132,7 +134,7 @@ export default function Dashboard() {
   const [modaleUpgrade, setModaleUpgrade] = useState<"scans" | "credits" | null>(null);
   const [suppressionEnCours, setSuppressionEnCours] = useState<string | null>(null);
   const [editionPoste, setEditionPoste] = useState<{ id: string; valeur: string } | null>(null);
-  const [ongletAnalyse, setOngletAnalyse] = useState<"resultats" | "offre" | "cv">("resultats");
+  const [ongletAnalyse, setOngletAnalyse] = useState<"resultats" | "apres" | "offre" | "cv">("resultats");
 
   // ── Auth redirect
   useEffect(() => {
@@ -304,7 +306,11 @@ export default function Dashboard() {
     await fetch(`/api/analyses/${idAnalyse}/score-apres`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ scoreApres: dataScore.score }),
+      body: JSON.stringify({
+        scoreApres: dataScore.score,
+        motsClesApresManquants: dataScore.motsClesManquants,
+        motsClesApresPresents: dataScore.motsClesPresents,
+      }),
     });
     chargerHistorique();
   }
@@ -971,16 +977,17 @@ export default function Dashboard() {
               </div>
             </div>
             {/* Barre d'onglets */}
-            <div className="flex border-b border-gray-100 px-6 shrink-0">
+            <div className="flex border-b border-gray-100 px-4 shrink-0 overflow-x-auto">
               {([
                 { key: "resultats", label: "Résultats" },
+                ...(analyseOuverte.score_apres != null ? [{ key: "apres", label: "Après adaptation" }] : []),
                 { key: "offre", label: "Offre d'emploi" },
                 { key: "cv", label: "CV original" },
-              ] as const).map(({ key, label }) => (
+              ] as { key: "resultats" | "apres" | "offre" | "cv"; label: string }[]).map(({ key, label }) => (
                 <button
                   key={key}
                   onClick={() => setOngletAnalyse(key)}
-                  className={`text-sm font-medium px-4 py-3 border-b-2 -mb-px transition-colors ${
+                  className={`text-sm font-medium px-3 py-3 border-b-2 -mb-px transition-colors whitespace-nowrap ${
                     ongletAnalyse === key
                       ? "border-indigo-500 text-indigo-600"
                       : "border-transparent text-gray-400 hover:text-gray-600"
@@ -1056,6 +1063,95 @@ export default function Dashboard() {
                   )}
                 </div>
               )}
+
+              {/* Onglet Après adaptation */}
+              {ongletAnalyse === "apres" && (() => {
+                const avant = analyseOuverte.mots_cles_manquants ?? [];
+                const apresManquants = analyseOuverte.mots_cles_apres_manquants ?? [];
+                const apresPresents = analyseOuverte.mots_cles_apres_presents ?? [];
+                // Mots-clés ajoutés = étaient manquants avant, présents après
+                const ajoutes = avant.filter((m) => apresPresents.map((x) => x.toLowerCase()).includes(m.toLowerCase()));
+                // Encore manquants après adaptation
+                const encoreManquants = apresManquants;
+                // Déjà présents avant et toujours présents
+                const dejaPresentsetToujours = (analyseOuverte.mots_cles_presents ?? []).filter(
+                  (m) => apresPresents.map((x) => x.toLowerCase()).includes(m.toLowerCase())
+                );
+                return (
+                  <div className="p-6 flex flex-col gap-6">
+                    {/* Score comparatif */}
+                    <div className="flex items-center gap-3 bg-emerald-50 ring-1 ring-emerald-100 rounded-xl px-5 py-4">
+                      <div className="flex flex-col items-center">
+                        <span className="text-2xl font-extrabold tabular-nums text-gray-400">{analyseOuverte.score}%</span>
+                        <span className="text-xs text-gray-400 mt-0.5">Avant</span>
+                      </div>
+                      <span className="text-gray-300 text-xl mx-1">→</span>
+                      <div className="flex flex-col items-center">
+                        <span className="text-2xl font-extrabold tabular-nums text-emerald-600">{analyseOuverte.score_apres}%</span>
+                        <span className="text-xs text-emerald-600 mt-0.5">Après</span>
+                      </div>
+                      <span className="ml-auto text-sm font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-full">
+                        +{(analyseOuverte.score_apres ?? 0) - analyseOuverte.score} pts
+                      </span>
+                    </div>
+
+                    {/* Mots-clés ajoutés */}
+                    {ajoutes.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-base">✅</span>
+                          <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">
+                            Mots-clés ajoutés <span className="text-emerald-600">({ajoutes.length})</span>
+                          </p>
+                        </div>
+                        <p className="text-xs text-gray-400 mb-2">Ces mots-clés manquaient dans votre CV original et ont été intégrés dans la version adaptée.</p>
+                        <div className="flex flex-wrap gap-2">
+                          {ajoutes.map((mot) => (
+                            <span key={mot} className="bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-1">
+                              <span className="text-emerald-500">+</span>{mot}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Encore manquants */}
+                    {encoreManquants.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-base">⚠️</span>
+                          <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">
+                            Encore manquants <span className="text-amber-500">({encoreManquants.length})</span>
+                          </p>
+                        </div>
+                        <p className="text-xs text-gray-400 mb-2">Ces mots-clés sont toujours absents même après adaptation — souvent parce que les compétences sous-jacentes ne figurent pas dans votre profil.</p>
+                        <div className="flex flex-wrap gap-2">
+                          {encoreManquants.map((mot) => (
+                            <span key={mot} className="bg-amber-50 text-amber-700 border border-amber-200 px-3 py-1 rounded-full text-xs font-semibold">{mot}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Déjà présents et conservés */}
+                    {dejaPresentsetToujours.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-base">✓</span>
+                          <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">
+                            Déjà présents et conservés <span className="text-gray-400">({dejaPresentsetToujours.length})</span>
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {dejaPresentsetToujours.map((mot) => (
+                            <span key={mot} className="bg-gray-50 text-gray-500 border border-gray-200 px-3 py-1 rounded-full text-xs font-semibold">{mot}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })()}
 
               {/* Onglet Offre d'emploi */}
               {ongletAnalyse === "offre" && (

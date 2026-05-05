@@ -14,6 +14,7 @@ export async function GET() {
   const { rows: analyses } = await pool.query(
     `SELECT a.id, a.nom_offre, a.score, a.score_apres, a.created_at,
             a.resume, a.mots_cles_manquants, a.mots_cles_presents,
+            a.mots_cles_apres_manquants, a.mots_cles_apres_presents,
             a.cv_texte, a.offre_texte,
             cv.id AS cv_adapte_id,
             f.fichier_nom AS cv_fichier_nom,
