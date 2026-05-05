@@ -57,15 +57,17 @@ export async function POST(req: NextRequest) {
     max_tokens: 2048,
     messages: [{
       role: "user",
-      content: `Tu es un expert en rédaction de lettres de motivation professionnelles.
-Rédige une lettre de motivation percutante et personnalisée basée sur le CV et l'offre d'emploi suivants.
+      content: `Tu es un recruteur senior qui rédige des lettres de motivation sobres et efficaces.
+Rédige une lettre de motivation courte et directe basée sur le CV et l'offre d'emploi suivants.
 
-RÈGLES IMPORTANTES :
-- Détecte la langue de l'offre d'emploi et rédige la lettre dans cette MÊME langue
-- Adapte le ton au type d'entreprise (startup = dynamique et direct ; grand groupe = formel et structuré)
-- La lettre doit être PERSONNALISÉE : cite l'entreprise, le poste, des éléments concrets du CV
-- Ne jamais être générique — chaque phrase doit être spécifique à ce candidat et ce poste
-- 4 paragraphes : accroche, expériences pertinentes, motivation/valeurs, conclusion avec disponibilité
+RÈGLES STRICTES :
+- Détecte la langue de l'offre d'emploi et rédige dans cette MÊME langue
+- Ton sobre et professionnel — pas d'enthousiasme excessif, pas de superlatifs, pas de "passionné", "ravi", "enchanté"
+- 3 paragraphes courts (4-5 lignes max chacun), sans redite entre eux
+- Chaque paragraphe a un seul angle : (1) pourquoi ce poste maintenant, (2) ce que le candidat apporte concrètement, (3) conclusion avec disponibilité
+- Pas de répétition du titre du poste ou du nom de l'entreprise plus d'une fois
+- Éviter les formules creuses : "je suis convaincu que", "ma candidature saura", "n'hésitez pas à"
+- S'appuyer sur des faits concrets du CV, pas sur des qualificatifs génériques
 
 CV :
 ${cv_texte}
@@ -75,12 +77,11 @@ ${offre_texte}
 
 Réponds UNIQUEMENT avec un objet JSON valide, sans markdown ni backticks :
 {
-  "salutation": "string (ex: Cher Responsable du recrutement,)",
+  "salutation": "string (ex: Madame, Monsieur,)",
   "paragraphes": [
-    "string (accroche : pourquoi ce poste/cette entreprise spécifiquement)",
-    "string (expériences pertinentes : ce que le candidat apporte concrètement)",
-    "string (motivation : adéquation valeurs, projet professionnel)",
-    "string (conclusion : disponibilité, demande d'entretien)"
+    "string (pourquoi ce poste — contexte et motivation factuelle, pas d'effusion)",
+    "string (ce que le candidat apporte — expériences et compétences concrètes du CV)",
+    "string (conclusion courte — disponibilité et demande d'entretien, 2 phrases max)"
   ],
   "formule_politesse": "string (ex: Cordialement,)"
 }`,
