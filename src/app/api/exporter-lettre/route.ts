@@ -79,20 +79,20 @@ export async function POST(req: NextRequest) {
   const { analyseId, format } = await req.json() as { analyseId: string; format: "pdf" | "docx" };
   if (!analyseId || !format) return NextResponse.json({ error: "Paramètres manquants." }, { status: 400 });
 
-  // Récupérer la lettre + les infos CV adaptées si disponibles
+  // Récupérer la lettre
   const { rows } = await pool.query(
-    `SELECT lm.lettre_texte, lm.nom_offre,
-            ca.cv_data
-     FROM lettres_motivation lm
-     LEFT JOIN cv_adapte ca ON ca.analyse_id = lm.analyse_id
-     WHERE lm.analyse_id = $1 AND lm.user_id = $2
-     LIMIT 1`,
+    `SELECT lettre_texte, nom_offre FROM lettres_motivation WHERE analyse_id = $1 AND user_id = $2 LIMIT 1`,
     [analyseId, session.user.id]
   );
-
   if (rows.length === 0) return NextResponse.json({ error: "Lettre introuvable." }, { status: 404 });
+  const { lettre_texte, nom_offre } = rows[0];
 
-  const { lettre_texte, nom_offre, cv_data } = rows[0];
+  // Récupérer le CV adapté pour les infos du candidat (cast uuid→text pour compatibilité)
+  const { rows: rowsCv } = await pool.query(
+    `SELECT cv_data FROM cv_adapte WHERE analyse_id::text = $1 LIMIT 1`,
+    [analyseId]
+  );
+  const cv_data = rowsCv[0]?.cv_data ?? null;
 
   let lettre: LettreData;
   try {
