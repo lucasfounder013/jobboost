@@ -37,6 +37,11 @@ export const auth = betterAuth({
         type: "string",
         fieldName: "stripe_subscription_id",
       },
+      lmCredits: {
+        type: "number",
+        defaultValue: 1,
+        fieldName: "lm_credits",
+      },
     },
   },
   plugins: [nextCookies()],

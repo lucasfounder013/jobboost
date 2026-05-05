@@ -18,10 +18,13 @@ export async function GET() {
             a.cv_texte, a.offre_texte,
             cv.id AS cv_adapte_id,
             f.fichier_nom AS cv_fichier_nom,
-            f.fichier_type AS cv_fichier_type
+            f.fichier_type AS cv_fichier_type,
+            lm.id AS lettre_id,
+            lm.lettre_texte AS lettre_texte
      FROM analyses a
      LEFT JOIN cv_adapte cv ON cv.analyse_id = a.id
      LEFT JOIN cv_fichier_original f ON f.analyse_id = a.id::text
+     LEFT JOIN lettres_motivation lm ON lm.analyse_id = a.id::text AND lm.user_id = $1
      WHERE a.user_id = $1
      ORDER BY a.created_at DESC`,
     [session.user.id]
@@ -36,16 +39,17 @@ export async function GET() {
   );
 
   const { rows: userRows } = await pool.query(
-    'SELECT scans, credits, is_subscribed FROM "user" WHERE id = $1',
+    'SELECT scans, credits, lm_credits, is_subscribed FROM "user" WHERE id = $1',
     [session.user.id]
   );
-  const utilisateur = userRows[0] ?? { scans: 0, credits: 0, is_subscribed: false };
+  const utilisateur = userRows[0] ?? { scans: 0, credits: 0, lm_credits: 0, is_subscribed: false };
 
   return NextResponse.json({
     analyses,
     cvsAdaptes,
     scans: utilisateur.scans,
     credits: utilisateur.credits,
+    lmCredits: utilisateur.lm_credits,
     estAbonne: utilisateur.is_subscribed,
   });
 }

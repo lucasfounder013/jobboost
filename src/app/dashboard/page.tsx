@@ -42,6 +42,8 @@ type AnalyseSauvegardee = {
   offre_texte?: string | null;
   cv_fichier_nom?: string | null;
   cv_fichier_type?: string | null;
+  lettre_id?: string | null;
+  lettre_texte?: string | null;
 };
 
 type CvAdapteSauvegarde = {
@@ -131,10 +133,13 @@ export default function Dashboard() {
   const [analyseId, setAnalyseId] = useState<string | null>(null);
   const [nomPosteEnregistre, setNomPosteEnregistre] = useState("");
   const [autoAnalyse, setAutoAnalyse] = useState(false);
-  const [modaleUpgrade, setModaleUpgrade] = useState<"scans" | "credits" | null>(null);
+  const [modaleUpgrade, setModaleUpgrade] = useState<"scans" | "credits" | "lm" | null>(null);
   const [suppressionEnCours, setSuppressionEnCours] = useState<string | null>(null);
   const [editionPoste, setEditionPoste] = useState<{ id: string; valeur: string } | null>(null);
-  const [ongletAnalyse, setOngletAnalyse] = useState<"resultats" | "apres" | "offre" | "cv">("resultats");
+  const [ongletAnalyse, setOngletAnalyse] = useState<"resultats" | "apres" | "lettre" | "offre" | "cv">("resultats");
+  const [lmCreditsRestants, setLmCreditsRestants] = useState<number | null>(null);
+  const [generationLmEnCours, setGenerationLmEnCours] = useState<string | null>(null);
+  const [exportLmEnCours, setExportLmEnCours] = useState<"pdf" | "docx" | null>(null);
 
   // ── Auth redirect
   useEffect(() => {
@@ -157,9 +162,11 @@ export default function Dashboard() {
           setEstAbonne(true);
           setScansRestants(null);
           setCreditsRestants(null);
+          setLmCreditsRestants(null);
         } else {
           setScansRestants(data.scans ?? 0);
           setCreditsRestants(data.credits ?? 0);
+          setLmCreditsRestants(data.lmCredits ?? 0);
         }
       })
       .finally(() => setChargementHistorique(false));
@@ -419,6 +426,45 @@ export default function Dashboard() {
     });
   }
 
+  async function genererLettreMotivation(analyseId: string) {
+    setGenerationLmEnCours(analyseId);
+    try {
+      const res = await fetch("/api/generer-lettre", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ analyseId }),
+      });
+      const data = await res.json();
+      if (res.status === 403) { setModaleUpgrade("lm"); return; }
+      if (!res.ok) return;
+      if (data.lmCreditsRestants !== undefined) setLmCreditsRestants(data.lmCreditsRestants);
+      chargerHistorique();
+    } finally {
+      setGenerationLmEnCours(null);
+    }
+  }
+
+  async function exporterLettre(analyseId: string, format: "pdf" | "docx") {
+    setExportLmEnCours(format);
+    try {
+      const res = await fetch("/api/exporter-lettre", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ analyseId, format }),
+      });
+      if (!res.ok) return;
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `lettre_motivation.${format}`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExportLmEnCours(null);
+    }
+  }
+
   const prenom = session?.user.name?.split(" ")[0] ?? "vous";
 
   if (isPending || !session) return null;
@@ -469,7 +515,11 @@ export default function Dashboard() {
                   <span className="text-indigo-300">Adaptation CV</span>
                   <span className={`font-bold ${(creditsRestants ?? 0) === 0 ? "text-rose-400" : "text-white"}`}>{(creditsRestants ?? 0) > 0 ? `${creditsRestants} crédit` : "0 crédit"}</span>
                 </div>
-                {((scansRestants ?? 0) <= 2 || (creditsRestants ?? 0) === 0) && (
+                <div className="flex items-center justify-between text-xs mt-0.5">
+                  <span className="text-indigo-300">Lettre de motivation</span>
+                  <span className={`font-bold ${(lmCreditsRestants ?? 0) === 0 ? "text-rose-400" : "text-white"}`}>{(lmCreditsRestants ?? 0) > 0 ? `${lmCreditsRestants} crédit` : "0 crédit"}</span>
+                </div>
+                {((scansRestants ?? 0) <= 2 || (creditsRestants ?? 0) === 0 || (lmCreditsRestants ?? 0) === 0) && (
                   <Link href="/pricing" className="mt-1 text-center text-xs font-semibold text-indigo-300 hover:text-white bg-indigo-800/60 hover:bg-indigo-700/60 rounded-lg py-1.5 transition-colors">
                     Passer à l&apos;abonnement →
                   </Link>
@@ -568,10 +618,11 @@ export default function Dashboard() {
               <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden">
 
                 {/* En-tête tableau */}
-                <div className="grid grid-cols-[1fr_auto_auto] sm:grid-cols-[2fr_1fr_1fr_auto] border-b border-gray-100 bg-gray-50/60 px-5 py-3 gap-4">
+                <div className="grid grid-cols-[1fr_auto_auto] lg:grid-cols-[2fr_1fr_1fr_1fr_auto] border-b border-gray-100 bg-gray-50/60 px-5 py-3 gap-4">
                   <span className="text-xs font-semibold uppercase tracking-widest text-gray-400">Poste visé</span>
                   <span className="text-xs font-semibold uppercase tracking-widest text-gray-400">Analyse</span>
-                  <span className="text-xs font-semibold uppercase tracking-widest text-gray-400 hidden sm:block">CV adapté</span>
+                  <span className="text-xs font-semibold uppercase tracking-widest text-gray-400 hidden lg:block">CV adapté</span>
+                  <span className="text-xs font-semibold uppercase tracking-widest text-gray-400 hidden lg:block">Lettre de motivation</span>
                   <span className="sr-only">Actions</span>
                 </div>
 
@@ -579,11 +630,12 @@ export default function Dashboard() {
                 {analyses.map((analyse, index) => {
                   const cvLie = cvsAdaptes.find((c) => c.id === analyse.cv_adapte_id) ?? null;
                   const enSuppression = suppressionEnCours === analyse.id;
+                  const enGenerationLm = generationLmEnCours === analyse.id;
                   return (
                     <div
                       key={analyse.id}
                       onClick={() => setAnalyseOuverte(analyse)}
-                      className={`grid grid-cols-[1fr_auto_auto] sm:grid-cols-[2fr_1fr_1fr_auto] items-center px-5 py-4 gap-4 transition-colors duration-150 cursor-pointer
+                      className={`grid grid-cols-[1fr_auto_auto] lg:grid-cols-[2fr_1fr_1fr_1fr_auto] items-center px-5 py-4 gap-4 transition-colors duration-150 cursor-pointer
                         ${index !== analyses.length - 1 ? "border-b border-gray-100" : ""}
                         ${enSuppression ? "opacity-40 pointer-events-none" : "hover:bg-indigo-50/40"}
                       `}
@@ -645,7 +697,48 @@ export default function Dashboard() {
                         )}
                       </div>
 
-                      {/* Colonne 4 : Supprimer */}
+                      {/* Colonne 4 : Lettre de motivation */}
+                      <div className="hidden lg:flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
+                        {analyse.lettre_id ? (
+                          <>
+                            <button
+                              onClick={() => { setAnalyseOuverte(analyse); setOngletAnalyse("lettre"); }}
+                              className="text-xs font-medium text-gray-500 hover:text-gray-800 px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+                            >
+                              Aperçu
+                            </button>
+                            <button
+                              onClick={() => exporterLettre(analyse.id, "pdf")}
+                              disabled={exportLmEnCours !== null}
+                              className="text-xs font-semibold text-white bg-gray-800 hover:bg-gray-700 px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-40"
+                            >
+                              PDF
+                            </button>
+                            <button
+                              onClick={() => exporterLettre(analyse.id, "docx")}
+                              disabled={exportLmEnCours !== null}
+                              className="text-xs font-semibold text-white bg-violet-600 hover:bg-violet-700 px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-40"
+                            >
+                              Word
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            onClick={() => genererLettreMotivation(analyse.id)}
+                            disabled={generationLmEnCours !== null}
+                            className="text-xs font-semibold text-violet-600 hover:text-violet-800 hover:bg-violet-50 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50"
+                          >
+                            {enGenerationLm ? (
+                              <span className="flex items-center gap-1.5">
+                                <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                                Génération...
+                              </span>
+                            ) : "Générer →"}
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Colonne 5 : Supprimer */}
                       <div className="flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
                         <button
                           onClick={() => supprimerAnalyse(analyse.id)}
@@ -981,9 +1074,10 @@ export default function Dashboard() {
               {([
                 { key: "resultats", label: "Résultats" },
                 ...(analyseOuverte.score_apres != null ? [{ key: "apres", label: "Après adaptation" }] : []),
+                ...(analyseOuverte.lettre_id ? [{ key: "lettre", label: "Lettre de motivation" }] : []),
                 { key: "offre", label: "Offre d'emploi" },
                 { key: "cv", label: "CV original" },
-              ] as { key: "resultats" | "apres" | "offre" | "cv"; label: string }[]).map(({ key, label }) => (
+              ] as { key: "resultats" | "apres" | "lettre" | "offre" | "cv"; label: string }[]).map(({ key, label }) => (
                 <button
                   key={key}
                   onClick={() => setOngletAnalyse(key)}
@@ -1153,6 +1247,53 @@ export default function Dashboard() {
                 );
               })()}
 
+              {/* Onglet Lettre de motivation */}
+              {ongletAnalyse === "lettre" && (() => {
+                let lettre: { salutation: string; paragraphes: string[]; formule_politesse: string } | null = null;
+                try { if (analyseOuverte.lettre_texte) lettre = JSON.parse(analyseOuverte.lettre_texte); } catch {}
+                return lettre ? (
+                  <div className="p-6 flex flex-col gap-4">
+                    {/* Boutons export */}
+                    <div className="flex items-center gap-2 justify-end">
+                      <button
+                        onClick={() => exporterLettre(analyseOuverte.id, "pdf")}
+                        disabled={exportLmEnCours !== null}
+                        className="flex items-center gap-1.5 text-xs font-semibold bg-gray-900 text-white px-3 py-1.5 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50"
+                      >
+                        {exportLmEnCours === "pdf" ? <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg> : null}
+                        PDF
+                      </button>
+                      <button
+                        onClick={() => exporterLettre(analyseOuverte.id, "docx")}
+                        disabled={exportLmEnCours !== null}
+                        className="flex items-center gap-1.5 text-xs font-semibold bg-violet-600 text-white px-3 py-1.5 rounded-lg hover:bg-violet-700 transition-colors disabled:opacity-50"
+                      >
+                        {exportLmEnCours === "docx" ? <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg> : null}
+                        Word
+                      </button>
+                    </div>
+                    {/* Aperçu lettre */}
+                    <div className="bg-white ring-1 ring-gray-200 rounded-xl p-6 flex flex-col gap-4 text-sm text-gray-800 leading-relaxed font-serif">
+                      <p className="text-gray-500 italic text-xs">{lettre.salutation}</p>
+                      {lettre.paragraphes.map((p, i) => (
+                        <p key={i}>{p}</p>
+                      ))}
+                      <p className="mt-2">{lettre.formule_politesse}</p>
+                    </div>
+                    {/* Regénérer */}
+                    <button
+                      onClick={() => genererLettreMotivation(analyseOuverte.id)}
+                      disabled={generationLmEnCours !== null}
+                      className="text-xs text-gray-400 hover:text-violet-600 transition-colors text-center disabled:opacity-40"
+                    >
+                      {generationLmEnCours === analyseOuverte.id ? "Regénération en cours..." : "↺ Regénérer la lettre"}
+                    </button>
+                  </div>
+                ) : (
+                  <p className="p-6 text-sm text-gray-400 italic">Lettre introuvable.</p>
+                );
+              })()}
+
               {/* Onglet Offre d'emploi */}
               {ongletAnalyse === "offre" && (
                 <div className="p-6">
@@ -1235,15 +1376,17 @@ export default function Dashboard() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-3xl">
-              {modaleUpgrade === "scans" ? "⚡" : "✨"}
+              {modaleUpgrade === "scans" ? "⚡" : modaleUpgrade === "lm" ? "✉️" : "✨"}
             </div>
             <div>
               <h2 className="text-xl font-extrabold text-gray-900 mb-2">
-                {modaleUpgrade === "scans" ? "Limite d'analyses atteinte" : "Plus de crédits disponibles"}
+                {modaleUpgrade === "scans" ? "Limite d'analyses atteinte" : modaleUpgrade === "lm" ? "Plus de crédits lettre de motivation" : "Plus de crédits disponibles"}
               </h2>
               <p className="text-gray-500 text-sm leading-relaxed">
                 {modaleUpgrade === "scans"
                   ? "Vous avez utilisé vos 5 analyses gratuites. Passez à un abonnement pour analyser autant de CV que vous le souhaitez."
+                  : modaleUpgrade === "lm"
+                  ? "Votre crédit gratuit de lettre de motivation a été utilisé. Passez à un abonnement pour générer des lettres illimitées."
                   : "Votre crédit d'adaptation CV gratuit a été utilisé. Passez à un abonnement pour adapter votre CV en illimité."}
               </p>
             </div>
