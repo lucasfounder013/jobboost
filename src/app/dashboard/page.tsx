@@ -274,6 +274,7 @@ export default function Dashboard() {
   // ── Adaptation CV
   async function adapterCV() {
     if (!resultat) return;
+    if (!analyseId) { setErreurAdaptation("Veuillez patienter un instant avant de relancer l'adaptation."); return; }
     setErreurAdaptation("");
     setCvAdapte(null);
     setAdaptationEnCours(true);
@@ -286,11 +287,12 @@ export default function Dashboard() {
       const data = await reponse.json();
       if (reponse.status === 403) { setModaleUpgrade("credits"); return; }
       if (!reponse.ok) throw new Error(data.error);
-      setCvAdapte(data.cvAdapte);
       setCreditsRestants(data.creditsRestants);
-      sauvegarderCvAdapte(data.cvAdapte).catch(() => {});
-      // Calcul du score après adaptation (sans décompter de scans)
+      // Attendre la sauvegarde avant de rediriger
+      await sauvegarderCvAdapte(data.cvAdapte);
+      // Calcul du score en arrière-plan (affiché sur la page de destination)
       calculerScoreApresAdaptation(data.cvAdapte).catch(() => {});
+      router.push(`/cv-adapte/${analyseId}`);
     } catch (e) {
       setErreurAdaptation(e instanceof Error ? e.message : "Une erreur est survenue.");
     } finally {
