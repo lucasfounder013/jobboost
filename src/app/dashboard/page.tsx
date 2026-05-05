@@ -640,7 +640,7 @@ export default function Dashboard() {
                             onClick={() => setVue("nouvelle-analyse")}
                             className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors"
                           >
-                            Adapter mon CV →
+                            Adapter pour les ATS →
                           </button>
                         )}
                       </div>
@@ -805,7 +805,7 @@ export default function Dashboard() {
                       ) : (
                         <>
                           <button onClick={adapterCV} disabled={adaptationEnCours} className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                            {adaptationEnCours ? (<><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Adaptation en cours...</>) : ("Adapter mon CV automatiquement →")}
+                            {adaptationEnCours ? (<><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Adaptation en cours...</>) : ("Adapter mon CV pour les ATS →")}
                           </button>
                           {erreurAdaptation && <p className="text-rose-500 text-xs font-medium text-center">{erreurAdaptation}</p>}
                           {creditsRestants !== null && creditsRestants > 0 ? (

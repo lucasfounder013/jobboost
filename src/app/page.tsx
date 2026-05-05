@@ -537,7 +537,7 @@ export default function PagePrincipale() {
                                 Adaptation en cours...
                               </>
                             ) : (
-                              "Adapter mon CV automatiquement →"
+                              "Adapter mon CV pour les ATS →"
                             )}
                           </button>
                           {erreurAdaptation && (
@@ -557,7 +557,7 @@ export default function PagePrincipale() {
                         href="/register"
                         className="w-full sm:w-auto flex-1 bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 px-5 rounded-xl font-bold text-sm text-center hover:opacity-90 transition-opacity shadow-md shadow-indigo-100"
                       >
-                        Adapter mon CV →
+                        Adapter mon CV pour les ATS →
                       </Link>
                       <p className="text-gray-400 text-xs whitespace-nowrap">1 adaptation gratuite à l&apos;inscription</p>
                     </div>
