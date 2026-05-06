@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
   try {
     const result = await pool.query<UserRow>(`
       SELECT
-        u.id, u.name, u.email, u.created_at,
+        u.id, u.name, u.email, u."createdAt" AS created_at,
         eo.id AS eo_id,
         eo.unsubscribe_token,
         eo.email_1_sent_at,
@@ -104,12 +104,16 @@ export async function GET(req: NextRequest) {
         unsubscribeUrl,
       });
 
-      await resend.emails.send({
+      const { error: resendError } = await resend.emails.send({
         from: "JobBoost <contact@jobboost.fr>",
         to: user.email,
         subject,
         html,
       });
+      if (resendError) {
+        console.error(`[cron/onboarding] Resend error pour user ${user.id}:`, resendError);
+        continue;
+      }
       await pool.query(
         `UPDATE email_onboarding SET ${columns[emailIndex]} = NOW() WHERE user_id = $1`,
         [user.id]
