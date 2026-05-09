@@ -249,6 +249,12 @@ export default function PagePrincipale() {
           {/* Nav */}
           <nav className="flex items-center gap-1 text-sm">
             <Link
+              href="/ressources"
+              className="px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150"
+            >
+              Ressources
+            </Link>
+            <Link
               href="/pricing"
               className="px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150"
             >
