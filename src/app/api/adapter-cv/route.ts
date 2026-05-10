@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Authentification requise." }, { status: 401 });
   }
 
-  const { cv, offre, motsClesManquants } = await req.json();
+  const { cv, offre, motsClesManquants, reponses } = await req.json();
 
   if (!cv || !offre || typeof cv !== "string" || typeof offre !== "string") {
     return NextResponse.json({ error: "Paramètres manquants." }, { status: 400 });
@@ -52,13 +52,18 @@ export async function POST(req: NextRequest) {
       ? `\n\nMots-clés importants à intégrer naturellement : ${motsClesManquants.join(", ")}`
       : "";
 
+  const reponsesListe =
+    Array.isArray(reponses) && reponses.length > 0
+      ? `\n\nInformations complémentaires fournies par le candidat :\n${(reponses as { question: string; reponse: string }[]).filter(r => r.reponse?.trim()).map(r => `- ${r.question} → ${r.reponse}`).join("\n")}\nUtilise ces informations pour enrichir le CV — ne les invente pas si elles ne sont pas fournies.`
+      : "";
+
   const message = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
     max_tokens: 4096,
     messages: [
       {
         role: "user",
-        content: `Tu es un expert en rédaction de CV ATS-friendly. Réécris ce CV pour maximiser sa correspondance avec l'offre d'emploi, en intégrant naturellement les mots-clés manquants. Ne fabrique pas d'expériences ni de diplômes — reformule et mets en valeur ce qui existe déjà. Les concours, compétitions et hackathons vont dans "projets", pas dans "certifications". Les certifications sont uniquement des diplômes ou titres officiels (ex : TOEIC, certifications professionnelles).${motsClesListe}
+        content: `Tu es un expert en rédaction de CV ATS-friendly. Réécris ce CV pour maximiser sa correspondance avec l'offre d'emploi, en intégrant naturellement les mots-clés manquants. Ne fabrique pas d'expériences ni de diplômes — reformule et mets en valeur ce qui existe déjà. Les concours, compétitions et hackathons vont dans "projets", pas dans "certifications". Les certifications sont uniquement des diplômes ou titres officiels (ex : TOEIC, certifications professionnelles).${motsClesListe}${reponsesListe}
 
 Retourne UNIQUEMENT un objet JSON valide, sans markdown ni backticks, respectant exactement ce schéma (n'inclure que les champs présents dans le CV original — ne pas inventer ni laisser de tableaux vides) :
 

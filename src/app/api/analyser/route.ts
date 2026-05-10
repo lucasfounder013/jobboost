@@ -64,38 +64,30 @@ ${offre}
 
 Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans backticks) avec cette structure exacte :
 {
-  "score": <nombre entier de 0 à 100>,
+  "niveauQualitatif": "<l'un des niveaux suivants exactement : Très mauvais | Mauvais | Moyen | Bon | Très bon | Excellent>",
   "nomPoste": "<titre du poste extrait de l'offre d'emploi, ex: 'Développeur React Senior'>",
   "resume": "<2-3 phrases d'analyse globale en français>",
-  "categories": {
-    "recherchabilite": {
-      "score": <0-100>,
-      "problemes": [{ "statut": "ok" | "avertissement" | "erreur", "message": "<explication courte>" }]
-    },
-    "competencesTechniques": {
-      "score": <0-100>,
-      "problemes": [{ "statut": "ok" | "avertissement" | "erreur", "message": "<explication courte>" }]
-    },
-    "competencesSoft": {
-      "score": <0-100>,
-      "problemes": [{ "statut": "ok" | "avertissement" | "erreur", "message": "<explication courte>" }]
-    },
-    "conseilsRecruteur": {
-      "score": <0-100>,
-      "problemes": [{ "statut": "ok" | "avertissement" | "erreur", "message": "<explication courte>" }]
-    }
-  },
+  "forme": [
+    { "verdict": "✅" | "❌", "constat": "<constat factuel court, jamais une question>" },
+    ...
+  ],
   "motsClesManquants": [<mots-clés importants de l'offre absents du CV>],
   "motsClesPresents": [<mots-clés importants de l'offre présents dans le CV>]
 }
 
-Critères par catégorie :
-- recherchabilite : titre de poste présent, mots-clés ATS, formatage lisible, absence de tableaux/colonnes complexes
-- competencesTechniques : compétences techniques demandées, outils, langages, certifications
-- competencesSoft : compétences comportementales, leadership, communication, travail en équipe
-- conseilsRecruteur : réalisations chiffrées, verbes d'action, longueur appropriée, clarté des expériences
+Règles pour niveauQualitatif :
+- Excellent : le CV est quasi parfaitement aligné avec l'offre
+- Très bon : très bonne correspondance, quelques points à affiner
+- Bon : bonne base mais lacunes notables
+- Moyen : correspondance partielle, travail significatif à faire
+- Mauvais : faible correspondance, CV peu adapté à l'offre
+- Très mauvais : très peu de correspondance, CV inadapté
 
-Génère 3 à 5 points par catégorie.`,
+Règles pour forme (section factuelle sur la qualité du CV) :
+- Génère 4 à 6 constats factuels sur la forme du CV (pas sur les mots-clés)
+- Chaque constat est une observation factuelle courte (jamais une question, jamais un conseil)
+- Exemples de bons constats : "Aucune expérience ne contient de chiffres ou de résultats mesurables", "Les titres de poste sont clairs et alignés avec l'offre", "Les bullet points sont absents dans la section expériences"
+- verdict ✅ si le point est positif, ❌ si c'est un problème`,
       },
     ],
   });

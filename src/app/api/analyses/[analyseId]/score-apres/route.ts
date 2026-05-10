@@ -10,19 +10,15 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ an
   if (!session) return NextResponse.json({ error: "Non autorisé." }, { status: 401 });
 
   const { analyseId } = await params;
-  const { scoreApres, motsClesApresManquants, motsClesApresPresents } = await req.json();
-
-  if (typeof scoreApres !== "number") {
-    return NextResponse.json({ error: "Score invalide." }, { status: 400 });
-  }
+  const { niveauQualitatifApres, motsClesApresManquants, motsClesApresPresents } = await req.json();
 
   await pool.query(
     `UPDATE analyses
-     SET score_apres = $1,
+     SET niveau_qualitatif_apres = $1,
          mots_cles_apres_manquants = $2,
          mots_cles_apres_presents = $3
      WHERE id = $4 AND user_id = $5`,
-    [scoreApres, motsClesApresManquants ?? null, motsClesApresPresents ?? null, analyseId, session.user.id]
+    [niveauQualitatifApres ?? null, motsClesApresManquants ?? null, motsClesApresPresents ?? null, analyseId, session.user.id]
   );
 
   return NextResponse.json({ ok: true });

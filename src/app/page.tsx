@@ -8,18 +8,14 @@ import CVPreview from "@/components/CVPreview";
 import Footer from "@/components/Footer";
 import { CVStructure } from "@/types/cv";
 
-type Probleme = { statut: "ok" | "avertissement" | "erreur"; message: string };
-type Categorie = { score: number; problemes: Probleme[] };
+type NiveauQualitatif = "Très mauvais" | "Mauvais" | "Moyen" | "Bon" | "Très bon" | "Excellent";
+type FormeItem = { verdict: "✅" | "❌"; constat: string };
 
 type ResultatAnalyse = {
-  score: number;
+  niveauQualitatif: NiveauQualitatif;
+  nomPoste?: string;
   resume: string;
-  categories: {
-    recherchabilite: Categorie;
-    competencesTechniques: Categorie;
-    competencesSoft: Categorie;
-    conseilsRecruteur: Categorie;
-  };
+  forme: FormeItem[];
   motsClesManquants: string[];
   motsClesPresents: string[];
 };
@@ -46,6 +42,10 @@ export default function PagePrincipale() {
   const [autoAnalyse, setAutoAnalyse] = useState(false);
   const [analyseId, setAnalyseId] = useState<string | null>(null);
   const [nomPosteEnregistre, setNomPosteEnregistre] = useState("");
+  const [etapeAdaptation, setEtapeAdaptation] = useState<"idle" | "questions" | "generation">("idle");
+  const [questionsAdaptation, setQuestionsAdaptation] = useState<string[]>([]);
+  const [reponsesAdaptation, setReponsesAdaptation] = useState<Record<number, string>>({});
+  const [chargementQuestions, setChargementQuestions] = useState(false);
 
   // Restaure le CV et l'offre sauvegardés avant une redirection (login ou Stripe)
   useEffect(() => {
@@ -132,30 +132,57 @@ export default function PagePrincipale() {
     }
   }
 
-  async function adapterCV() {
+  async function lancerEtapeQuestions() {
     if (!resultat) return;
     setErreurAdaptation("");
-    setCvAdapte(null);
-    setAdaptationEnCours(true);
+    setChargementQuestions(true);
+    setEtapeAdaptation("questions");
+    setQuestionsAdaptation([]);
+    setReponsesAdaptation({});
     try {
-      const reponse = await fetch("/api/adapter-cv", {
+      const reponse = await fetch("/api/generer-questions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cv, offre, motsClesManquants: resultat.motsClesManquants }),
       });
       const data = await reponse.json();
       if (!reponse.ok) throw new Error(data.error);
+      setQuestionsAdaptation(data.questions ?? []);
+    } catch {
+      setEtapeAdaptation("idle");
+    } finally {
+      setChargementQuestions(false);
+    }
+  }
+
+  async function adapterCV() {
+    if (!resultat) return;
+    setErreurAdaptation("");
+    setCvAdapte(null);
+    setAdaptationEnCours(true);
+    setEtapeAdaptation("generation");
+    try {
+      const reponses = questionsAdaptation.map((q, i) => ({ question: q, reponse: reponsesAdaptation[i] ?? "" }));
+      const reponse = await fetch("/api/adapter-cv", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cv, offre, motsClesManquants: resultat.motsClesManquants, reponses }),
+      });
+      const data = await reponse.json();
+      if (!reponse.ok) throw new Error(data.error);
       setCvAdapte(data.cvAdapte);
       setCreditsRestants(data.creditsRestants);
+      setEtapeAdaptation("idle");
       sauvegarderCvAdapte(data.cvAdapte).catch(() => {});
     } catch (e) {
       setErreurAdaptation(e instanceof Error ? e.message : "Une erreur est survenue.");
+      setEtapeAdaptation("questions");
     } finally {
       setAdaptationEnCours(false);
     }
   }
 
-  async function sauvegarderAnalyse(data: ResultatAnalyse & { nomPoste?: string }) {
+  async function sauvegarderAnalyse(data: ResultatAnalyse) {
     const nomOffre = data.nomPoste || nomFichier || "Analyse sans titre";
     setNomPosteEnregistre(nomOffre);
     const reponse = await fetch("/api/sauvegarder", {
@@ -163,7 +190,7 @@ export default function PagePrincipale() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         nomOffre,
-        score: data.score,
+        niveauQualitatif: data.niveauQualitatif,
         resume: data.resume,
         motsClesManquants: data.motsClesManquants,
         motsClesPresents: data.motsClesPresents,
@@ -183,7 +210,7 @@ export default function PagePrincipale() {
       body: JSON.stringify(
         analyseId
           ? { analyseId, nomOffre, cvAdapte: cv }
-          : { nomOffre, score: resultat?.score ?? 0, resume: resultat?.resume ?? "", motsClesManquants: resultat?.motsClesManquants ?? [], motsClesPresents: resultat?.motsClesPresents ?? [], cvAdapte: cv }
+          : { nomOffre, niveauQualitatif: resultat?.niveauQualitatif, resume: resultat?.resume ?? "", motsClesManquants: resultat?.motsClesManquants ?? [], motsClesPresents: resultat?.motsClesPresents ?? [], cvAdapte: cv }
       ),
     });
   }
@@ -213,22 +240,16 @@ export default function PagePrincipale() {
     }
   }
 
-  const couleurScore = (score: number) => {
-    if (score >= 75) return "text-emerald-600";
-    if (score >= 50) return "text-amber-500";
-    return "text-rose-500";
-  };
-
-  const ringScore = (score: number) => {
-    if (score >= 75) return "ring-emerald-200 bg-emerald-50";
-    if (score >= 50) return "ring-amber-200 bg-amber-50";
-    return "ring-rose-200 bg-rose-50";
-  };
-
-  const scoreLabel = (score: number) => {
-    if (score >= 75) return "Excellent";
-    if (score >= 50) return "Moyen";
-    return "Faible";
+  const badgeNiveau = (niveau: NiveauQualitatif) => {
+    const map: Record<NiveauQualitatif, string> = {
+      "Très mauvais": "bg-rose-100 text-rose-700",
+      "Mauvais": "bg-orange-100 text-orange-700",
+      "Moyen": "bg-amber-100 text-amber-700",
+      "Bon": "bg-blue-100 text-blue-700",
+      "Très bon": "bg-emerald-100 text-emerald-700",
+      "Excellent": "bg-violet-100 text-violet-700",
+    };
+    return map[niveau] ?? "bg-gray-100 text-gray-700";
   };
 
   return (
@@ -490,23 +511,15 @@ export default function PagePrincipale() {
           <section className="max-w-6xl mx-auto px-6 pb-20">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-              {/* Score */}
-              <div className={`bg-white rounded-2xl ring-2 shadow-sm p-8 flex flex-col items-center justify-center text-center ${ringScore(resultat.score)}`}>
-                <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Score de correspondance</p>
-                <p className={`text-7xl font-extrabold tabular-nums ${couleurScore(resultat.score)}`}>
-                  {resultat.score}
-                  <span className="text-3xl">%</span>
-                </p>
-                <span className={`mt-3 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full ${
-                  resultat.score >= 75 ? "bg-emerald-100 text-emerald-700" :
-                  resultat.score >= 50 ? "bg-amber-100 text-amber-700" :
-                  "bg-rose-100 text-rose-700"
-                }`}>
-                  {scoreLabel(resultat.score)}
+              {/* Badge qualitatif */}
+              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-8 flex flex-col items-center justify-center text-center">
+                <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Niveau de correspondance</p>
+                <span className={`text-2xl font-extrabold px-5 py-2 rounded-full ${badgeNiveau(resultat.niveauQualitatif)}`}>
+                  {resultat.niveauQualitatif}
                 </span>
               </div>
 
-              {/* Analyse */}
+              {/* Analyse + CTA */}
               <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6 lg:col-span-2 flex flex-col justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Analyse</p>
@@ -527,35 +540,27 @@ export default function PagePrincipale() {
                           </Link>
                           <p className="text-gray-400 text-xs text-center">Votre crédit gratuit a été utilisé</p>
                         </div>
-                      ) : (
+                      ) : etapeAdaptation === "generation" ? (
+                        <button disabled className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm opacity-70 cursor-not-allowed flex items-center justify-center gap-2">
+                          <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                          Génération du CV en cours...
+                        </button>
+                      ) : etapeAdaptation === "idle" ? (
                         <>
                           <button
-                            onClick={adapterCV}
+                            onClick={lancerEtapeQuestions}
                             disabled={adaptationEnCours}
                             className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                           >
-                            {adaptationEnCours ? (
-                              <>
-                                <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                                </svg>
-                                Adaptation en cours...
-                              </>
-                            ) : (
-                              "Adapter mon CV pour les ATS →"
-                            )}
+                            Adapter mon CV pour les ATS →
                           </button>
-                          {erreurAdaptation && (
-                            <p className="text-rose-500 text-xs font-medium text-center">{erreurAdaptation}</p>
-                          )}
                           {creditsRestants !== null && creditsRestants > 0 ? (
                             <p className="text-gray-400 text-xs text-center">{creditsRestants} crédit{creditsRestants !== 1 ? "s" : ""} restant{creditsRestants !== 1 ? "s" : ""}</p>
                           ) : creditsRestants === null && cvAdapte ? (
                             <p className="text-emerald-600 text-xs text-center font-medium">Adaptations illimitées ✓</p>
                           ) : null}
                         </>
-                      )}
+                      ) : null}
                     </>
                   ) : (
                     <div className="flex flex-col sm:flex-row items-center gap-3">
@@ -571,44 +576,82 @@ export default function PagePrincipale() {
                 </div>
               </div>
 
-              {/* Catégories détaillées */}
-              {resultat.categories && (() => {
-                const cats: { cle: keyof typeof resultat.categories; label: string }[] = [
-                  { cle: "recherchabilite", label: "Recherchabilité" },
-                  { cle: "competencesTechniques", label: "Compétences techniques" },
-                  { cle: "competencesSoft", label: "Compétences comportementales" },
-                  { cle: "conseilsRecruteur", label: "Conseils recruteur" },
-                ];
-                return cats.map(({ cle, label }) => {
-                  const cat = resultat.categories[cle];
-                  return (
-                    <div key={cle} className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6">
-                      <div className="flex items-center justify-between mb-4">
-                        <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">{label}</p>
-                        <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
-                          cat.score >= 75 ? "bg-emerald-100 text-emerald-700" :
-                          cat.score >= 50 ? "bg-amber-100 text-amber-700" :
-                          "bg-rose-100 text-rose-700"
-                        }`}>{cat.score}%</span>
-                      </div>
-                      <ul className="flex flex-col gap-2">
-                        {cat.problemes.map((p, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm">
-                            <span className="mt-0.5 shrink-0">
-                              {p.statut === "ok" ? "✅" : p.statut === "avertissement" ? "⚠️" : "❌"}
-                            </span>
-                            <span className={
-                              p.statut === "ok" ? "text-emerald-700" :
-                              p.statut === "avertissement" ? "text-amber-700" :
-                              "text-rose-600"
-                            }>{p.message}</span>
-                          </li>
-                        ))}
-                      </ul>
+              {/* Étape questions */}
+              {etapeAdaptation === "questions" && (
+                <div className="bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm p-6 lg:col-span-3">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Quelques précisions pour personnaliser votre CV</p>
+                  <p className="text-sm text-gray-500 mb-5">Ces informations permettront à l&apos;IA de rédiger un CV plus précis. Répondez à celles qui vous semblent pertinentes.</p>
+                  {chargementQuestions ? (
+                    <div className="flex items-center gap-2 text-indigo-500">
+                      <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                      </svg>
+                      <span className="text-sm font-medium">Génération des questions...</span>
                     </div>
-                  );
-                });
-              })()}
+                  ) : (
+                    <>
+                      <div className="flex flex-col gap-4 mb-5">
+                        {questionsAdaptation.map((q, i) => (
+                          <div key={i}>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">{q}</label>
+                            <input
+                              type="text"
+                              value={reponsesAdaptation[i] ?? ""}
+                              onChange={(e) => setReponsesAdaptation(prev => ({ ...prev, [i]: e.target.value }))}
+                              placeholder="Votre réponse (optionnel)"
+                              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={adapterCV}
+                          disabled={adaptationEnCours}
+                          className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+                        >
+                          {adaptationEnCours ? (
+                            <>
+                              <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                              </svg>
+                              Génération en cours...
+                            </>
+                          ) : (
+                            "Générer mon CV adapté →"
+                          )}
+                        </button>
+                        <button
+                          onClick={() => setEtapeAdaptation("idle")}
+                          className="text-sm text-gray-400 hover:text-gray-600 font-medium transition-colors"
+                        >
+                          Annuler
+                        </button>
+                      </div>
+                      {erreurAdaptation && (
+                        <p className="text-rose-500 text-xs font-medium mt-2">{erreurAdaptation}</p>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+
+              {/* Section Forme */}
+              {resultat.forme && resultat.forme.length > 0 && (
+                <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6 lg:col-span-3">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Forme du CV</p>
+                  <ul className="flex flex-col gap-3">
+                    {resultat.forme.map((item, i) => (
+                      <li key={i} className="flex items-start gap-3 text-sm">
+                        <span className="shrink-0 mt-0.5">{item.verdict}</span>
+                        <span className="text-gray-700 leading-relaxed">{item.constat}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
 
               {/* Mots-clés manquants */}
               {resultat.motsClesManquants.length > 0 && (
@@ -656,21 +699,6 @@ export default function PagePrincipale() {
 
             </div>
 
-            {/* Lien vers le dashboard */}
-            {session && analyseId && (
-              <div className="mt-5 flex justify-end">
-                <Link
-                  href="/dashboard"
-                  className="flex items-center gap-2 text-sm font-semibold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-4 py-2 rounded-xl transition-colors"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                  </svg>
-                  Revenir au dashboard →
-                </Link>
-              </div>
-            )}
-
             {/* CV adapté */}
             {cvAdapte && (
               <div className="mt-5 bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm overflow-hidden">
@@ -714,6 +742,17 @@ export default function PagePrincipale() {
                       )}
                       Word
                     </button>
+                    {session && (
+                      <Link
+                        href="/dashboard"
+                        className="flex items-center gap-1.5 text-xs font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition-colors"
+                      >
+                        <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                        </svg>
+                        Dashboard
+                      </Link>
+                    )}
                   </div>
                 </div>
                 <div className="p-4">

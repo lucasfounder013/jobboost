@@ -9,19 +9,14 @@ import { CVStructure } from "@/types/cv";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type Probleme = { statut: "ok" | "avertissement" | "erreur"; message: string };
-type Categorie = { score: number; problemes: Probleme[] };
+type NiveauQualitatif = "Très mauvais" | "Mauvais" | "Moyen" | "Bon" | "Très bon" | "Excellent";
+type FormeItem = { verdict: "✅" | "❌"; constat: string };
 
 type ResultatAnalyse = {
-  score: number;
+  niveauQualitatif: NiveauQualitatif;
   nomPoste?: string;
   resume: string;
-  categories: {
-    recherchabilite: Categorie;
-    competencesTechniques: Categorie;
-    competencesSoft: Categorie;
-    conseilsRecruteur: Categorie;
-  };
+  forme: FormeItem[];
   motsClesManquants: string[];
   motsClesPresents: string[];
 };
@@ -29,12 +24,14 @@ type ResultatAnalyse = {
 type AnalyseSauvegardee = {
   id: string;
   nom_offre: string;
-  score: number;
-  score_apres?: number | null;
+  niveau_qualitatif?: string | null;
+  niveau_qualitatif_apres?: string | null;
   created_at: string;
   resume?: string;
   mots_cles_manquants?: string[];
   mots_cles_presents?: string[];
+  score?: number | null;
+  score_apres?: number | null;
   mots_cles_apres_manquants?: string[] | null;
   mots_cles_apres_presents?: string[] | null;
   cv_adapte_id: string | null;
@@ -51,6 +48,7 @@ type CvAdapteSauvegarde = {
   nom_offre: string;
   created_at: string;
   cv_data: CVStructure;
+  questions_reponses?: { question: string; reponse: string }[] | null;
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -88,10 +86,15 @@ function cvStructureVersTexte(cv: CVStructure): string {
   return lignes.filter(Boolean).join("\n");
 }
 
-const couleurScore = (s: number) => s >= 75 ? "text-emerald-600" : s >= 50 ? "text-amber-500" : "text-rose-500";
-const bgScore = (s: number) => s >= 75 ? "bg-emerald-50 text-emerald-700 ring-emerald-200" : s >= 50 ? "bg-amber-50 text-amber-700 ring-amber-200" : "bg-rose-50 text-rose-700 ring-rose-200";
-const ringScore = (s: number) => s >= 75 ? "ring-emerald-300 text-emerald-600" : s >= 50 ? "ring-amber-300 text-amber-500" : "ring-rose-300 text-rose-500";
-const labelScore = (s: number) => s >= 75 ? "Excellent" : s >= 50 ? "Moyen" : "Faible";
+const BADGE_NIVEAU: Record<string, string> = {
+  "Très mauvais": "bg-rose-100 text-rose-700",
+  "Mauvais": "bg-orange-100 text-orange-700",
+  "Moyen": "bg-amber-100 text-amber-700",
+  "Bon": "bg-blue-100 text-blue-700",
+  "Très bon": "bg-emerald-100 text-emerald-700",
+  "Excellent": "bg-violet-100 text-violet-700",
+};
+const badgeNiveau = (niveau: string | null | undefined) => BADGE_NIVEAU[niveau ?? ""] ?? "bg-gray-100 text-gray-700";
 const formaterDate = (iso: string) => new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 
 // ─── Composant ────────────────────────────────────────────────────────────────
@@ -133,6 +136,10 @@ export default function Dashboard() {
   const [analyseId, setAnalyseId] = useState<string | null>(null);
   const [nomPosteEnregistre, setNomPosteEnregistre] = useState("");
   const [autoAnalyse, setAutoAnalyse] = useState(false);
+  const [etapeAdaptation, setEtapeAdaptation] = useState<"idle" | "questions" | "generation">("idle");
+  const [questionsAdaptation, setQuestionsAdaptation] = useState<string[]>([]);
+  const [reponsesAdaptation, setReponsesAdaptation] = useState<Record<number, string>>({});
+  const [chargementQuestions, setChargementQuestions] = useState(false);
   const [modaleUpgrade, setModaleUpgrade] = useState<"scans" | "credits" | "lm" | null>(null);
   const [suppressionEnCours, setSuppressionEnCours] = useState<string | null>(null);
   const [editionPoste, setEditionPoste] = useState<{ id: string; valeur: string } | null>(null);
@@ -271,30 +278,58 @@ export default function Dashboard() {
     }
   }
 
-  // ── Adaptation CV
-  async function adapterCV() {
+  // ── Lancer étape questions avant adaptation
+  async function lancerEtapeQuestions() {
     if (!resultat) return;
-    if (!analyseId) { setErreurAdaptation("Veuillez patienter un instant avant de relancer l'adaptation."); return; }
     setErreurAdaptation("");
-    setCvAdapte(null);
-    setAdaptationEnCours(true);
+    setChargementQuestions(true);
+    setEtapeAdaptation("questions");
+    setQuestionsAdaptation([]);
+    setReponsesAdaptation({});
     try {
-      const reponse = await fetch("/api/adapter-cv", {
+      const reponse = await fetch("/api/generer-questions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cv, offre, motsClesManquants: resultat.motsClesManquants }),
       });
       const data = await reponse.json();
-      if (reponse.status === 403) { setModaleUpgrade("credits"); return; }
+      if (reponse.ok) setQuestionsAdaptation(data.questions ?? []);
+    } catch {
+      setEtapeAdaptation("idle");
+    } finally {
+      setChargementQuestions(false);
+    }
+  }
+
+  // ── Adaptation CV
+  async function adapterCV() {
+    if (!resultat) return;
+    setErreurAdaptation("");
+    setCvAdapte(null);
+    setAdaptationEnCours(true);
+    setEtapeAdaptation("generation");
+    try {
+      const reponses = questionsAdaptation.map((q, i) => ({ question: q, reponse: reponsesAdaptation[i] ?? "" }));
+      const reponse = await fetch("/api/adapter-cv", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cv, offre, motsClesManquants: resultat.motsClesManquants, reponses }),
+      });
+      const data = await reponse.json();
+      if (reponse.status === 403) { setModaleUpgrade("credits"); setEtapeAdaptation("idle"); return; }
       if (!reponse.ok) throw new Error(data.error);
       setCreditsRestants(data.creditsRestants);
-      // Attendre la sauvegarde avant de rediriger
+      setEtapeAdaptation("idle");
       await sauvegarderCvAdapte(data.cvAdapte);
-      // Calcul du score en arrière-plan (affiché sur la page de destination)
       calculerScoreApresAdaptation(data.cvAdapte).catch(() => {});
-      router.push(`/cv-adapte/${analyseId}`);
+      if (analyseId) {
+        router.push(`/cv-adapte/${analyseId}`);
+      } else {
+        setCvAdapte(data.cvAdapte);
+      }
     } catch (e) {
       setErreurAdaptation(e instanceof Error ? e.message : "Une erreur est survenue.");
+      setEtapeAdaptation("questions");
     } finally {
       setAdaptationEnCours(false);
     }
@@ -316,7 +351,7 @@ export default function Dashboard() {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        scoreApres: dataScore.score,
+        niveauQualitatifApres: dataScore.niveauQualitatif,
         motsClesApresManquants: dataScore.motsClesManquants,
         motsClesApresPresents: dataScore.motsClesPresents,
       }),
@@ -333,7 +368,7 @@ export default function Dashboard() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         nomOffre,
-        score: data.score,
+        niveauQualitatif: data.niveauQualitatif,
         resume: data.resume,
         motsClesManquants: data.motsClesManquants,
         motsClesPresents: data.motsClesPresents,
@@ -364,13 +399,16 @@ export default function Dashboard() {
   // ── Auto-save CV adapté
   async function sauvegarderCvAdapte(cvData: CVStructure) {
     const nomOffre = nomPosteEnregistre || nomFichier || "Analyse sans titre";
+    const qr = questionsAdaptation
+      .map((q, i) => ({ question: q, reponse: reponsesAdaptation[i] ?? "" }))
+      .filter(r => r.reponse.trim());
     await fetch("/api/sauvegarder", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(
         analyseId
-          ? { analyseId, nomOffre, cvAdapte: cvData }
-          : { nomOffre, score: resultat?.score ?? 0, resume: resultat?.resume ?? "", motsClesManquants: resultat?.motsClesManquants ?? [], motsClesPresents: resultat?.motsClesPresents ?? [], cvAdapte: cvData }
+          ? { analyseId, nomOffre, cvAdapte: cvData, questionsReponses: qr }
+          : { nomOffre, niveauQualitatif: resultat?.niveauQualitatif, resume: resultat?.resume ?? "", motsClesManquants: resultat?.motsClesManquants ?? [], motsClesPresents: resultat?.motsClesPresents ?? [], cvAdapte: cvData, questionsReponses: qr }
       ),
     });
   }
@@ -648,18 +686,17 @@ export default function Dashboard() {
                         <p className="text-xs text-gray-400">{formaterDate(analyse.created_at)}</p>
                       </div>
 
-                      {/* Colonne 2 : Analyse CV — badge ou comparatif avant/après */}
-                      <div onClick={(e) => e.stopPropagation()} className="flex items-center">
-                        {analyse.score_apres != null ? (
+                      {/* Colonne 2 : Analyse CV — badge qualitatif avant/après */}
+                      <div className="flex items-center">
+                        {analyse.niveau_qualitatif_apres ? (
                           <span className="inline-flex items-center gap-1 text-xs font-semibold">
-                            <span className={`px-2.5 py-1.5 rounded-full ring-1 ${bgScore(analyse.score)}`}>{analyse.score}%</span>
+                            <span className={`px-2.5 py-1.5 rounded-full ${badgeNiveau(analyse.niveau_qualitatif)}`}>{analyse.niveau_qualitatif ?? "—"}</span>
                             <span className="text-gray-300 mx-0.5">→</span>
-                            <span className="bg-emerald-50 text-emerald-700 ring-emerald-200 ring-1 px-2.5 py-1.5 rounded-full font-bold">{analyse.score_apres}%</span>
+                            <span className={`px-2.5 py-1.5 rounded-full font-bold ${badgeNiveau(analyse.niveau_qualitatif_apres)}`}>{analyse.niveau_qualitatif_apres}</span>
                           </span>
                         ) : (
-                          <span className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full ring-1 ${bgScore(analyse.score)}`}>
-                            <span className="tabular-nums">{analyse.score}%</span>
-                            <span>{labelScore(analyse.score)}</span>
+                          <span className={`inline-flex items-center text-xs font-bold px-3 py-1.5 rounded-full ${badgeNiveau(analyse.niveau_qualitatif)}`}>
+                            {analyse.niveau_qualitatif ?? "—"}
                           </span>
                         )}
                       </div>
@@ -876,13 +913,12 @@ export default function Dashboard() {
               <div className="flex flex-col gap-5">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-                  {/* Score */}
-                  <div className={`bg-white rounded-2xl ring-2 shadow-sm p-8 flex flex-col items-center justify-center text-center ${
-                    resultat.score >= 75 ? "ring-emerald-200 bg-emerald-50" : resultat.score >= 50 ? "ring-amber-200 bg-amber-50" : "ring-rose-200 bg-rose-50"
-                  }`}>
-                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-3">Score de correspondance</p>
-                    <p className={`text-7xl font-extrabold tabular-nums ${couleurScore(resultat.score)}`}>{resultat.score}<span className="text-3xl">%</span></p>
-                    <span className={`mt-3 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full ${bgScore(resultat.score)}`}>{labelScore(resultat.score)}</span>
+                  {/* Badge qualitatif */}
+                  <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-8 flex flex-col items-center justify-center text-center">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Niveau de correspondance</p>
+                    <span className={`text-2xl font-extrabold px-5 py-2 rounded-full ${badgeNiveau(resultat.niveauQualitatif)}`}>
+                      {resultat.niveauQualitatif}
+                    </span>
                   </div>
 
                   {/* Analyse + CTA */}
@@ -897,10 +933,15 @@ export default function Dashboard() {
                           <Link href="/pricing" className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm text-center hover:opacity-90 transition-opacity shadow-md shadow-indigo-100">S&apos;abonner pour des adaptations illimitées →</Link>
                           <p className="text-gray-400 text-xs text-center">Votre crédit gratuit a été utilisé</p>
                         </div>
-                      ) : (
+                      ) : etapeAdaptation === "generation" ? (
+                        <button disabled className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm opacity-70 cursor-not-allowed flex items-center justify-center gap-2">
+                          <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                          Génération du CV en cours...
+                        </button>
+                      ) : etapeAdaptation === "idle" ? (
                         <>
-                          <button onClick={adapterCV} disabled={adaptationEnCours} className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                            {adaptationEnCours ? (<><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Adaptation en cours...</>) : ("Adapter mon CV pour les ATS →")}
+                          <button onClick={lancerEtapeQuestions} disabled={adaptationEnCours} className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                            Adapter mon CV pour les ATS →
                           </button>
                           {erreurAdaptation && <p className="text-rose-500 text-xs font-medium text-center">{erreurAdaptation}</p>}
                           {creditsRestants !== null && creditsRestants > 0 ? (
@@ -909,38 +950,62 @@ export default function Dashboard() {
                             <p className="text-emerald-600 text-xs text-center font-medium">Adaptations illimitées ✓</p>
                           ) : null}
                         </>
-                      )}
+                      ) : null}
                     </div>
                   </div>
 
-                  {/* Catégories */}
-                  {resultat.categories && (() => {
-                    const cats: { cle: keyof typeof resultat.categories; label: string }[] = [
-                      { cle: "recherchabilite", label: "Recherchabilité" },
-                      { cle: "competencesTechniques", label: "Compétences techniques" },
-                      { cle: "competencesSoft", label: "Compétences comportementales" },
-                      { cle: "conseilsRecruteur", label: "Conseils recruteur" },
-                    ];
-                    return cats.map(({ cle, label }) => {
-                      const cat = resultat.categories[cle];
-                      return (
-                        <div key={cle} className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6">
-                          <div className="flex items-center justify-between mb-4">
-                            <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">{label}</p>
-                            <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${bgScore(cat.score)}`}>{cat.score}%</span>
-                          </div>
-                          <ul className="flex flex-col gap-2">
-                            {cat.problemes.map((p, i) => (
-                              <li key={i} className="flex items-start gap-2 text-sm">
-                                <span className="mt-0.5 shrink-0">{p.statut === "ok" ? "✅" : p.statut === "avertissement" ? "⚠️" : "❌"}</span>
-                                <span className={p.statut === "ok" ? "text-emerald-700" : p.statut === "avertissement" ? "text-amber-700" : "text-rose-600"}>{p.message}</span>
-                              </li>
-                            ))}
-                          </ul>
+                  {/* Étape questions */}
+                  {etapeAdaptation === "questions" && (
+                    <div className="bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm p-6 lg:col-span-3">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Quelques précisions pour personnaliser votre CV</p>
+                      <p className="text-sm text-gray-500 mb-5">Ces informations permettront à l&apos;IA de rédiger un CV plus précis. Répondez à celles qui vous semblent pertinentes.</p>
+                      {chargementQuestions ? (
+                        <div className="flex items-center gap-2 text-indigo-500">
+                          <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                          <span className="text-sm font-medium">Génération des questions...</span>
                         </div>
-                      );
-                    });
-                  })()}
+                      ) : (
+                        <>
+                          <div className="flex flex-col gap-4 mb-5">
+                            {questionsAdaptation.map((q, i) => (
+                              <div key={i}>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">{q}</label>
+                                <input
+                                  type="text"
+                                  value={reponsesAdaptation[i] ?? ""}
+                                  onChange={(e) => setReponsesAdaptation(prev => ({ ...prev, [i]: e.target.value }))}
+                                  placeholder="Votre réponse (optionnel)"
+                                  className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                                />
+                              </div>
+                            ))}
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <button onClick={adapterCV} disabled={adaptationEnCours} className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2">
+                              {adaptationEnCours ? (<><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Génération en cours...</>) : ("Générer mon CV adapté →")}
+                            </button>
+                            <button onClick={() => setEtapeAdaptation("idle")} className="text-sm text-gray-400 hover:text-gray-600 font-medium transition-colors">Annuler</button>
+                          </div>
+                          {erreurAdaptation && <p className="text-rose-500 text-xs font-medium mt-2">{erreurAdaptation}</p>}
+                        </>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Section Forme */}
+                  {resultat.forme && resultat.forme.length > 0 && (
+                    <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6 lg:col-span-3">
+                      <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Forme du CV</p>
+                      <ul className="flex flex-col gap-3">
+                        {resultat.forme.map((item, i) => (
+                          <li key={i} className="flex items-start gap-3 text-sm">
+                            <span className="shrink-0 mt-0.5">{item.verdict}</span>
+                            <span className="text-gray-700 leading-relaxed">{item.constat}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
 
                   {/* Mots-clés manquants */}
                   {resultat.motsClesManquants.length > 0 && (
@@ -1075,7 +1140,7 @@ export default function Dashboard() {
             <div className="flex border-b border-gray-100 px-4 shrink-0 overflow-x-auto">
               {([
                 { key: "resultats", label: "Résultats" },
-                ...(analyseOuverte.score_apres != null ? [{ key: "apres", label: "Après adaptation" }] : []),
+                ...(analyseOuverte.niveau_qualitatif_apres != null ? [{ key: "apres", label: "Après adaptation" }] : []),
                 ...(analyseOuverte.lettre_id ? [{ key: "lettre", label: "Lettre de motivation" }] : []),
                 { key: "offre", label: "Offre d'emploi" },
                 { key: "cv", label: "CV original" },
@@ -1099,27 +1164,19 @@ export default function Dashboard() {
               {/* Onglet Résultats */}
               {ongletAnalyse === "resultats" && (
                 <div className="p-6 flex flex-col gap-6">
-                  {/* Comparatif avant/après si score_apres disponible */}
-                  {analyseOuverte.score_apres != null && (
+                  {/* Comparatif avant/après si niveau_qualitatif_apres disponible */}
+                  {analyseOuverte.niveau_qualitatif_apres != null && (
                     <div className="flex items-center gap-3 bg-emerald-50 ring-1 ring-emerald-100 rounded-xl px-4 py-3">
-                      <span className="text-2xl font-extrabold tabular-nums text-gray-400">{analyseOuverte.score}%</span>
+                      <span className={`text-sm font-bold px-2.5 py-1 rounded-full ${badgeNiveau(analyseOuverte.niveau_qualitatif)}`}>{analyseOuverte.niveau_qualitatif ?? "—"}</span>
                       <span className="text-gray-300 text-lg">→</span>
-                      <span className="text-2xl font-extrabold tabular-nums text-emerald-600">{analyseOuverte.score_apres}%</span>
-                      <span className="text-sm text-emerald-700 font-semibold ml-1">
-                        +{analyseOuverte.score_apres - analyseOuverte.score} pts après adaptation
-                      </span>
+                      <span className={`text-sm font-bold px-2.5 py-1 rounded-full ${badgeNiveau(analyseOuverte.niveau_qualitatif_apres)}`}>{analyseOuverte.niveau_qualitatif_apres}</span>
+                      <span className="text-sm text-emerald-700 font-semibold ml-1">après adaptation</span>
                     </div>
                   )}
-                  {/* Score */}
+                  {/* Badge niveau */}
                   <div className="flex items-center gap-5">
-                    <div className={`w-20 h-20 rounded-full ring-4 shrink-0 flex flex-col items-center justify-center ${ringScore(analyseOuverte.score)}`}>
-                      <span className={`text-2xl font-extrabold tabular-nums leading-none ${couleurScore(analyseOuverte.score)}`}>{analyseOuverte.score}</span>
-                      <span className={`text-xs font-bold ${couleurScore(analyseOuverte.score)}`}>%</span>
-                    </div>
-                    <div>
-                      <span className={`text-xs font-bold px-2.5 py-1 rounded-full ring-1 ${bgScore(analyseOuverte.score)}`}>{labelScore(analyseOuverte.score)}</span>
-                      <p className="text-xs text-gray-400 mt-2">{formaterDate(analyseOuverte.created_at)}</p>
-                    </div>
+                    <span className={`text-base font-extrabold px-4 py-2 rounded-full ${badgeNiveau(analyseOuverte.niveau_qualitatif)}`}>{analyseOuverte.niveau_qualitatif ?? "—"}</span>
+                    <p className="text-xs text-gray-400">{formaterDate(analyseOuverte.created_at)}</p>
                   </div>
 
                   {/* Résumé */}
@@ -1162,6 +1219,8 @@ export default function Dashboard() {
 
               {/* Onglet Après adaptation */}
               {ongletAnalyse === "apres" && (() => {
+                const cvLie = cvsAdaptes.find((c) => c.id === analyseOuverte.cv_adapte_id) ?? null;
+                const qr = cvLie?.questions_reponses?.filter((r) => r.reponse?.trim()) ?? [];
                 const avant = analyseOuverte.mots_cles_manquants ?? [];
                 const apresManquants = analyseOuverte.mots_cles_apres_manquants ?? [];
                 const apresPresents = analyseOuverte.mots_cles_apres_presents ?? [];
@@ -1175,20 +1234,17 @@ export default function Dashboard() {
                 );
                 return (
                   <div className="p-6 flex flex-col gap-6">
-                    {/* Score comparatif */}
+                    {/* Niveau comparatif */}
                     <div className="flex items-center gap-3 bg-emerald-50 ring-1 ring-emerald-100 rounded-xl px-5 py-4">
-                      <div className="flex flex-col items-center">
-                        <span className="text-2xl font-extrabold tabular-nums text-gray-400">{analyseOuverte.score}%</span>
-                        <span className="text-xs text-gray-400 mt-0.5">Avant</span>
+                      <div className="flex flex-col items-center gap-1">
+                        <span className={`text-sm font-bold px-3 py-1 rounded-full ${badgeNiveau(analyseOuverte.niveau_qualitatif)}`}>{analyseOuverte.niveau_qualitatif ?? "—"}</span>
+                        <span className="text-xs text-gray-400">Avant</span>
                       </div>
                       <span className="text-gray-300 text-xl mx-1">→</span>
-                      <div className="flex flex-col items-center">
-                        <span className="text-2xl font-extrabold tabular-nums text-emerald-600">{analyseOuverte.score_apres}%</span>
-                        <span className="text-xs text-emerald-600 mt-0.5">Après</span>
+                      <div className="flex flex-col items-center gap-1">
+                        <span className={`text-sm font-bold px-3 py-1 rounded-full ${badgeNiveau(analyseOuverte.niveau_qualitatif_apres)}`}>{analyseOuverte.niveau_qualitatif_apres}</span>
+                        <span className="text-xs text-emerald-600">Après</span>
                       </div>
-                      <span className="ml-auto text-sm font-bold text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-full">
-                        +{(analyseOuverte.score_apres ?? 0) - analyseOuverte.score} pts
-                      </span>
                     </div>
 
                     {/* Mots-clés ajoutés */}
@@ -1241,6 +1297,27 @@ export default function Dashboard() {
                         <div className="flex flex-wrap gap-2">
                           {dejaPresentsetToujours.map((mot) => (
                             <span key={mot} className="bg-gray-50 text-gray-500 border border-gray-200 px-3 py-1 rounded-full text-xs font-semibold">{mot}</span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Informations ajoutées grâce aux questions */}
+                    {qr.length > 0 && (
+                      <div>
+                        <div className="flex items-center gap-2 mb-3">
+                          <span className="text-base">💬</span>
+                          <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">
+                            Enrichissements apportés par vos réponses
+                          </p>
+                        </div>
+                        <p className="text-xs text-gray-400 mb-3">Ces informations chiffrées ont été intégrées dans votre CV adapté.</p>
+                        <div className="flex flex-col gap-3">
+                          {qr.map((item, i) => (
+                            <div key={i} className="bg-indigo-50 ring-1 ring-indigo-100 rounded-xl px-4 py-3">
+                              <p className="text-xs text-indigo-400 font-medium mb-1">{item.question}</p>
+                              <p className="text-sm text-indigo-800 font-semibold">{item.reponse}</p>
+                            </div>
                           ))}
                         </div>
                       </div>

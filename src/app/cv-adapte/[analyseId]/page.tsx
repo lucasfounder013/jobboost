@@ -8,8 +8,8 @@ import { CVStructure } from "@/types/cv";
 
 type PageData = {
   nom_offre: string;
-  score: number;
-  score_apres: number | null;
+  niveau_qualitatif: string | null;
+  niveau_qualitatif_apres: string | null;
   mots_cles_manquants: string[];
   mots_cles_presents: string[];
   mots_cles_apres_manquants: string[] | null;
@@ -17,13 +17,15 @@ type PageData = {
   cv_data: CVStructure | null;
 };
 
-const bgScore = (s: number) =>
-  s >= 75 ? "bg-emerald-50 text-emerald-700 ring-emerald-200" :
-  s >= 50 ? "bg-amber-50 text-amber-700 ring-amber-200" :
-  "bg-rose-50 text-rose-700 ring-rose-200";
-
-const couleurScore = (s: number) =>
-  s >= 75 ? "text-emerald-600" : s >= 50 ? "text-amber-500" : "text-rose-500";
+const BADGE_NIVEAU: Record<string, string> = {
+  "Très mauvais": "bg-rose-100 text-rose-700",
+  "Mauvais": "bg-orange-100 text-orange-700",
+  "Moyen": "bg-amber-100 text-amber-700",
+  "Bon": "bg-blue-100 text-blue-700",
+  "Très bon": "bg-emerald-100 text-emerald-700",
+  "Excellent": "bg-violet-100 text-violet-700",
+};
+const badgeNiveau = (niveau: string | null | undefined) => BADGE_NIVEAU[niveau ?? ""] ?? "bg-gray-100 text-gray-700";
 
 export default function CvAdaptePage() {
   const router = useRouter();
@@ -34,7 +36,7 @@ export default function CvAdaptePage() {
   const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState("");
   const [exportEnCours, setExportEnCours] = useState<"pdf" | "docx" | null>(null);
-  const [scoreApres, setScoreApres] = useState<number | null>(null);
+  const [niveauApres, setNiveauApres] = useState<string | null>(null);
   const [motsClesApresManquants, setMotsClesApresManquants] = useState<string[] | null>(null);
   const [motsClesApresPresents, setMotsClesApresPresents] = useState<string[] | null>(null);
 
@@ -46,7 +48,7 @@ export default function CvAdaptePage() {
       })
       .then((d: PageData) => {
         setData(d);
-        setScoreApres(d.score_apres);
+        setNiveauApres(d.niveau_qualitatif_apres);
         setMotsClesApresManquants(d.mots_cles_apres_manquants);
         setMotsClesApresPresents(d.mots_cles_apres_presents);
       })
@@ -54,15 +56,15 @@ export default function CvAdaptePage() {
       .finally(() => setChargement(false));
   }, [analyseId]);
 
-  // Polling si score_apres pas encore calculé
+  // Polling si niveau_qualitatif_apres pas encore calculé
   useEffect(() => {
-    if (!data || scoreApres !== null) return;
+    if (!data || niveauApres !== null) return;
     const interval = setInterval(() => {
       fetch(`/api/cv-adapte/${analyseId}`)
         .then((r) => r.json())
         .then((d: PageData) => {
-          if (d.score_apres !== null) {
-            setScoreApres(d.score_apres);
+          if (d.niveau_qualitatif_apres !== null) {
+            setNiveauApres(d.niveau_qualitatif_apres);
             setMotsClesApresManquants(d.mots_cles_apres_manquants);
             setMotsClesApresPresents(d.mots_cles_apres_presents);
             clearInterval(interval);
@@ -71,7 +73,7 @@ export default function CvAdaptePage() {
         .catch(() => {});
     }, 3000);
     return () => clearInterval(interval);
-  }, [analyseId, data, scoreApres]);
+  }, [analyseId, data, niveauApres]);
 
   async function exporterCV(format: "pdf" | "docx") {
     if (!data?.cv_data) return;
@@ -175,35 +177,28 @@ export default function CvAdaptePage() {
 
       <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col gap-6">
 
-        {/* Score */}
+        {/* Niveau de correspondance */}
         <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6">
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Score de compatibilité ATS</p>
-          <div className="flex items-center gap-6 flex-wrap">
-            <div className="flex items-center gap-4">
-              <div className="text-center">
-                <p className="text-xs text-gray-400 mb-1">Avant</p>
-                <span className={`text-4xl font-extrabold tabular-nums ${couleurScore(data.score)}`}>{data.score}<span className="text-xl">%</span></span>
-              </div>
-              <svg className="w-6 h-6 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-              </svg>
-              <div className="text-center">
-                <p className="text-xs text-gray-400 mb-1">Après</p>
-                {scoreApres !== null ? (
-                  <span className="text-4xl font-extrabold tabular-nums text-emerald-600">{scoreApres}<span className="text-xl">%</span></span>
-                ) : (
-                  <div className="flex items-center gap-1.5 text-indigo-500">
-                    <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
-                    <span className="text-sm font-medium">Calcul...</span>
-                  </div>
-                )}
-              </div>
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Niveau de correspondance</p>
+          <div className="flex items-center gap-5 flex-wrap">
+            <div className="flex flex-col items-center gap-1">
+              <p className="text-xs text-gray-400">Avant</p>
+              <span className={`text-base font-extrabold px-4 py-2 rounded-full ${badgeNiveau(data.niveau_qualitatif)}`}>{data.niveau_qualitatif ?? "—"}</span>
             </div>
-            {scoreApres !== null && scoreApres > data.score && (
-              <span className="bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200 text-sm font-bold px-4 py-2 rounded-full">
-                +{scoreApres - data.score} points ✓
-              </span>
-            )}
+            <svg className="w-6 h-6 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+            </svg>
+            <div className="flex flex-col items-center gap-1">
+              <p className="text-xs text-gray-400">Après</p>
+              {niveauApres !== null ? (
+                <span className={`text-base font-extrabold px-4 py-2 rounded-full ${badgeNiveau(niveauApres)}`}>{niveauApres}</span>
+              ) : (
+                <div className="flex items-center gap-1.5 text-indigo-500">
+                  <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                  <span className="text-sm font-medium">Calcul...</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -273,6 +268,20 @@ export default function CvAdaptePage() {
             CV adapté non disponible.
           </div>
         )}
+
+        {/* Bouton retour dashboard */}
+        <div className="flex justify-center pb-4">
+          <Link
+            href="/dashboard"
+            className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-900 bg-white hover:bg-gray-50 ring-1 ring-gray-200 px-5 py-2.5 rounded-xl transition-colors shadow-sm"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Retour au dashboard
+          </Link>
+        </div>
+
       </div>
     </div>
   );
