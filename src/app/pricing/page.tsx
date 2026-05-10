@@ -97,7 +97,7 @@ export default function PagePricing() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-1.5 group">
-            <span className="text-lg">⚡</span>
+            
             <span className="text-base font-bold tracking-tight text-gray-900 group-hover:text-indigo-600 transition-colors">JobBoost</span>
           </Link>
           <nav className="flex items-center gap-3 text-sm">

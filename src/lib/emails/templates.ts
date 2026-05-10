@@ -27,7 +27,7 @@ function base(contenu: string, ctaTexte: string, ctaUrl: string, unsubscribeUrl:
           <!-- Header -->
           <tr>
             <td style="background:#4f46e5;border-radius:12px 12px 0 0;padding:20px 32px;">
-              <span style="color:#fff;font-size:18px;font-weight:700;letter-spacing:-0.3px;">⚡ JobBoost</span>
+              <span style="color:#fff;font-size:18px;font-weight:700;letter-spacing:-0.3px;">JobBoost</span>
             </td>
           </tr>
 

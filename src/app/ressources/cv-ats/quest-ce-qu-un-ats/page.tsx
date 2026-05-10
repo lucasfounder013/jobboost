@@ -28,7 +28,7 @@ export default function ArticleATS() {
       <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-xl border-b border-gray-100 shadow-sm shadow-indigo-50">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2 group">
-            <span className="text-xl leading-none">⚡</span>
+
             <span className="text-lg font-extrabold tracking-tight text-gray-900 group-hover:text-indigo-600 transition-colors duration-200">
               JobBoost
             </span>
@@ -267,7 +267,7 @@ export default function ArticleATS() {
                 href="/"
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-indigo-200/60 hover:shadow-indigo-300/60 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
               >
-                ⚡ Analyser mon CV gratuitement →
+                Analyser mon CV gratuitement →
               </Link>
             </div>
 

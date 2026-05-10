@@ -480,7 +480,7 @@ export default function Dashboard() {
       <aside className="fixed left-0 top-0 h-full w-64 bg-indigo-950 flex flex-col z-40 shrink-0">
         <div className="px-5 py-5 border-b border-indigo-900">
           <Link href="/" className="flex items-center gap-2 group">
-            <span className="text-xl">⚡</span>
+            
             <span className="text-lg font-bold tracking-tight text-white group-hover:text-indigo-200 transition-colors">JobBoost</span>
           </Link>
         </div>
@@ -604,7 +604,7 @@ export default function Dashboard() {
               </div>
             ) : analyses.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-32 text-center gap-5">
-                <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-2xl">⚡</div>
+                <div className="w-16 h-16 rounded-2xl bg-indigo-50 flex items-center justify-center text-2xl"></div>
                 <div>
                   <p className="text-gray-800 font-semibold text-lg">Aucune candidature pour l&apos;instant</p>
                   <p className="text-gray-400 text-sm mt-1">Analysez votre CV face à une offre pour commencer à suivre vos candidatures.</p>
@@ -861,7 +861,7 @@ export default function Dashboard() {
                   {chargement ? (
                     <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Analyse en cours...</>
                   ) : (
-                    <>⚡ {estAbonne ? "Analyser" : "Analyser gratuitement"}</>
+                    <>{estAbonne ? "Analyser" : "Analyser gratuitement"}</>
                   )}
                 </span>
                 <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-200 rounded-xl" />
@@ -1378,7 +1378,7 @@ export default function Dashboard() {
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
             </button>
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-3xl">
-              {modaleUpgrade === "scans" ? "⚡" : modaleUpgrade === "lm" ? "✉️" : "✨"}
+              {modaleUpgrade === "scans" ? "" : modaleUpgrade === "lm" ? "✉️" : "✨"}
             </div>
             <div>
               <h2 className="text-xl font-extrabold text-gray-900 mb-2">

@@ -240,7 +240,7 @@ export default function PagePrincipale() {
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
-            <span className="text-xl leading-none">⚡</span>
+
             <span className="text-lg font-extrabold tracking-tight text-gray-900 group-hover:text-indigo-600 transition-colors duration-200">
               JobBoost
             </span>
@@ -328,7 +328,7 @@ export default function PagePrincipale() {
               onClick={() => document.getElementById("zones-texte")?.scrollIntoView({ behavior: "smooth" })}
               className="relative group overflow-hidden bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl shadow-indigo-200 hover:shadow-indigo-300 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
             >
-              <span className="relative z-10">⚡ {estAbonne ? "Analyser mon CV" : "Analyser mon CV gratuitement"}</span>
+              <span className="relative z-10">{estAbonne ? "Analyser mon CV" : "Analyser mon CV gratuitement"}</span>
               <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-200 rounded-xl" />
             </button>
           </div>
@@ -469,7 +469,7 @@ export default function PagePrincipale() {
                 </>
               ) : (
                 <>
-                  ⚡ {estAbonne ? "Analyser" : "Analyser gratuitement"}
+                  {estAbonne ? "Analyser" : "Analyser gratuitement"}
                 </>
               )}
             </span>

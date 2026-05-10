@@ -4,7 +4,7 @@ export default function PageSucces() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
       <Link href="/" className="flex items-center gap-1.5 mb-10">
-        <span className="text-lg">⚡</span>
+        
         <span className="text-base font-bold tracking-tight text-gray-900">JobBoost</span>
       </Link>
 
