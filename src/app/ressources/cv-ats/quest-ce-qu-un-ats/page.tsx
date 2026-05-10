@@ -3,22 +3,19 @@ import Footer from "@/components/Footer";
 import ShareButtons from "./ShareButtons";
 
 export const metadata = {
-  title: "C'est quoi un ATS ? Définition et fonctionnement | JobBoost",
+  title: "C'est quoi un ATS ? Tout ce qu'il faut savoir | JobBoost",
   description:
-    "Un ATS filtre les CV avant qu'un recruteur les lise. Découvrez comment ça fonctionne vraiment, et pourquoi votre CV est peut-être rejeté automatiquement.",
+    "Non, un ATS ne rejette pas automatiquement votre CV. Voici ce qu'un ATS fait vraiment, et pourquoi vous optimisez peut-être pour rien.",
 };
 
 const TOC = [
-  { id: "quest-ce-qu-un-ats", titre: "Qu'est-ce qu'un ATS ?", niveau: 2 },
-  { id: "pourquoi", titre: "Pourquoi les entreprises utilisent-elles un ATS ?", niveau: 2 },
-  { id: "comment-analyse", titre: "Comment un ATS analyse votre CV ?", niveau: 2 },
-  { id: "parse", titre: "Il lit et découpe votre CV", niveau: 3 },
-  { id: "compare", titre: "Il compare votre CV à l'offre", niveau: 3 },
-  { id: "score", titre: "Il attribue un score", niveau: 3 },
-  { id: "limites", titre: "Ce qu'un ATS ne sait pas faire", niveau: 2 },
-  { id: "recruteur", titre: "ATS et recruteur : qui décide vraiment ?", niveau: 2 },
-  { id: "outils", titre: "Comment savoir si votre CV passe les filtres ?", niveau: 2 },
-  { id: "retenir", titre: "Ce qu'il faut retenir", niveau: 2 },
+  { id: "ce-qu-un-ats-fait",    titre: "Ce qu'un ATS fait vraiment",                  niveau: 2 },
+  { id: "qui-filtre",           titre: "Qui filtre vraiment les candidatures ?",        niveau: 2 },
+  { id: "score-ats",            titre: "Et le fameux \"score ATS\" ?",                 niveau: 2 },
+  { id: "pourquoi-pas-lu",      titre: "Alors pourquoi votre CV n'est pas lu ?",       niveau: 2 },
+  { id: "ce-que-ca-change",     titre: "Ce que ça change concrètement pour vous",      niveau: 2 },
+  { id: "ce-que-fait-jobboost", titre: "Ce que fait JobBoost",                         niveau: 2 },
+  { id: "retenir",              titre: "Ce qu'il faut retenir",                        niveau: 2 },
 ];
 
 export default function ArticleATS() {
@@ -73,12 +70,12 @@ export default function ArticleATS() {
           <span>›</span>
           <Link href="/ressources" className="hover:text-violet-600 transition-colors">Ressources</Link>
           <span>›</span>
-          <span className="text-gray-600">C&apos;est quoi un ATS ?</span>
+          <span className="text-gray-600">Ce qu&apos;on vous a dit sur les ATS</span>
         </div>
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">
-          C&apos;est quoi un ATS ?<br />Comment ça fonctionne vraiment
+          C&apos;est quoi un ATS ? Tout ce qu&apos;il faut savoir
         </h1>
 
         {/* Grille article + TOC */}
@@ -101,166 +98,147 @@ export default function ArticleATS() {
 
             {/* Intro */}
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Vous avez postulé à des dizaines d&apos;offres.
+              Votre CV serait rejeté automatiquement par un robot.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Pas de réponse. Même pas un refus.
+              Un score ATS déciderait de votre sort en quelques secondes.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Dans la plupart des cas, ce n&apos;est pas un recruteur qui a ignoré votre candidature.
+              75% des candidatures ne seraient jamais lues par un humain.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              C&apos;est un logiciel qui ne l&apos;a jamais transmise.
+              Ces affirmations circulent partout. Sur LinkedIn, dans les guides RH, sur les sites de coaching.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Elles sont en grande partie fausses.
             </p>
 
             {/* Section 1 */}
-            <h2 id="quest-ce-qu-un-ats" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
-              Qu&apos;est-ce qu&apos;un ATS ?
+            <h2 id="ce-qu-un-ats-fait" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
+              Ce qu&apos;un ATS fait vraiment
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              ATS signifie <strong>Applicant Tracking System</strong>, en français, "système de suivi des candidatures".
+              Un ATS, Applicant Tracking System, est avant tout une base de données.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              C&apos;est le logiciel qu&apos;utilisent les entreprises pour gérer les candidatures qu&apos;elles reçoivent.
+              Quand vous postulez en ligne, votre CV est reçu, lu et découpé par le logiciel. Il en extrait les informations clés : nom, coordonnées, expériences, formations, compétences. C&apos;est ce qu&apos;on appelle le "parsing".
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Concrètement : quand vous cliquez sur "Envoyer ma candidature", votre CV n&apos;arrive pas dans la boîte mail d&apos;un recruteur humain. Il entre dans une base de données gérée par l&apos;ATS, qui va l&apos;analyser, le classer, et décider s&apos;il mérite d&apos;être vu par un humain.
+              Ces informations sont ensuite stockées dans une fiche candidat, dans une base de données consultable par le recruteur.
             </p>
             <blockquote className="bg-violet-50/40 rounded-xl p-6 my-8 relative">
               <span className="text-violet-200 text-6xl font-serif absolute top-3 left-5 leading-none select-none">&ldquo;</span>
               <p className="text-gray-700 italic leading-8 pt-4 text-lg">
-                En France, la grande majorité des entreprises de plus de 50 salariés utilisent un ATS. Les plus répandus : Workday, Taleo, SAP SuccessFactors, Greenhouse.
+                Pensez à l&apos;ATS comme à un outil d&apos;organisation puissant, pas comme à un robot autonome qui décide de votre sort.
               </p>
             </blockquote>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              C&apos;est tout. À ce stade, aucune décision n&apos;a été prise sur votre candidature.
+            </p>
 
             {/* Section 2 */}
-            <h2 id="pourquoi" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
-              Pourquoi les entreprises utilisent-elles un ATS ?
+            <h2 id="qui-filtre" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
+              Qui filtre vraiment les candidatures ?
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              La raison est simple : le volume.
+              Le recruteur. Pas le logiciel.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Une offre publiée sur LinkedIn peut recevoir plusieurs centaines de candidatures en quelques jours. Aucun recruteur ne peut toutes les lire.
+              Une fois les CV parsés et stockés, c&apos;est le recruteur humain qui ouvre l&apos;ATS et filtre lui-même les profils selon ses critères : un niveau d&apos;expérience, une compétence précise, une localisation.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              L&apos;ATS automatise le premier tri. Il permet de :
-            </p>
-            <ul className="list-disc list-inside space-y-2 text-gray-700 mb-6 ml-2 text-lg">
-              <li>Centraliser toutes les candidatures</li>
-              <li>Rechercher des profils par mots-clés</li>
-              <li>Suivre l&apos;avancement de chaque dossier</li>
-              <li>Collaborer entre membres de l&apos;équipe RH</li>
-            </ul>
-            <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Pour l&apos;entreprise, c&apos;est un gain de temps énorme.
+              L&apos;ATS lui fournit des outils de recherche, exactement comme Google vous permet de filtrer des résultats. Mais c&apos;est lui qui tape les critères. C&apos;est lui qui décide.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Pour vous, c&apos;est un filtre invisible à franchir avant qu&apos;un humain pose les yeux sur votre dossier.
+              Votre CV n&apos;est pas rejeté automatiquement.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Il est soit trouvé, soit non trouvé.
             </p>
 
             {/* Section 3 */}
-            <h2 id="comment-analyse" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
-              Comment un ATS analyse votre CV ?
+            <h2 id="score-ats" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
+              Et le fameux &ldquo;score ATS&rdquo; ?
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              C&apos;est là que beaucoup de candidats perdent la partie sans le savoir.
-            </p>
-
-            <h3 id="parse" className="text-xl font-semibold text-gray-800 mt-10 mb-4">
-              1. Il lit et découpe votre CV
-            </h3>
-            <p className="text-gray-700 leading-8 mb-6 text-lg">
-              L&apos;ATS commence par "parser" votre CV, c&apos;est-à-dire en extraire les informations : nom, coordonnées, expériences, formations, compétences.
+              C&apos;est là que la désinformation est la plus répandue.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Le problème : il lit du texte, pas des mises en page.
-            </p>
-            <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Tableaux, colonnes, zones de texte, graphiques, tout ça peut le perturber. Des informations mal lues, mal classées, ou simplement ignorées.
-            </p>
-
-            <h3 id="compare" className="text-xl font-semibold text-gray-800 mt-10 mb-4">
-              2. Il compare votre CV à l&apos;offre
-            </h3>
-            <p className="text-gray-700 leading-8 mb-6 text-lg">
-              L&apos;ATS cherche des correspondances entre votre CV et les mots-clés de l&apos;offre.
-            </p>
-            <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Si l&apos;offre dit "gestion de projet" et que vous écrivez "pilotage de projets", certains ATS ne feront pas le lien.
-            </p>
-            <p className="text-gray-700 leading-8 mb-6 text-lg">
-              C&apos;est pourquoi adapter le vocabulaire de votre CV à chaque offre n&apos;est pas optionnel.
-            </p>
-
-            <h3 id="score" className="text-xl font-semibold text-gray-800 mt-10 mb-4">
-              3. Il attribue un score à votre candidature
-            </h3>
-            <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Sur cette base, l&apos;ATS attribue un score de correspondance.
-            </p>
-            <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Les scores les plus élevés remontent en tête de liste. Les autres ne sont souvent jamais consultés.
+              Certains outils, dont des concurrents directs de JobBoost, vous donnent un score "compatibilité ATS" de 67%, 82%, 94%... en vous laissant croire que l&apos;ATS de l&apos;entreprise calcule ce même score et élimine votre CV s&apos;il est trop bas.
             </p>
             <blockquote className="bg-violet-50/40 rounded-xl p-6 my-8 relative">
               <span className="text-violet-200 text-6xl font-serif absolute top-3 left-5 leading-none select-none">&ldquo;</span>
               <p className="text-gray-700 italic leading-8 pt-4 text-lg">
-                Ce n&apos;est pas le meilleur candidat qui passe. C&apos;est le candidat dont le CV correspond le mieux aux mots-clés de l&apos;offre.
+                Ces scores sont souvent des métriques marketing inventées, sans lien réel avec ce que les recruteurs voient dans leur ATS.
               </p>
             </blockquote>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              La réalité : la majorité des recruteurs ne configurent aucun score automatique. Ils ouvrent leur ATS et cherchent des profils manuellement.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Certains ATS proposent bien une fonctionnalité de scoring, mais elle est rarement activée, rarement fiable, et toujours soumise à la validation humaine.
+            </p>
 
             {/* Section 4 */}
-            <h2 id="limites" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
-              Ce qu&apos;un ATS ne sait pas faire
+            <h2 id="pourquoi-pas-lu" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
+              Alors pourquoi votre CV n&apos;est pas lu ?
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Un ATS est puissant. Mais il a des angles morts importants.
+              Ce n&apos;est pas un robot qui l&apos;ignore.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              <strong>Il ne comprend pas le contexte.</strong> Des responsabilités équivalentes à un chef de projet, sans le titre, il ne le verra pas.
+              C&apos;est que le recruteur, en filtrant sa base de données, ne tombe pas sur vous. Parce que votre CV ne contient pas les mots exacts qu&apos;il a tapés dans sa barre de recherche.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              <strong>Il ne lit pas les images.</strong> Vos compétences en étoiles ou en barres de progression sont invisibles pour lui.
+              La différence est importante.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              <strong>Il ne perçoit pas votre potentiel.</strong> Votre motivation, votre adaptabilité, ça n&apos;existe pas pour un ATS.
+              Ce n&apos;est pas un score qui vous élimine.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Optimiser son CV pour les ATS ne signifie pas le rendre robotique. Cela signifie le rendre lisible par une machine, sans perdre ce qui le rend humain.
+              C&apos;est une absence de correspondance entre les mots de votre CV et les mots cherchés par le recruteur.
             </p>
 
             {/* Section 5 */}
-            <h2 id="recruteur" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
-              ATS et recruteur : qui décide vraiment ?
+            <h2 id="ce-que-ca-change" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
+              Ce que ça change concrètement pour vous
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              L&apos;ATS ne décide pas seul.
+              Si l&apos;ennemi n&apos;est pas un robot mais une barre de recherche humaine, la stratégie change.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Son rôle : faire un premier filtre et présenter une liste restreinte au recruteur humain, qui lit ensuite les CV sélectionnés.
+              Il ne s&apos;agit pas de "battre un algorithme". Il s&apos;agit de parler le même langage que le recruteur qui cherche votre profil.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Ce qui veut dire deux choses :
+              Concrètement :
             </p>
-            <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Si votre CV ne passe pas l&apos;ATS → aucun humain ne le verra jamais.
-            </p>
-            <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Si votre CV passe l&apos;ATS → il doit ensuite convaincre un humain.
-            </p>
-            <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Les deux étapes comptent.
-            </p>
+            <ul className="list-disc list-inside space-y-2 text-gray-700 mb-6 ml-2 text-lg">
+              <li>Utilisez les mots exacts de l&apos;offre d&apos;emploi</li>
+              <li>Privilégiez un format simple et lisible (le parsing rate les tableaux et les colonnes)</li>
+              <li>Adaptez votre CV à chaque offre, pas de façon robotique, mais naturelle</li>
+            </ul>
+            <blockquote className="bg-violet-50/40 rounded-xl p-6 my-8 relative">
+              <span className="text-violet-200 text-6xl font-serif absolute top-3 left-5 leading-none select-none">&ldquo;</span>
+              <p className="text-gray-700 italic leading-8 pt-4 text-lg">
+                Un CV lisible par une machine ET convaincant pour un humain. C&apos;est le seul objectif qui compte.
+              </p>
+            </blockquote>
 
             {/* Section 6 */}
-            <h2 id="outils" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
-              Comment savoir si votre CV passe les filtres ?
+            <h2 id="ce-que-fait-jobboost" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
+              Ce que fait JobBoost
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Il existe des outils qui analysent automatiquement la correspondance entre votre CV et une offre, et vous donnent un score avec des recommandations concrètes.
+              JobBoost analyse la correspondance entre votre CV et une offre d&apos;emploi spécifique.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              JobBoost est l&apos;une des rares alternatives françaises à ces outils. Il analyse votre CV face à une offre précise, identifie les mots-clés manquants, et vous dit exactement quoi modifier.
+              Pas pour vous donner un score magique.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Mais pour identifier les mots-clés que le recruteur cherchera probablement dans sa base de données, et vous aider à les intégrer naturellement dans votre CV.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              L&apos;objectif : que le recruteur tombe sur vous quand il cherche le bon profil.
             </p>
             <div className="mt-6 mb-6">
               <Link
@@ -276,13 +254,16 @@ export default function ArticleATS() {
               Ce qu&apos;il faut retenir
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Un ATS lit votre CV, en extrait les infos clés, et le compare aux mots-clés de l&apos;offre.
+              Un ATS est une base de données, pas un juge.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Si la correspondance est faible, votre candidature ne sera jamais lue.
+              Il parse votre CV et le stocke. Le recruteur filtre ensuite lui-même.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Ce n&apos;est pas une question de mérite. C&apos;est une question de lisibilité.
+              Il n&apos;y a pas de score automatique qui vous élimine en silence.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Il y a un recruteur qui cherche des mots-clés, et votre CV doit contenir les bons.
             </p>
 
             <div className="mt-16 pt-10 border-t border-gray-100">

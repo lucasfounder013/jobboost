@@ -9,9 +9,9 @@ const articles = [
   {
     id: 1,
     categorie: "CV & ATS",
-    titre: "C'est quoi un ATS ? Comment ça fonctionne vraiment",
+    titre: "C'est quoi un ATS ? Tout ce qu'il faut savoir",
     extrait:
-      "Votre CV est peut-être rejeté avant même qu'un recruteur le lise. Découvrez comment fonctionne le logiciel qui filtre les candidatures.",
+      "Non, un ATS ne rejette pas automatiquement votre CV. Voici ce qu'un ATS fait vraiment, et pourquoi vous optimisez peut-être pour rien.",
     slug: "/ressources/cv-ats/quest-ce-qu-un-ats",
     date: "9 mai 2026",
   },
