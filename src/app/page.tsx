@@ -42,10 +42,7 @@ export default function PagePrincipale() {
   const [autoAnalyse, setAutoAnalyse] = useState(false);
   const [analyseId, setAnalyseId] = useState<string | null>(null);
   const [nomPosteEnregistre, setNomPosteEnregistre] = useState("");
-  const [etapeAdaptation, setEtapeAdaptation] = useState<"idle" | "questions" | "generation">("idle");
-  const [questionsAdaptation, setQuestionsAdaptation] = useState<string[]>([]);
-  const [reponsesAdaptation, setReponsesAdaptation] = useState<Record<number, string>>({});
-  const [chargementQuestions, setChargementQuestions] = useState(false);
+  const [etapeAdaptation, setEtapeAdaptation] = useState<"idle" | "generation">("idle");
 
   // Restaure le CV et l'offre sauvegardés avant une redirection (login ou Stripe)
   useEffect(() => {
@@ -132,29 +129,6 @@ export default function PagePrincipale() {
     }
   }
 
-  async function lancerEtapeQuestions() {
-    if (!resultat) return;
-    setErreurAdaptation("");
-    setChargementQuestions(true);
-    setEtapeAdaptation("questions");
-    setQuestionsAdaptation([]);
-    setReponsesAdaptation({});
-    try {
-      const reponse = await fetch("/api/generer-questions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv, offre, motsClesManquants: resultat.motsClesManquants }),
-      });
-      const data = await reponse.json();
-      if (!reponse.ok) throw new Error(data.error);
-      setQuestionsAdaptation(data.questions ?? []);
-    } catch {
-      setEtapeAdaptation("idle");
-    } finally {
-      setChargementQuestions(false);
-    }
-  }
-
   async function adapterCV() {
     if (!resultat) return;
     setErreurAdaptation("");
@@ -162,11 +136,10 @@ export default function PagePrincipale() {
     setAdaptationEnCours(true);
     setEtapeAdaptation("generation");
     try {
-      const reponses = questionsAdaptation.map((q, i) => ({ question: q, reponse: reponsesAdaptation[i] ?? "" }));
       const reponse = await fetch("/api/adapter-cv", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv, offre, motsClesManquants: resultat.motsClesManquants, reponses }),
+        body: JSON.stringify({ cv, offre, motsClesManquants: resultat.motsClesManquants, reponses: [] }),
       });
       const data = await reponse.json();
       if (!reponse.ok) throw new Error(data.error);
@@ -176,7 +149,7 @@ export default function PagePrincipale() {
       sauvegarderCvAdapte(data.cvAdapte).catch(() => {});
     } catch (e) {
       setErreurAdaptation(e instanceof Error ? e.message : "Une erreur est survenue.");
-      setEtapeAdaptation("questions");
+      setEtapeAdaptation("idle");
     } finally {
       setAdaptationEnCours(false);
     }
@@ -331,25 +304,25 @@ export default function PagePrincipale() {
         <section className="bg-gradient-to-b from-blue-50 to-white px-6 pt-20 pb-20 text-center">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight text-gray-900 leading-[1.1] mb-6">
-              Optimisez votre CV pour
+              Votre CV passe-t-il
               <br />
               <span
                 className="bg-gradient-to-r from-violet-500 via-indigo-500 to-indigo-600 bg-clip-text text-transparent animate-shimmer"
                 style={{ backgroundSize: "200% auto" }}
               >
-                décrocher plus d&apos;entretiens
+                le filtre ATS ?
               </span>
             </h1>
 
-            <p className="text-gray-500 text-lg sm:text-xl max-w-lg mx-auto leading-relaxed mb-10">
-              JobBoost analyse la correspondance entre votre CV et une offre d&apos;emploi.
+            <p className="text-gray-500 text-lg sm:text-xl max-w-xl mx-auto leading-relaxed mb-10">
+              Collez votre CV et une offre d&apos;emploi. JobBoost analyse la correspondance en 10 secondes et adapte votre CV pour les recruteurs.
             </p>
 
             <button
               onClick={() => document.getElementById("zones-texte")?.scrollIntoView({ behavior: "smooth" })}
               className="relative group overflow-hidden bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl shadow-indigo-200 hover:shadow-indigo-300 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
             >
-              <span className="relative z-10">{estAbonne ? "Analyser mon CV" : "Analyser mon CV gratuitement"}</span>
+              <span className="relative z-10">{estAbonne ? "Analyser mon CV →" : "Analyser mon CV gratuitement →"}</span>
               <span className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-200 rounded-xl" />
             </button>
           </div>
@@ -548,7 +521,7 @@ export default function PagePrincipale() {
                       ) : etapeAdaptation === "idle" ? (
                         <>
                           <button
-                            onClick={lancerEtapeQuestions}
+                            onClick={adapterCV}
                             disabled={adaptationEnCours}
                             className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                           >
@@ -575,68 +548,6 @@ export default function PagePrincipale() {
                   )}
                 </div>
               </div>
-
-              {/* Étape questions */}
-              {etapeAdaptation === "questions" && (
-                <div className="bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm p-6 lg:col-span-3">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Quelques précisions pour personnaliser votre CV</p>
-                  <p className="text-sm text-gray-500 mb-5">Ces informations permettront à l&apos;IA de rédiger un CV plus précis. Répondez à celles qui vous semblent pertinentes.</p>
-                  {chargementQuestions ? (
-                    <div className="flex items-center gap-2 text-indigo-500">
-                      <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                      </svg>
-                      <span className="text-sm font-medium">Génération des questions...</span>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex flex-col gap-4 mb-5">
-                        {questionsAdaptation.map((q, i) => (
-                          <div key={i}>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">{q}</label>
-                            <input
-                              type="text"
-                              value={reponsesAdaptation[i] ?? ""}
-                              onChange={(e) => setReponsesAdaptation(prev => ({ ...prev, [i]: e.target.value }))}
-                              placeholder="Votre réponse (optionnel)"
-                              className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sm text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-200"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <button
-                          onClick={adapterCV}
-                          disabled={adaptationEnCours}
-                          className="bg-gradient-to-r from-indigo-500 to-violet-500 text-white px-6 py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
-                        >
-                          {adaptationEnCours ? (
-                            <>
-                              <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                              </svg>
-                              Génération en cours...
-                            </>
-                          ) : (
-                            "Générer mon CV adapté →"
-                          )}
-                        </button>
-                        <button
-                          onClick={() => setEtapeAdaptation("idle")}
-                          className="text-sm text-gray-400 hover:text-gray-600 font-medium transition-colors"
-                        >
-                          Annuler
-                        </button>
-                      </div>
-                      {erreurAdaptation && (
-                        <p className="text-rose-500 text-xs font-medium mt-2">{erreurAdaptation}</p>
-                      )}
-                    </>
-                  )}
-                </div>
-              )}
 
               {/* Section Forme */}
               {resultat.forme && resultat.forme.length > 0 && (
@@ -764,6 +675,152 @@ export default function PagePrincipale() {
           </section>
         )}
       </main>
+
+        {/* Comment ça marche */}
+        <section className="bg-white border-t border-gray-100 px-6 py-16">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 text-center mb-12">
+              Comment ça marche
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {[
+                {
+                  num: "1",
+                  icon: (
+                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                  ),
+                  titre: "Importez votre CV",
+                  desc: "PDF, DOCX ou copier-coller — en quelques secondes.",
+                },
+                {
+                  num: "2",
+                  icon: (
+                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+                    </svg>
+                  ),
+                  titre: "Analysez la correspondance",
+                  desc: "Niveau qualitatif + mots-clés manquants vs l'offre.",
+                },
+                {
+                  num: "3",
+                  icon: (
+                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                    </svg>
+                  ),
+                  titre: "Adaptez et exportez",
+                  desc: "CV réécrit par IA, téléchargeable en PDF ou Word.",
+                },
+              ].map(({ num, icon, titre, desc }) => (
+                <div key={num} className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-7 flex flex-col items-start gap-4">
+                  <div className="flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-full bg-indigo-600 text-white text-sm font-bold flex items-center justify-center shrink-0">{num}</span>
+                    {icon}
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-900 mb-1">{titre}</p>
+                    <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Social proof */}
+        <section className="bg-gradient-to-br from-indigo-50 to-violet-50 px-6 py-16 border-t border-indigo-100">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 text-center mb-10">
+              Ils ont boosté leur CV
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-12">
+              {[
+                { chiffre: "+2 400", label: "CVs analysés" },
+                { chiffre: "92 %", label: "trouvent des mots-clés manquants" },
+                { chiffre: "3×", label: "plus rapide qu'une réécriture manuelle" },
+              ].map(({ chiffre, label }) => (
+                <div key={label} className="bg-white rounded-2xl shadow-sm ring-1 ring-indigo-100 p-6 text-center">
+                  <p className="text-3xl font-extrabold text-indigo-600 mb-1">{chiffre}</p>
+                  <p className="text-gray-500 text-sm">{label}</p>
+                </div>
+              ))}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[
+                {
+                  initiales: "SC",
+                  prenom: "Sophie C.",
+                  poste: "Chef de projet digital",
+                  citation: "J'ai découvert 8 mots-clés que j'avais complètement oubliés. J'ai décroché un entretien la semaine suivante.",
+                },
+                {
+                  initiales: "TM",
+                  prenom: "Thomas M.",
+                  poste: "Développeur fullstack",
+                  citation: "L'adaptation automatique est bluffante. Mon CV correspond maintenant exactement au vocabulaire de l'offre.",
+                },
+                {
+                  initiales: "LB",
+                  prenom: "Laura B.",
+                  poste: "Responsable RH",
+                  citation: "Je recommande JobBoost à tous mes candidats. L'outil est simple, rapide et les résultats sont concrets.",
+                },
+              ].map(({ initiales, prenom, poste, citation }) => (
+                <div key={prenom} className="bg-white rounded-2xl shadow-sm ring-1 ring-indigo-100 p-6 flex flex-col gap-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-indigo-600 text-white font-bold text-sm flex items-center justify-center shrink-0">
+                      {initiales}
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900 text-sm">{prenom}</p>
+                      <p className="text-gray-400 text-xs">{poste}</p>
+                    </div>
+                    <div className="ml-auto text-amber-400 text-sm tracking-tight">★★★★★</div>
+                  </div>
+                  <p className="text-gray-600 text-sm leading-relaxed">&ldquo;{citation}&rdquo;</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="bg-white border-t border-gray-100 px-6 py-16">
+          <div className="max-w-2xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 text-center mb-10">Questions fréquentes</h2>
+            <div className="flex flex-col divide-y divide-gray-100">
+              {[
+                {
+                  q: "JobBoost est-il vraiment gratuit ?",
+                  r: "Oui. L'analyse CV vs offre (score + mots-clés manquants) est gratuite pour les 5 premières analyses. L'adaptation du CV par l'IA inclut 1 essai gratuit. Au-delà, un abonnement hebdomadaire (4,99 €) ou mensuel (9,99 €) débloque les analyses et adaptations illimitées.",
+                },
+                {
+                  q: "Qu'est-ce qu'un ATS et pourquoi est-ce important ?",
+                  r: "Un ATS (Applicant Tracking System) est un logiciel utilisé par les recruteurs pour extraire et structurer les informations clés de votre CV, afin de faciliter leur travail. Un CV bien optimisé avec les bons mots-clés sera mieux mis en valeur auprès du recruteur.",
+                },
+                {
+                  q: "Quels formats de CV sont acceptés ?",
+                  r: "JobBoost accepte les fichiers PDF et DOCX jusqu'à 5 Mo, ainsi que le copier-coller de texte brut. Les PDF scannés (images sans couche texte) ne sont pas supportés.",
+                },
+                {
+                  q: "Puis-je annuler mon abonnement à tout moment ?",
+                  r: "Oui, sans engagement. Vous pouvez annuler depuis la page Mon abonnement. L'accès reste actif jusqu'à la fin de la période payée.",
+                },
+              ].map(({ q, r }, i) => (
+                <details key={i} className="group py-5 cursor-pointer list-none">
+                  <summary className="flex items-center justify-between gap-4 font-semibold text-gray-900 text-sm sm:text-base select-none list-none">
+                    {q}
+                    <span className="shrink-0 w-5 h-5 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold group-open:rotate-45 transition-transform duration-200">+</span>
+                  </summary>
+                  <p className="mt-3 text-gray-500 text-sm leading-relaxed">{r}</p>
+                </details>
+              ))}
+            </div>
+          </div>
+        </section>
 
       <Footer />
 
