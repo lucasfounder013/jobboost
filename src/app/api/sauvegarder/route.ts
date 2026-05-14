@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   const body = await req.json() as {
     analyseId?: string;
     nomOffre: string;
-    niveauQualitatif?: string;
+    score?: number;
     resume?: string;
     motsClesManquants?: string[];
     motsClesPresents?: string[];
@@ -25,14 +25,14 @@ export async function POST(req: NextRequest) {
     questionsReponses?: { question: string; reponse: string }[];
   };
 
-  const { analyseId, nomOffre, niveauQualitatif, resume, motsClesManquants, motsClesPresents, cvAdapte, cvTexte, offreTexte, questionsReponses } = body;
+  const { analyseId, nomOffre, score, resume, motsClesManquants, motsClesPresents, cvAdapte, cvTexte, offreTexte, questionsReponses } = body;
 
   if (!nomOffre) {
     return NextResponse.json({ error: "Paramètres manquants." }, { status: 400 });
   }
 
   // Cas B : ajouter un CV adapté à une analyse existante
-  if (analyseId && typeof niveauQualitatif === "undefined") {
+  if (analyseId && typeof score === "undefined") {
     if (!cvAdapte) {
       return NextResponse.json({ error: "CV adapté manquant." }, { status: 400 });
     }
@@ -46,10 +46,10 @@ export async function POST(req: NextRequest) {
 
   // Cas A : créer une nouvelle analyse (+ optionnellement un CV adapté)
   const { rows } = await pool.query(
-    `INSERT INTO analyses (user_id, nom_offre, niveau_qualitatif, resume, mots_cles_manquants, mots_cles_presents, cv_texte, offre_texte)
+    `INSERT INTO analyses (user_id, nom_offre, score, resume, mots_cles_manquants, mots_cles_presents, cv_texte, offre_texte)
      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
      RETURNING id`,
-    [session.user.id, nomOffre, niveauQualitatif ?? null, resume ?? "", JSON.stringify(motsClesManquants ?? []), JSON.stringify(motsClesPresents ?? []), cvTexte ?? null, offreTexte ?? null]
+    [session.user.id, nomOffre, score ?? null, resume ?? "", JSON.stringify(motsClesManquants ?? []), JSON.stringify(motsClesPresents ?? []), cvTexte ?? null, offreTexte ?? null]
   );
   const nouvelAnalyseId: string = rows[0].id;
 

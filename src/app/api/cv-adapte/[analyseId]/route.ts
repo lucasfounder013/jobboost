@@ -12,7 +12,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ ana
   const { analyseId } = await params;
 
   const { rows } = await pool.query(
-    `SELECT a.nom_offre, a.niveau_qualitatif, a.niveau_qualitatif_apres,
+    `SELECT a.nom_offre, a.score, a.score_apres,
             a.mots_cles_manquants, a.mots_cles_presents,
             a.mots_cles_apres_manquants, a.mots_cles_apres_presents,
             cv.cv_data

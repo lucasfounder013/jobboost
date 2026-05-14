@@ -64,7 +64,7 @@ ${offre}
 
 Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans backticks) avec cette structure exacte :
 {
-  "niveauQualitatif": "<l'un des niveaux suivants exactement : Très mauvais | Mauvais | Moyen | Bon | Très bon | Excellent>",
+  "score": <entier entre 0 et 100 représentant le pourcentage de correspondance ATS>,
   "nomPoste": "<titre du poste extrait de l'offre d'emploi, ex: 'Développeur React Senior'>",
   "resume": "<2-3 phrases d'analyse globale en français>",
   "forme": [
@@ -75,13 +75,14 @@ Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans backticks) av
   "motsClesPresents": [<mots-clés importants de l'offre présents dans le CV>]
 }
 
-Règles pour niveauQualitatif :
-- Excellent : le CV est quasi parfaitement aligné avec l'offre
-- Très bon : très bonne correspondance, quelques points à affiner
-- Bon : bonne base mais lacunes notables
-- Moyen : correspondance partielle, travail significatif à faire
-- Mauvais : faible correspondance, CV peu adapté à l'offre
-- Très mauvais : très peu de correspondance, CV inadapté
+Règles pour le score ATS (0-100) :
+- 90-100 : CV quasi parfaitement aligné avec l'offre
+- 75-89 : très bonne correspondance, quelques points à affiner
+- 60-74 : bonne base mais lacunes notables
+- 40-59 : correspondance partielle, travail significatif à faire
+- 20-39 : faible correspondance, CV peu adapté à l'offre
+- 0-19 : très peu de correspondance, CV inadapté
+Le score doit refléter précisément le ratio mots-clés présents / total mots-clés importants, ajusté par la pertinence de l'expérience.
 
 Règles pour forme (section factuelle sur la qualité du CV) :
 - Génère 4 à 6 constats factuels sur la forme du CV (pas sur les mots-clés)

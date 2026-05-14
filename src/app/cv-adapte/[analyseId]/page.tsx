@@ -8,8 +8,8 @@ import { CVStructure } from "@/types/cv";
 
 type PageData = {
   nom_offre: string;
-  niveau_qualitatif: string | null;
-  niveau_qualitatif_apres: string | null;
+  score: number | null;
+  score_apres: number | null;
   mots_cles_manquants: string[];
   mots_cles_presents: string[];
   mots_cles_apres_manquants: string[] | null;
@@ -17,15 +17,24 @@ type PageData = {
   cv_data: CVStructure | null;
 };
 
-const BADGE_NIVEAU: Record<string, string> = {
-  "Très mauvais": "bg-rose-100 text-rose-700",
-  "Mauvais": "bg-orange-100 text-orange-700",
-  "Moyen": "bg-amber-100 text-amber-700",
-  "Bon": "bg-blue-100 text-blue-700",
-  "Très bon": "bg-emerald-100 text-emerald-700",
-  "Excellent": "bg-violet-100 text-violet-700",
-};
-const badgeNiveau = (niveau: string | null | undefined) => BADGE_NIVEAU[niveau ?? ""] ?? "bg-gray-100 text-gray-700";
+function couleurScore(score: number | null | undefined): string {
+  if (score == null) return "text-gray-500 bg-gray-100";
+  if (score <= 20) return "text-rose-700 bg-rose-100";
+  if (score <= 40) return "text-orange-700 bg-orange-100";
+  if (score <= 60) return "text-amber-700 bg-amber-100";
+  if (score <= 75) return "text-blue-700 bg-blue-100";
+  if (score <= 89) return "text-emerald-700 bg-emerald-100";
+  return "text-violet-700 bg-violet-100";
+}
+function ringScore(score: number | null | undefined): string {
+  if (score == null) return "ring-gray-200 text-gray-500";
+  if (score <= 20) return "ring-rose-300 text-rose-700";
+  if (score <= 40) return "ring-orange-300 text-orange-700";
+  if (score <= 60) return "ring-amber-300 text-amber-700";
+  if (score <= 75) return "ring-blue-300 text-blue-700";
+  if (score <= 89) return "ring-emerald-300 text-emerald-700";
+  return "ring-violet-300 text-violet-700";
+}
 
 export default function CvAdaptePage() {
   const router = useRouter();
@@ -36,7 +45,7 @@ export default function CvAdaptePage() {
   const [chargement, setChargement] = useState(true);
   const [erreur, setErreur] = useState("");
   const [exportEnCours, setExportEnCours] = useState<"pdf" | "docx" | null>(null);
-  const [niveauApres, setNiveauApres] = useState<string | null>(null);
+  const [scoreApres, setScoreApres] = useState<number | null>(null);
   const [motsClesApresManquants, setMotsClesApresManquants] = useState<string[] | null>(null);
   const [motsClesApresPresents, setMotsClesApresPresents] = useState<string[] | null>(null);
 
@@ -48,7 +57,7 @@ export default function CvAdaptePage() {
       })
       .then((d: PageData) => {
         setData(d);
-        setNiveauApres(d.niveau_qualitatif_apres);
+        setScoreApres(d.score_apres);
         setMotsClesApresManquants(d.mots_cles_apres_manquants);
         setMotsClesApresPresents(d.mots_cles_apres_presents);
       })
@@ -56,15 +65,15 @@ export default function CvAdaptePage() {
       .finally(() => setChargement(false));
   }, [analyseId]);
 
-  // Polling si niveau_qualitatif_apres pas encore calculé
+  // Polling si score_apres pas encore calculé
   useEffect(() => {
-    if (!data || niveauApres !== null) return;
+    if (!data || scoreApres !== null) return;
     const interval = setInterval(() => {
       fetch(`/api/cv-adapte/${analyseId}`)
         .then((r) => r.json())
         .then((d: PageData) => {
-          if (d.niveau_qualitatif_apres !== null) {
-            setNiveauApres(d.niveau_qualitatif_apres);
+          if (d.score_apres !== null) {
+            setScoreApres(d.score_apres);
             setMotsClesApresManquants(d.mots_cles_apres_manquants);
             setMotsClesApresPresents(d.mots_cles_apres_presents);
             clearInterval(interval);
@@ -73,7 +82,7 @@ export default function CvAdaptePage() {
         .catch(() => {});
     }, 3000);
     return () => clearInterval(interval);
-  }, [analyseId, data, niveauApres]);
+  }, [analyseId, data, scoreApres]);
 
   async function exporterCV(format: "pdf" | "docx") {
     if (!data?.cv_data) return;
@@ -177,25 +186,30 @@ export default function CvAdaptePage() {
 
       <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col gap-6">
 
-        {/* Niveau de correspondance */}
+        {/* Score ATS */}
         <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6">
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Niveau de correspondance</p>
-          <div className="flex items-center gap-5 flex-wrap">
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Score ATS</p>
+          <div className="flex items-center gap-8 flex-wrap">
             <div className="flex flex-col items-center gap-1">
               <p className="text-xs text-gray-400">Avant</p>
-              <span className={`text-base font-extrabold px-4 py-2 rounded-full ${badgeNiveau(data.niveau_qualitatif)}`}>{data.niveau_qualitatif ?? "—"}</span>
+              <div className={`w-20 h-20 rounded-full flex flex-col items-center justify-center ring-4 bg-white ${ringScore(data.score)}`}>
+                <span className="text-2xl font-black">{data.score ?? "—"}</span>
+                <span className="text-[10px] font-semibold text-gray-400">/ 100</span>
+              </div>
             </div>
             <svg className="w-6 h-6 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
             <div className="flex flex-col items-center gap-1">
               <p className="text-xs text-gray-400">Après</p>
-              {niveauApres !== null ? (
-                <span className={`text-base font-extrabold px-4 py-2 rounded-full ${badgeNiveau(niveauApres)}`}>{niveauApres}</span>
+              {scoreApres !== null ? (
+                <div className={`w-20 h-20 rounded-full flex flex-col items-center justify-center ring-4 bg-white ${ringScore(scoreApres)}`}>
+                  <span className="text-2xl font-black">{scoreApres}</span>
+                  <span className="text-[10px] font-semibold text-gray-400">/ 100</span>
+                </div>
               ) : (
-                <div className="flex items-center gap-1.5 text-indigo-500">
-                  <svg className="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
-                  <span className="text-sm font-medium">Calcul...</span>
+                <div className="w-20 h-20 rounded-full ring-4 ring-gray-100 bg-white flex items-center justify-center">
+                  <svg className="animate-spin w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
                 </div>
               )}
             </div>

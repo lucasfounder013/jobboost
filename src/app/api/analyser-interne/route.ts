@@ -33,18 +33,19 @@ ${offre}
 
 Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans backticks) avec cette structure exacte :
 {
-  "niveauQualitatif": "<l'un des niveaux suivants exactement : Très mauvais | Mauvais | Moyen | Bon | Très bon | Excellent>",
+  "score": <entier entre 0 et 100 représentant le pourcentage de correspondance ATS>,
   "motsClesManquants": [<mots-clés importants de l'offre absents du CV>],
   "motsClesPresents": [<mots-clés importants de l'offre présents dans le CV>]
 }
 
-Règles pour niveauQualitatif :
-- Excellent : le CV est quasi parfaitement aligné avec l'offre
-- Très bon : très bonne correspondance, quelques points à affiner
-- Bon : bonne base mais lacunes notables
-- Moyen : correspondance partielle, travail significatif à faire
-- Mauvais : faible correspondance, CV peu adapté à l'offre
-- Très mauvais : très peu de correspondance, CV inadapté`,
+Règles pour le score ATS (0-100) :
+- 90-100 : CV quasi parfaitement aligné avec l'offre
+- 75-89 : très bonne correspondance, quelques points à affiner
+- 60-74 : bonne base mais lacunes notables
+- 40-59 : correspondance partielle, travail significatif à faire
+- 20-39 : faible correspondance, CV peu adapté à l'offre
+- 0-19 : très peu de correspondance, CV inadapté
+Le score doit refléter précisément le ratio mots-clés présents / total mots-clés importants, ajusté par la pertinence de l'expérience.`,
       },
     ],
   });
@@ -63,7 +64,7 @@ Règles pour niveauQualitatif :
   }
 
   return NextResponse.json({
-    niveauQualitatif: resultat.niveauQualitatif,
+    score: resultat.score,
     motsClesManquants: resultat.motsClesManquants ?? [],
     motsClesPresents: resultat.motsClesPresents ?? [],
   });

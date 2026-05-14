@@ -9,11 +9,10 @@ import { CVStructure } from "@/types/cv";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type NiveauQualitatif = "Très mauvais" | "Mauvais" | "Moyen" | "Bon" | "Très bon" | "Excellent";
 type FormeItem = { verdict: "✅" | "❌"; constat: string };
 
 type ResultatAnalyse = {
-  niveauQualitatif: NiveauQualitatif;
+  score: number;
   nomPoste?: string;
   resume: string;
   forme: FormeItem[];
@@ -24,14 +23,12 @@ type ResultatAnalyse = {
 type AnalyseSauvegardee = {
   id: string;
   nom_offre: string;
-  niveau_qualitatif?: string | null;
-  niveau_qualitatif_apres?: string | null;
+  score?: number | null;
+  score_apres?: number | null;
   created_at: string;
   resume?: string;
   mots_cles_manquants?: string[];
   mots_cles_presents?: string[];
-  score?: number | null;
-  score_apres?: number | null;
   mots_cles_apres_manquants?: string[] | null;
   mots_cles_apres_presents?: string[] | null;
   cv_adapte_id: string | null;
@@ -86,15 +83,24 @@ function cvStructureVersTexte(cv: CVStructure): string {
   return lignes.filter(Boolean).join("\n");
 }
 
-const BADGE_NIVEAU: Record<string, string> = {
-  "Très mauvais": "bg-rose-100 text-rose-700",
-  "Mauvais": "bg-orange-100 text-orange-700",
-  "Moyen": "bg-amber-100 text-amber-700",
-  "Bon": "bg-blue-100 text-blue-700",
-  "Très bon": "bg-emerald-100 text-emerald-700",
-  "Excellent": "bg-violet-100 text-violet-700",
-};
-const badgeNiveau = (niveau: string | null | undefined) => BADGE_NIVEAU[niveau ?? ""] ?? "bg-gray-100 text-gray-700";
+function couleurScore(score: number | null | undefined): string {
+  if (score == null) return "text-gray-500 bg-gray-100";
+  if (score <= 20) return "text-rose-700 bg-rose-100";
+  if (score <= 40) return "text-orange-700 bg-orange-100";
+  if (score <= 60) return "text-amber-700 bg-amber-100";
+  if (score <= 75) return "text-blue-700 bg-blue-100";
+  if (score <= 89) return "text-emerald-700 bg-emerald-100";
+  return "text-violet-700 bg-violet-100";
+}
+function ringScore(score: number | null | undefined): string {
+  if (score == null) return "ring-gray-200 text-gray-500";
+  if (score <= 20) return "ring-rose-300 text-rose-700";
+  if (score <= 40) return "ring-orange-300 text-orange-700";
+  if (score <= 60) return "ring-amber-300 text-amber-700";
+  if (score <= 75) return "ring-blue-300 text-blue-700";
+  if (score <= 89) return "ring-emerald-300 text-emerald-700";
+  return "ring-violet-300 text-violet-700";
+}
 const formaterDate = (iso: string) => new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 
 // ─── Composant ────────────────────────────────────────────────────────────────
@@ -324,7 +330,7 @@ export default function Dashboard() {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        niveauQualitatifApres: dataScore.niveauQualitatif,
+        scoreApres: dataScore.score,
         motsClesApresManquants: dataScore.motsClesManquants,
         motsClesApresPresents: dataScore.motsClesPresents,
       }),
@@ -341,7 +347,7 @@ export default function Dashboard() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         nomOffre,
-        niveauQualitatif: data.niveauQualitatif,
+        score: data.score,
         resume: data.resume,
         motsClesManquants: data.motsClesManquants,
         motsClesPresents: data.motsClesPresents,
@@ -378,7 +384,7 @@ export default function Dashboard() {
       body: JSON.stringify(
         analyseId
           ? { analyseId, nomOffre, cvAdapte: cvData, questionsReponses: [] }
-          : { nomOffre, niveauQualitatif: resultat?.niveauQualitatif, resume: resultat?.resume ?? "", motsClesManquants: resultat?.motsClesManquants ?? [], motsClesPresents: resultat?.motsClesPresents ?? [], cvAdapte: cvData, questionsReponses: [] }
+          : { nomOffre, score: resultat?.score, resume: resultat?.resume ?? "", motsClesManquants: resultat?.motsClesManquants ?? [], motsClesPresents: resultat?.motsClesPresents ?? [], cvAdapte: cvData, questionsReponses: [] }
       ),
     });
   }
@@ -656,17 +662,17 @@ export default function Dashboard() {
                         <p className="text-xs text-gray-400">{formaterDate(analyse.created_at)}</p>
                       </div>
 
-                      {/* Colonne 2 : Analyse CV — badge qualitatif avant/après */}
+                      {/* Colonne 2 : Score ATS avant/après */}
                       <div className="flex items-center">
-                        {analyse.niveau_qualitatif_apres ? (
+                        {analyse.score_apres != null ? (
                           <span className="inline-flex items-center gap-1 text-xs font-semibold">
-                            <span className={`px-2.5 py-1.5 rounded-full ${badgeNiveau(analyse.niveau_qualitatif)}`}>{analyse.niveau_qualitatif ?? "—"}</span>
+                            <span className={`px-2.5 py-1.5 rounded-full ${couleurScore(analyse.score)}`}>{analyse.score ?? "—"}</span>
                             <span className="text-gray-300 mx-0.5">→</span>
-                            <span className={`px-2.5 py-1.5 rounded-full font-bold ${badgeNiveau(analyse.niveau_qualitatif_apres)}`}>{analyse.niveau_qualitatif_apres}</span>
+                            <span className={`px-2.5 py-1.5 rounded-full font-bold ${couleurScore(analyse.score_apres)}`}>{analyse.score_apres}</span>
                           </span>
                         ) : (
-                          <span className={`inline-flex items-center text-xs font-bold px-3 py-1.5 rounded-full ${badgeNiveau(analyse.niveau_qualitatif)}`}>
-                            {analyse.niveau_qualitatif ?? "—"}
+                          <span className={`inline-flex items-center text-xs font-bold px-3 py-1.5 rounded-full ${couleurScore(analyse.score)}`}>
+                            {analyse.score != null ? `${analyse.score} / 100` : "—"}
                           </span>
                         )}
                       </div>
@@ -883,12 +889,13 @@ export default function Dashboard() {
               <div className="flex flex-col gap-5">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
-                  {/* Badge qualitatif */}
+                  {/* Score ATS */}
                   <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-8 flex flex-col items-center justify-center text-center">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Niveau de correspondance</p>
-                    <span className={`text-2xl font-extrabold px-5 py-2 rounded-full ${badgeNiveau(resultat.niveauQualitatif)}`}>
-                      {resultat.niveauQualitatif}
-                    </span>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Score ATS</p>
+                    <div className={`w-24 h-24 rounded-full flex flex-col items-center justify-center ring-4 bg-white ${ringScore(resultat.score)}`}>
+                      <span className="text-3xl font-black">{resultat.score}</span>
+                      <span className="text-xs font-semibold text-gray-400">/ 100</span>
+                    </div>
                   </div>
 
                   {/* Analyse + CTA */}
@@ -1073,7 +1080,7 @@ export default function Dashboard() {
             <div className="flex border-b border-gray-100 px-4 shrink-0 overflow-x-auto">
               {([
                 { key: "resultats", label: "Résultats" },
-                ...(analyseOuverte.niveau_qualitatif_apres != null ? [{ key: "apres", label: "Après adaptation" }] : []),
+                ...(analyseOuverte.score_apres != null ? [{ key: "apres", label: "Après adaptation" }] : []),
                 ...(analyseOuverte.lettre_id ? [{ key: "lettre", label: "Lettre de motivation" }] : []),
                 { key: "offre", label: "Offre d'emploi" },
                 { key: "cv", label: "CV original" },
@@ -1097,18 +1104,18 @@ export default function Dashboard() {
               {/* Onglet Résultats */}
               {ongletAnalyse === "resultats" && (
                 <div className="p-6 flex flex-col gap-6">
-                  {/* Comparatif avant/après si niveau_qualitatif_apres disponible */}
-                  {analyseOuverte.niveau_qualitatif_apres != null && (
+                  {/* Comparatif avant/après si score_apres disponible */}
+                  {analyseOuverte.score_apres != null && (
                     <div className="flex items-center gap-3 bg-emerald-50 ring-1 ring-emerald-100 rounded-xl px-4 py-3">
-                      <span className={`text-sm font-bold px-2.5 py-1 rounded-full ${badgeNiveau(analyseOuverte.niveau_qualitatif)}`}>{analyseOuverte.niveau_qualitatif ?? "—"}</span>
+                      <span className={`text-sm font-bold px-2.5 py-1 rounded-full ${couleurScore(analyseOuverte.score)}`}>{analyseOuverte.score ?? "—"}</span>
                       <span className="text-gray-300 text-lg">→</span>
-                      <span className={`text-sm font-bold px-2.5 py-1 rounded-full ${badgeNiveau(analyseOuverte.niveau_qualitatif_apres)}`}>{analyseOuverte.niveau_qualitatif_apres}</span>
+                      <span className={`text-sm font-bold px-2.5 py-1 rounded-full ${couleurScore(analyseOuverte.score_apres)}`}>{analyseOuverte.score_apres}</span>
                       <span className="text-sm text-emerald-700 font-semibold ml-1">après adaptation</span>
                     </div>
                   )}
-                  {/* Badge niveau */}
+                  {/* Score */}
                   <div className="flex items-center gap-5">
-                    <span className={`text-base font-extrabold px-4 py-2 rounded-full ${badgeNiveau(analyseOuverte.niveau_qualitatif)}`}>{analyseOuverte.niveau_qualitatif ?? "—"}</span>
+                    <span className={`text-base font-extrabold px-4 py-2 rounded-full ${couleurScore(analyseOuverte.score)}`}>{analyseOuverte.score != null ? `${analyseOuverte.score} / 100` : "—"}</span>
                     <p className="text-xs text-gray-400">{formaterDate(analyseOuverte.created_at)}</p>
                   </div>
 
@@ -1167,15 +1174,15 @@ export default function Dashboard() {
                 );
                 return (
                   <div className="p-6 flex flex-col gap-6">
-                    {/* Niveau comparatif */}
+                    {/* Score comparatif */}
                     <div className="flex items-center gap-3 bg-emerald-50 ring-1 ring-emerald-100 rounded-xl px-5 py-4">
                       <div className="flex flex-col items-center gap-1">
-                        <span className={`text-sm font-bold px-3 py-1 rounded-full ${badgeNiveau(analyseOuverte.niveau_qualitatif)}`}>{analyseOuverte.niveau_qualitatif ?? "—"}</span>
+                        <span className={`text-sm font-bold px-3 py-1 rounded-full ${couleurScore(analyseOuverte.score)}`}>{analyseOuverte.score != null ? `${analyseOuverte.score} / 100` : "—"}</span>
                         <span className="text-xs text-gray-400">Avant</span>
                       </div>
                       <span className="text-gray-300 text-xl mx-1">→</span>
                       <div className="flex flex-col items-center gap-1">
-                        <span className={`text-sm font-bold px-3 py-1 rounded-full ${badgeNiveau(analyseOuverte.niveau_qualitatif_apres)}`}>{analyseOuverte.niveau_qualitatif_apres}</span>
+                        <span className={`text-sm font-bold px-3 py-1 rounded-full ${couleurScore(analyseOuverte.score_apres)}`}>{analyseOuverte.score_apres != null ? `${analyseOuverte.score_apres} / 100` : "—"}</span>
                         <span className="text-xs text-emerald-600">Après</span>
                       </div>
                     </div>
