@@ -1,71 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession, signOut } from "@/lib/auth-client";
-import CVPreview from "@/components/CVPreview";
 import Footer from "@/components/Footer";
-import { CVStructure } from "@/types/cv";
-
-type NiveauQualitatif = "Très mauvais" | "Mauvais" | "Moyen" | "Bon" | "Très bon" | "Excellent";
-type FormeItem = { verdict: "✅" | "❌"; constat: string };
-
-type ResultatAnalyse = {
-  niveauQualitatif: NiveauQualitatif;
-  nomPoste?: string;
-  resume: string;
-  forme: FormeItem[];
-  motsClesManquants: string[];
-  motsClesPresents: string[];
-};
 
 export default function PagePrincipale() {
   const { data: session } = useSession();
   const router = useRouter();
   const [cv, setCv] = useState("");
   const [offre, setOffre] = useState("");
-  const [resultat, setResultat] = useState<ResultatAnalyse | null>(null);
-  const [chargement, setChargement] = useState(false);
   const [erreur, setErreur] = useState("");
   const [modeCV, setModeCV] = useState<"upload" | "texte">("upload");
   const [nomFichier, setNomFichier] = useState("");
   const [extractionEnCours, setExtractionEnCours] = useState(false);
   const [dragActif, setDragActif] = useState(false);
-  const [cvAdapte, setCvAdapte] = useState<CVStructure | null>(null);
-  const [adaptationEnCours, setAdaptationEnCours] = useState(false);
-  const [erreurAdaptation, setErreurAdaptation] = useState("");
-  const [creditsRestants, setCreditsRestants] = useState<number | null>(null);
-  const [scansRestants, setScansRestants] = useState<number | null>(null);
-  const [estAbonne, setEstAbonne] = useState(false);
-  const [exportEnCours, setExportEnCours] = useState<"pdf" | "docx" | null>(null);
-  const [autoAnalyse, setAutoAnalyse] = useState(false);
-  const [analyseId, setAnalyseId] = useState<string | null>(null);
-  const [nomPosteEnregistre, setNomPosteEnregistre] = useState("");
-  const [etapeAdaptation, setEtapeAdaptation] = useState<"idle" | "generation">("idle");
-
-  // Restaure le CV et l'offre sauvegardés avant une redirection (login ou Stripe)
-  useEffect(() => {
-    const raw = localStorage.getItem("pendingAnalysis");
-    if (!raw) return;
-    localStorage.removeItem("pendingAnalysis");
-    try {
-      const { cv: c, offre: o, nomFichier: n } = JSON.parse(raw);
-      if (c) setCv(c);
-      if (o) setOffre(o);
-      if (n) { setNomFichier(n); setModeCV("upload"); }
-      setAutoAnalyse(true);
-    } catch {}
-  }, []);
-
-  // Lance l'analyse automatiquement une fois la session disponible
-  useEffect(() => {
-    if (autoAnalyse && session) {
-      setAutoAnalyse(false);
-      analyser(); // eslint-disable-line react-hooks/exhaustive-deps
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [autoAnalyse, session]);
 
   async function traiterFichier(fichier: File) {
     const ext = fichier.name.split(".").pop()?.toLowerCase();
@@ -91,139 +41,14 @@ export default function PagePrincipale() {
   }
 
   async function analyser() {
-    if (!session) {
-      localStorage.setItem("pendingAnalysis", JSON.stringify({ cv, offre, nomFichier }));
-      router.push("/login");
-      return;
-    }
     if (!cv.trim() || !offre.trim()) {
       setErreur("Veuillez remplir les deux champs.");
       return;
     }
-    setErreur("");
-    setChargement(true);
-    setResultat(null);
-
-    try {
-      const reponse = await fetch("/api/analyser", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv, offre }),
-      });
-      const data = await reponse.json();
-      if (reponse.status === 403) {
-        // Sauvegarder pour restaurer après abonnement (survit à la redirection Stripe)
-        localStorage.setItem("pendingAnalysis", JSON.stringify({ cv, offre, nomFichier }));
-        setErreur(data.error);
-        return;
-      }
-      if (!reponse.ok) throw new Error("Erreur lors de l'analyse.");
-      setResultat(data);
-      setScansRestants(data.scansRestants ?? null);
-      if (data.scansRestants === null) setEstAbonne(true);
-      sauvegarderAnalyse(data).catch(() => {});
-    } catch {
-      setErreur("Une erreur est survenue. Veuillez réessayer.");
-    } finally {
-      setChargement(false);
-    }
+    // Connecté ou non : on sauvegarde et on redirige vers le dashboard (ou login)
+    localStorage.setItem("pendingAnalysis", JSON.stringify({ cv, offre, nomFichier }));
+    router.push(session ? "/dashboard" : "/login");
   }
-
-  async function adapterCV() {
-    if (!resultat) return;
-    setErreurAdaptation("");
-    setCvAdapte(null);
-    setAdaptationEnCours(true);
-    setEtapeAdaptation("generation");
-    try {
-      const reponse = await fetch("/api/adapter-cv", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv, offre, motsClesManquants: resultat.motsClesManquants, reponses: [] }),
-      });
-      const data = await reponse.json();
-      if (!reponse.ok) throw new Error(data.error);
-      setCvAdapte(data.cvAdapte);
-      setCreditsRestants(data.creditsRestants);
-      setEtapeAdaptation("idle");
-      sauvegarderCvAdapte(data.cvAdapte).catch(() => {});
-    } catch (e) {
-      setErreurAdaptation(e instanceof Error ? e.message : "Une erreur est survenue.");
-      setEtapeAdaptation("idle");
-    } finally {
-      setAdaptationEnCours(false);
-    }
-  }
-
-  async function sauvegarderAnalyse(data: ResultatAnalyse) {
-    const nomOffre = data.nomPoste || nomFichier || "Analyse sans titre";
-    setNomPosteEnregistre(nomOffre);
-    const reponse = await fetch("/api/sauvegarder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        nomOffre,
-        niveauQualitatif: data.niveauQualitatif,
-        resume: data.resume,
-        motsClesManquants: data.motsClesManquants,
-        motsClesPresents: data.motsClesPresents,
-      }),
-    });
-    if (reponse.ok) {
-      const json = await reponse.json();
-      setAnalyseId(json.analyseId);
-    }
-  }
-
-  async function sauvegarderCvAdapte(cv: CVStructure) {
-    const nomOffre = nomPosteEnregistre || nomFichier || "Analyse sans titre";
-    await fetch("/api/sauvegarder", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(
-        analyseId
-          ? { analyseId, nomOffre, cvAdapte: cv }
-          : { nomOffre, niveauQualitatif: resultat?.niveauQualitatif, resume: resultat?.resume ?? "", motsClesManquants: resultat?.motsClesManquants ?? [], motsClesPresents: resultat?.motsClesPresents ?? [], cvAdapte: cv }
-      ),
-    });
-  }
-
-  async function exporterCV(format: "pdf" | "docx") {
-    if (!cvAdapte) return;
-    setExportEnCours(format);
-    try {
-      const reponse = await fetch("/api/exporter-cv", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv: cvAdapte, format }),
-      });
-      if (!reponse.ok) throw new Error("Erreur lors de l'export.");
-      const blob = await reponse.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      const nom = (cvAdapte.nom || "cv").toLowerCase().replace(/\s+/g, "_");
-      a.href = url;
-      a.download = `${nom}_cv.${format}`;
-      a.click();
-      URL.revokeObjectURL(url);
-    } catch {
-      // silencieux — l'utilisateur voit que le bouton se débloque
-    } finally {
-      setExportEnCours(null);
-    }
-  }
-
-  const badgeNiveau = (niveau: NiveauQualitatif) => {
-    const map: Record<NiveauQualitatif, string> = {
-      "Très mauvais": "bg-rose-100 text-rose-700",
-      "Mauvais": "bg-orange-100 text-orange-700",
-      "Moyen": "bg-amber-100 text-amber-700",
-      "Bon": "bg-blue-100 text-blue-700",
-      "Très bon": "bg-emerald-100 text-emerald-700",
-      "Excellent": "bg-violet-100 text-violet-700",
-    };
-    return map[niveau] ?? "bg-gray-100 text-gray-700";
-  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -479,8 +304,8 @@ export default function PagePrincipale() {
           )}
         </section>
 
-        {/* Résultats */}
-        {resultat && (
+        {/* Résultats — supprimé, l'analyse se fait dans le dashboard */}
+        {false && (
           <section className="max-w-6xl mx-auto px-6 pb-20">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
 
