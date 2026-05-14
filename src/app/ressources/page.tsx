@@ -15,6 +15,15 @@ const articles = [
     slug: "/ressources/cv-ats/quest-ce-qu-un-ats",
     date: "9 mai 2026",
   },
+  {
+    id: 2,
+    categorie: "CV & ATS",
+    titre: "PDF ou Word : quel format de CV passe vraiment mieux les ATS ?",
+    extrait:
+      "Tout le monde dit PDF. Mais est-ce vraiment le bon choix quand votre CV passe par un ATS ?",
+    slug: "/ressources/cv-ats/cv-pdf-ou-word-ats",
+    date: "14 mai 2026",
+  },
 ];
 
 const CATEGORIES = ["Toutes", "CV & ATS", "Lettre de motivation", "Trouver des offres"];
