@@ -7,6 +7,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 3,
+    categorie: "CV & ATS",
+    titre: "Ce que voit vraiment le recruteur dans son ATS quand il reçoit votre CV",
+    extrait:
+      "Vous imaginez un robot qui analyse votre CV. La réalité est bien différente. Voici ce que voit vraiment un recruteur de l'autre côté.",
+    slug: "/ressources/cv-ats/ce-que-voit-le-recruteur-dans-son-ats",
+    date: "16 mai 2026",
+  },
+  {
     id: 1,
     categorie: "CV & ATS",
     titre: "C'est quoi un ATS ? Tout ce qu'il faut savoir",
