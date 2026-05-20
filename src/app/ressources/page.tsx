@@ -7,6 +7,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 4,
+    categorie: "CV & ATS",
+    titre: "Les ATS les plus utilisés en France, et ce que ça change pour vous",
+    extrait:
+      "Workday, Taleo, Greenhouse... Ces logiciels gèrent vos candidatures sans que vous le sachiez. Voici ce qu'il faut savoir sur chacun.",
+    slug: "/ressources/cv-ats/ats-les-plus-utilises-en-france",
+    date: "20 mai 2026",
+  },
+  {
     id: 3,
     categorie: "CV & ATS",
     titre: "Ce que voit vraiment le recruteur dans son ATS quand il reçoit votre CV",
