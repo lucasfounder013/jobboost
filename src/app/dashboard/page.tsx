@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession, signOut } from "@/lib/auth-client";
+import { usePostHog } from "posthog-js/react";
 import CVPreview from "@/components/CVPreview";
 import { CVStructure } from "@/types/cv";
 
@@ -46,6 +47,23 @@ type CvAdapteSauvegarde = {
   created_at: string;
   cv_data: CVStructure;
   questions_reponses?: { question: string; reponse: string }[] | null;
+};
+
+type ResultatEntretien = {
+  entretienId: string;
+  nomPoste: string;
+  pitchComplet: string;
+  questionsProbables: { question: string; conseil: string }[];
+  questionsAPoseur: string[];
+};
+
+type EntretienSauvegarde = {
+  id: string;
+  nom_offre: string;
+  pitch: string;
+  questions_probables: { question: string; conseil: string }[];
+  questions_a_poser: string[];
+  created_at: string;
 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -108,9 +126,10 @@ const formaterDate = (iso: string) => new Date(iso).toLocaleDateString("fr-FR", 
 export default function Dashboard() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
+  const posthog = usePostHog();
 
   // Vue active
-  const [vue, setVue] = useState<"historique" | "nouvelle-analyse">("historique");
+  const [vue, setVue] = useState<"historique" | "nouvelle-analyse" | "preparer-entretien">("historique");
 
   // ── Données historique
   const [analyses, setAnalyses] = useState<AnalyseSauvegardee[]>([]);
@@ -151,10 +170,29 @@ export default function Dashboard() {
   const [generationLmEnCours, setGenerationLmEnCours] = useState<string | null>(null);
   const [exportLmEnCours, setExportLmEnCours] = useState<"pdf" | "docx" | null>(null);
 
+  // ── Entretien
+  const [cvEntretien, setCvEntretien] = useState("");
+  const [offreEntretien, setOffreEntretien] = useState("");
+  const [urlEntreprise, setUrlEntreprise] = useState("");
+  const [nomFichierEntretien, setNomFichierEntretien] = useState("");
+  const [extractionEntretienEnCours, setExtractionEntretienEnCours] = useState(false);
+  const [dragActifEntretien, setDragActifEntretien] = useState(false);
+  const [generationEntretienEnCours, setGenerationEntretienEnCours] = useState(false);
+  const [resultatEntretien, setResultatEntretien] = useState<ResultatEntretien | null>(null);
+  const [erreurEntretien, setErreurEntretien] = useState("");
+  const [entretiens, setEntretiens] = useState<EntretienSauvegarde[]>([]);
+
   // ── Auth redirect
   useEffect(() => {
     if (!isPending && !session) router.push("/login");
   }, [session, isPending, router]);
+
+  // ── Identification PostHog
+  useEffect(() => {
+    if (session?.user) {
+      posthog?.identify(session.user.id, { email: session.user.email });
+    }
+  }, [session, posthog]);
 
   // ── Réinitialiser l'onglet du drawer à chaque ouverture
   useEffect(() => {
@@ -168,6 +206,7 @@ export default function Dashboard() {
       .then((data) => {
         setAnalyses(data.analyses ?? []);
         setCvsAdaptes(data.cvsAdaptes ?? []);
+        setEntretiens(data.entretiens ?? []);
         if (data.estAbonne) {
           setEstAbonne(true);
           setScansRestants(null);
@@ -273,6 +312,7 @@ export default function Dashboard() {
       setResultat(data);
       setScansRestants(data.scansRestants ?? null);
       if (data.scansRestants === null) setEstAbonne(true);
+      posthog?.capture("analyse_completee", { score: data.score, nb_mots_manquants: data.motsClesManquants?.length ?? 0 });
       sauvegarderAnalyse(data).catch(() => {});
     } catch {
       setErreur("Une erreur est survenue. Veuillez réessayer.");
@@ -298,6 +338,7 @@ export default function Dashboard() {
       if (reponse.status === 403) { setModaleUpgrade("credits"); setEtapeAdaptation("idle"); return; }
       if (!reponse.ok) throw new Error(data.error);
       setCreditsRestants(data.creditsRestants);
+      posthog?.capture("cv_adapte", { credits_restants: data.creditsRestants });
       setEtapeAdaptation("idle");
       await sauvegarderCvAdapte(data.cvAdapte);
       calculerScoreApresAdaptation(data.cvAdapte).catch(() => {});
@@ -408,6 +449,7 @@ export default function Dashboard() {
       a.download = `${nom}_cv.${format}`;
       a.click();
       URL.revokeObjectURL(url);
+      posthog?.capture("cv_exporte", { format });
     } finally {
       setter(null);
     }
@@ -479,6 +521,73 @@ export default function Dashboard() {
     } finally {
       setExportLmEnCours(null);
     }
+  }
+
+  async function traiterFichierEntretien(fichier: File) {
+    const ext = fichier.name.split(".").pop()?.toLowerCase();
+    if (ext !== "pdf" && ext !== "docx") {
+      setErreurEntretien("Format non supporté. Utilisez un fichier PDF ou Word (.docx).");
+      return;
+    }
+    setErreurEntretien("");
+    setExtractionEntretienEnCours(true);
+    const formData = new FormData();
+    formData.append("fichier", fichier);
+    try {
+      const reponse = await fetch("/api/extraire-cv", { method: "POST", body: formData });
+      const data = await reponse.json();
+      if (!reponse.ok) throw new Error(data.error);
+      setCvEntretien(data.texte);
+      setNomFichierEntretien(fichier.name);
+    } catch (e) {
+      setErreurEntretien(e instanceof Error ? e.message : "Impossible d'extraire le texte du fichier.");
+    } finally {
+      setExtractionEntretienEnCours(false);
+    }
+  }
+
+  async function preparerEntretien() {
+    if (!cvEntretien.trim() || !offreEntretien.trim()) {
+      setErreurEntretien("Veuillez uploader votre CV et coller l'offre d'emploi.");
+      return;
+    }
+    setErreurEntretien("");
+    setGenerationEntretienEnCours(true);
+    setResultatEntretien(null);
+    try {
+      const res = await fetch("/api/preparer-entretien", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cv: cvEntretien, offre: offreEntretien, urlEntreprise }),
+      });
+      const data = await res.json();
+      if (!res.ok) { setErreurEntretien(data.error ?? "Une erreur est survenue."); return; }
+      setResultatEntretien(data);
+      chargerHistorique();
+    } catch {
+      setErreurEntretien("Une erreur est survenue. Veuillez réessayer.");
+    } finally {
+      setGenerationEntretienEnCours(false);
+    }
+  }
+
+  function ouvrirEntretien(e: EntretienSauvegarde) {
+    setResultatEntretien({
+      entretienId: e.id,
+      nomPoste: e.nom_offre,
+      pitchComplet: e.pitch,
+      questionsProbables: e.questions_probables,
+      questionsAPoseur: e.questions_a_poser,
+    });
+  }
+
+  function resetEntretien() {
+    setResultatEntretien(null);
+    setCvEntretien("");
+    setOffreEntretien("");
+    setUrlEntreprise("");
+    setNomFichierEntretien("");
+    setErreurEntretien("");
   }
 
   const prenom = session?.user.name?.split(" ")[0] ?? "vous";
@@ -566,6 +675,16 @@ export default function Dashboard() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
             </svg>
             Mes candidatures
+          </button>
+
+          <button
+            onClick={() => { setVue("preparer-entretien"); resetEntretien(); }}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm w-full text-left transition-colors ${vue === "preparer-entretien" ? "bg-indigo-800 text-white" : "text-indigo-200 hover:bg-indigo-800/60 hover:text-white"}`}
+          >
+            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+            Préparer mon entretien
           </button>
 
           <Link
@@ -1018,6 +1137,226 @@ export default function Dashboard() {
                 )}
               </div>
             )}
+          </div>
+        )}
+
+        {/* ── Vue : Préparer mon entretien ─────────────────────────────────── */}
+        {vue === "preparer-entretien" && (
+          <div className="max-w-3xl mx-auto px-8 py-10">
+            <div className="mb-8">
+              <h1 className="text-2xl font-bold text-gray-900">Préparer mon entretien</h1>
+              <p className="text-gray-400 text-sm mt-1">Générez une roadmap personnalisée pour décrocher le poste.</p>
+            </div>
+
+            {!estAbonne ? (
+              /* CTA abonnement */
+              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-10 flex flex-col items-center text-center gap-5">
+                <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center">
+                  <svg className="w-7 h-7 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-gray-900">Fonctionnalité réservée aux abonnés</p>
+                  <p className="text-gray-500 text-sm mt-2 max-w-sm">
+                    La préparation d&apos;entretien est incluse dans l&apos;abonnement JobBoost. Pitch, questions probables, questions à poser et message de relance générés par l&apos;IA.
+                  </p>
+                </div>
+                <Link
+                  href="/pricing"
+                  className="bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-indigo-200/60 transition-all"
+                >
+                  Voir les abonnements →
+                </Link>
+              </div>
+            ) : resultatEntretien ? (
+              /* Résultat */
+              <div className="flex flex-col gap-6">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-gray-500">Préparation pour <span className="font-semibold text-gray-800">{resultatEntretien.nomPoste}</span></p>
+                  <button
+                    onClick={resetEntretien}
+                    className="text-sm text-indigo-600 hover:text-indigo-800 font-semibold transition-colors"
+                  >
+                    ← Nouvelle préparation
+                  </button>
+                </div>
+
+                {/* Pitch */}
+                <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6">
+                  <div className="flex items-center gap-2 mb-5">
+                    <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 text-xs font-bold flex items-center justify-center">1</span>
+                    <p className="font-bold text-gray-900">Pitch d&apos;introduction</p>
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <button onClick={() => navigator.clipboard.writeText(resultatEntretien.pitchComplet)} className="text-xs text-gray-400 hover:text-indigo-600 font-medium transition-colors">Copier</button>
+                    </div>
+                    <p className="text-gray-700 text-sm leading-relaxed">{resultatEntretien.pitchComplet}</p>
+                  </div>
+                </div>
+
+                {/* Questions probables */}
+                <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 text-xs font-bold flex items-center justify-center">2</span>
+                    <p className="font-bold text-gray-900">Questions probables</p>
+                  </div>
+                  <div className="flex flex-col gap-4">
+                    {resultatEntretien.questionsProbables.map((q, i) => (
+                      <div key={i} className="border-l-2 border-indigo-200 pl-4">
+                        <p className="text-sm font-semibold text-gray-900 mb-1">{q.question}</p>
+                        <p className="text-sm text-gray-500 leading-relaxed">{q.conseil}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Questions à poser */}
+                <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 text-xs font-bold flex items-center justify-center">3</span>
+                    <p className="font-bold text-gray-900">Questions à poser au recruteur</p>
+                  </div>
+                  <ol className="flex flex-col gap-2 list-decimal list-inside">
+                    {resultatEntretien.questionsAPoseur.map((q, i) => (
+                      <li key={i} className="text-sm text-gray-700 leading-relaxed">{q}</li>
+                    ))}
+                  </ol>
+                </div>
+
+                {/* Autres préparations */}
+                {entretiens.length > 1 && (
+                  <div>
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Autres préparations</p>
+                    <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden">
+                      {entretiens.filter((e) => e.id !== resultatEntretien.entretienId).map((e, i, arr) => (
+                        <button
+                          key={e.id}
+                          onClick={() => ouvrirEntretien(e)}
+                          className={`w-full flex items-center justify-between px-5 py-3.5 text-sm hover:bg-indigo-50 transition-colors text-left ${i !== arr.length - 1 ? "border-b border-gray-100" : ""}`}
+                        >
+                          <span className="font-medium text-gray-800 truncate">{e.nom_offre}</span>
+                          <span className="text-gray-400 text-xs shrink-0 ml-4">{formaterDate(e.created_at)}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            ) : (
+              /* Formulaire */
+              <div className="flex flex-col gap-5">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                  {/* CV — upload */}
+                  <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm hover:shadow-md hover:ring-indigo-200 transition-all duration-200 overflow-hidden">
+                    <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100 bg-gray-50/50">
+                      <div className="w-2 h-2 rounded-full bg-indigo-400" />
+                      <span className="text-xs font-semibold text-gray-600 uppercase tracking-widest">Votre CV</span>
+                    </div>
+                    <div className="p-5">
+                      <label
+                        className={`flex flex-col items-center justify-center min-h-40 border-2 border-dashed rounded-xl cursor-pointer transition-all duration-200 ${dragActifEntretien ? "border-indigo-400 bg-indigo-50" : "border-gray-200 bg-gray-50/50 hover:border-indigo-300 hover:bg-indigo-50/40"}`}
+                        onDragOver={(e) => { e.preventDefault(); setDragActifEntretien(true); }}
+                        onDragLeave={() => setDragActifEntretien(false)}
+                        onDrop={(e) => { e.preventDefault(); setDragActifEntretien(false); const f = e.dataTransfer.files[0]; if (f) traiterFichierEntretien(f); }}
+                      >
+                        <input type="file" accept=".pdf,.docx" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) traiterFichierEntretien(f); }} />
+                        {extractionEntretienEnCours ? (
+                          <div className="flex flex-col items-center gap-2 text-indigo-500">
+                            <svg className="animate-spin w-6 h-6" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                            <span className="text-sm font-medium">Extraction en cours...</span>
+                          </div>
+                        ) : nomFichierEntretien ? (
+                          <div className="flex flex-col items-center gap-2 text-emerald-600">
+                            <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span className="text-sm font-semibold">{nomFichierEntretien}</span>
+                            <span className="text-xs text-gray-400">Cliquez pour changer de fichier</span>
+                          </div>
+                        ) : (
+                          <div className="flex flex-col items-center gap-2 text-gray-400 px-4 text-center">
+                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                            <span className="text-sm font-semibold text-gray-600">Glissez votre CV ici</span>
+                            <span className="text-xs">ou cliquez pour choisir</span>
+                            <span className="text-xs text-gray-300">Formats acceptés : PDF, Word (.docx)</span>
+                          </div>
+                        )}
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Offre */}
+                  <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm hover:shadow-md hover:ring-violet-200 transition-all duration-200 overflow-hidden">
+                    <div className="flex items-center gap-2 px-5 py-3.5 border-b border-gray-100 bg-gray-50/50">
+                      <div className="w-2 h-2 rounded-full bg-violet-400" />
+                      <span className="text-xs font-semibold text-gray-600 uppercase tracking-widest">Offre d&apos;emploi</span>
+                    </div>
+                    <textarea
+                      value={offreEntretien}
+                      onChange={(e) => setOffreEntretien(e.target.value)}
+                      placeholder="Collez ici le texte de l'offre d'emploi..."
+                      className="w-full min-h-48 p-5 text-sm text-gray-700 placeholder-gray-300 resize-none focus:outline-none bg-transparent leading-relaxed"
+                    />
+                  </div>
+                </div>
+
+                {/* Champ optionnel — URL entreprise */}
+                <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-5">
+                  <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Optionnel — enrichit la préparation</p>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">Site web de l&apos;entreprise</label>
+                  <input
+                    type="url"
+                    value={urlEntreprise}
+                    onChange={(e) => setUrlEntreprise(e.target.value)}
+                    placeholder="https://www.entreprise.fr"
+                    className="w-full bg-gray-50 border border-gray-200 text-gray-700 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  />
+                  <p className="text-xs text-gray-400 mt-1">JobBoost lit automatiquement le contenu de cette page pour personnaliser la préparation.</p>
+                </div>
+
+                {erreurEntretien && (
+                  <p className="text-rose-500 text-sm font-medium">{erreurEntretien}</p>
+                )}
+
+                <button
+                  onClick={preparerEntretien}
+                  disabled={generationEntretienEnCours}
+                  className="self-start flex items-center gap-2 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg shadow-indigo-200/60 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed disabled:scale-100"
+                >
+                  {generationEntretienEnCours ? (
+                    <>
+                      <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                      </svg>
+                      Génération en cours...
+                    </>
+                  ) : (
+                    "Préparer mon entretien →"
+                  )}
+                </button>
+
+                {entretiens.length > 0 && (
+                  <div className="mt-4">
+                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-3">Préparations précédentes</p>
+                    <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden">
+                      {entretiens.map((e, i) => (
+                        <button
+                          key={e.id}
+                          onClick={() => ouvrirEntretien(e)}
+                          className={`w-full flex items-center justify-between px-5 py-3.5 text-sm hover:bg-indigo-50 transition-colors text-left ${i !== entretiens.length - 1 ? "border-b border-gray-100" : ""}`}
+                        >
+                          <span className="font-medium text-gray-800 truncate">{e.nom_offre}</span>
+                          <span className="text-gray-400 text-xs shrink-0 ml-4">{formaterDate(e.created_at)}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) }
           </div>
         )}
 

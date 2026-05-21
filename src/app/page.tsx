@@ -4,11 +4,13 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession, signOut } from "@/lib/auth-client";
+import { usePostHog } from "posthog-js/react";
 import Footer from "@/components/Footer";
 
 export default function PagePrincipale() {
   const { data: session } = useSession();
   const router = useRouter();
+  const posthog = usePostHog();
   const [cv, setCv] = useState("");
   const [offre, setOffre] = useState("");
   const [erreur, setErreur] = useState("");
@@ -33,8 +35,11 @@ export default function PagePrincipale() {
       if (!reponse.ok) throw new Error(data.error);
       setCv(data.texte);
       setNomFichier(fichier.name);
+      posthog?.capture("cv_fichier_charge", { format: ext });
     } catch (e) {
-      setErreur(e instanceof Error ? e.message : "Impossible d'extraire le texte du fichier.");
+      const msg = e instanceof Error ? e.message : "Impossible d'extraire le texte du fichier.";
+      posthog?.capture("cv_fichier_erreur", { erreur: msg });
+      setErreur(msg);
     } finally {
       setExtractionEnCours(false);
     }
@@ -46,6 +51,7 @@ export default function PagePrincipale() {
       return;
     }
     // Connecté ou non : on sauvegarde et on redirige vers le dashboard (ou login)
+    posthog?.capture("analyse_lancee", { connecte: !!session });
     localStorage.setItem("pendingAnalysis", JSON.stringify({ cv, offre, nomFichier }));
     router.push(session ? "/dashboard" : "/login");
   }
@@ -226,7 +232,7 @@ export default function PagePrincipale() {
                   </label>
 
                   <button
-                    onClick={() => setModeCV("texte")}
+                    onClick={() => { setModeCV("texte"); posthog?.capture("mode_cv_change", { mode: "texte" }); }}
                     className="text-xs text-indigo-500 hover:text-indigo-700 font-medium text-center transition-colors"
                   >
                     Ou coller le texte →

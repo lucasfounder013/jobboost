@@ -38,6 +38,12 @@ export async function GET() {
     [session.user.id]
   );
 
+  const { rows: entretiens } = await pool.query(
+    `SELECT id, nom_offre, pitch, questions_probables, questions_a_poser, created_at
+     FROM entretiens WHERE user_id = $1 ORDER BY created_at DESC`,
+    [session.user.id]
+  );
+
   const { rows: userRows } = await pool.query(
     'SELECT scans, credits, lm_credits, is_subscribed FROM "user" WHERE id = $1',
     [session.user.id]
@@ -47,6 +53,7 @@ export async function GET() {
   return NextResponse.json({
     analyses,
     cvsAdaptes,
+    entretiens,
     scans: utilisateur.scans,
     credits: utilisateur.credits,
     lmCredits: utilisateur.lm_credits,
