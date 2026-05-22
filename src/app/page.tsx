@@ -158,6 +158,122 @@ export default function PagePrincipale() {
           </div>
         </section>
 
+        {/* Mockup produit */}
+        <section className="bg-white border-t border-gray-100 px-6 pt-16 pb-16">
+          <div className="max-w-4xl mx-auto">
+
+            {/* Texte au-dessus du mockup */}
+            <div className="text-center mb-10">
+              <span className="inline-block bg-indigo-50 text-indigo-600 text-xs font-bold px-3 py-1 rounded-full mb-4 tracking-wide uppercase">
+                Tout en un
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-4">
+                De l&apos;analyse à la candidature,<br className="hidden sm:block" /> en quelques clics.
+              </h2>
+              <p className="text-gray-500 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
+                Collez votre CV et une offre d&apos;emploi. JobBoost calcule votre score ATS, identifie les mots-clés manquants, adapte votre CV, vous permet de l&apos;exporter en PDF ou Word, et vous prépare aux questions d&apos;entretien les plus probables pour le poste visé.
+              </p>
+            </div>
+
+            <div className="rounded-2xl ring-1 ring-gray-200 shadow-xl shadow-indigo-50 overflow-hidden">
+              {/* Barre navigateur */}
+              <div className="bg-gray-100 px-4 py-3 flex items-center gap-2 border-b border-gray-200">
+                <div className="flex gap-1.5">
+                  <div className="w-3 h-3 rounded-full bg-red-400" />
+                  <div className="w-3 h-3 rounded-full bg-amber-400" />
+                  <div className="w-3 h-3 rounded-full bg-emerald-400" />
+                </div>
+                <div className="flex-1 mx-4 bg-white rounded-md px-3 py-1 text-xs text-gray-400 font-mono">
+                  app.jobboost.fr/dashboard
+                </div>
+              </div>
+
+              {/* App shell */}
+              <div className="flex h-[460px]">
+                {/* Sidebar */}
+                <div className="w-48 bg-indigo-950 flex flex-col py-5 px-3 shrink-0">
+                  <div className="text-white font-extrabold text-sm mb-5 px-2">JobBoost</div>
+                  <button className="flex items-center justify-center gap-1.5 bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-bold px-3 py-2 rounded-lg mb-4 mx-1">
+                    <span>+</span> Nouvelle analyse
+                  </button>
+                  <p className="text-emerald-400 text-[10px] px-2 mb-3 flex items-center gap-1">
+                    <span>✓</span> Analyses illimitées
+                  </p>
+                  <p className="text-indigo-400 text-[9px] font-semibold uppercase tracking-widest px-2 mb-2">Menu</p>
+                  {[
+                    { label: "Dashboard", active: true },
+                    { label: "Mes candidatures", active: false },
+                    { label: "Préparer mon entretien", active: false },
+                    { label: "Mon abonnement", active: false },
+                  ].map(({ label, active }) => (
+                    <div
+                      key={label}
+                      className={`text-xs px-3 py-2 rounded-lg mb-0.5 font-medium ${active ? "bg-white/15 text-white" : "text-indigo-300"}`}
+                    >
+                      {label}
+                    </div>
+                  ))}
+                  <div className="mt-auto px-2 space-y-1">
+                    <p className="text-indigo-400 text-[10px]">sophie.martin@gmail.com</p>
+                    <p className="text-indigo-400 text-[10px] cursor-pointer hover:text-white">Nous contacter</p>
+                    <p className="text-indigo-400 text-[10px] cursor-pointer hover:text-white">Déconnexion</p>
+                  </div>
+                </div>
+
+                {/* Contenu */}
+                <div className="flex-1 bg-white p-6 overflow-hidden">
+                  <h2 className="text-base font-bold text-gray-900 mb-0.5">Bonjour, Sophie 👋</h2>
+                  <p className="text-xs text-gray-400 mb-4">Voici un aperçu de vos analyses et CV adaptés.</p>
+
+                  <div className="bg-white rounded-xl ring-1 ring-gray-200 overflow-hidden text-xs">
+                    <div className="grid px-4 py-2 bg-gray-50 text-gray-400 font-semibold uppercase text-[10px] tracking-wider" style={{ gridTemplateColumns: "2fr 1fr 1.4fr 1.4fr" }}>
+                      <span>Poste visé</span><span>Analyse</span><span>CV adapté</span><span>Lettre de motivation</span>
+                    </div>
+                    {[
+                      { poste: "Chef de projet digital", date: "20 mai 2026", avant: null, apres: 74, pdf: false },
+                      { poste: "Responsable marketing", date: "18 mai 2026", avant: 61, apres: 88, pdf: true },
+                      { poste: "Product Manager", date: "15 mai 2026", avant: 58, apres: 82, pdf: true },
+                      { poste: "Chargé-e de communication", date: "12 mai 2026", avant: 63, apres: 91, pdf: true },
+                    ].map((r, i) => (
+                      <div key={i} className="grid px-4 py-2.5 border-t border-gray-100 items-center gap-1" style={{ gridTemplateColumns: "2fr 1fr 1.4fr 1.4fr" }}>
+                        <div>
+                          <p className="font-semibold text-gray-800 text-[11px]">{r.poste}</p>
+                          <p className="text-gray-400 text-[10px]">{r.date}</p>
+                        </div>
+                        <div>
+                          {r.avant === null ? (
+                            <span className="inline-flex items-center gap-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2 py-1 rounded-lg">{r.apres} / 100</span>
+                          ) : (
+                            <div className="flex items-center gap-1">
+                              <span className="text-gray-400 text-[10px] font-bold">{r.avant}</span>
+                              <span className="text-gray-300 text-[10px]">→</span>
+                              <span className="text-emerald-600 text-[10px] font-bold">{r.apres}</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1">
+                          {r.pdf ? (
+                            <>
+                              <span className="bg-gray-900 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">PDF</span>
+                              <span className="bg-indigo-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">Word</span>
+                              <span className="text-indigo-500 text-[9px] font-medium">Aperçu</span>
+                            </>
+                          ) : (
+                            <span className="text-indigo-500 text-[9px] font-medium">Adapter pour les ATS →</span>
+                          )}
+                        </div>
+                        <div>
+                          <span className="text-indigo-500 text-[9px] font-medium">Générer →</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Zones de texte */}
         <section id="zones-texte" className="max-w-6xl mx-auto px-6 pb-6 pt-12">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
