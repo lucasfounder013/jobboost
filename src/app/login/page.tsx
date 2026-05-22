@@ -5,6 +5,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { signIn } from "@/lib/auth-client";
 
+const TEMOIGNAGE = {
+  citation: "J'ai découvert 8 mots-clés que j'avais complètement oubliés dans mon CV. J'ai décroché un entretien la semaine suivante.",
+  prenom: "Sophie C.",
+  poste: "Chef de projet digital",
+  initiales: "SC",
+};
+
 export default function PageConnexion() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -37,57 +44,103 @@ export default function PageConnexion() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
-      <Link href="/" className="text-2xl font-bold text-blue-600 mb-8">
-        JobBoost
-      </Link>
+    <div className="min-h-screen flex">
 
-      <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-8 w-full max-w-sm">
-        <h1 className="text-xl font-semibold text-gray-900 mb-6 text-center">Connexion</h1>
-
-        <form onSubmit={soumettreFormulaire} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
-            <input
-              type="password"
-              value={motDePasse}
-              onChange={(e) => setMotDePasse(e.target.value)}
-              required
-              autoComplete="current-password"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          {erreur && <p className="text-red-600 text-sm">{erreur}</p>}
-
-          <button
-            type="submit"
-            disabled={chargement}
-            className="w-full bg-blue-600 text-white py-2.5 rounded-lg font-semibold text-sm hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
-          >
-            {chargement ? "Connexion..." : "Se connecter"}
-          </button>
-        </form>
-
-        <p className="text-center text-sm text-gray-500 mt-6">
-          Pas encore de compte ?{" "}
-          <Link href="/register" className="text-blue-600 hover:underline font-medium">
-            S&apos;inscrire
+      {/* Colonne gauche — formulaire */}
+      <div className="flex-1 flex flex-col items-center justify-center bg-gray-50 px-8 py-12">
+        <div className="w-full max-w-sm">
+          <Link href="/" className="text-2xl font-bold text-indigo-600 mb-8 block">
+            JobBoost
           </Link>
-        </p>
+
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">Bon retour 👋</h1>
+          <p className="text-sm text-gray-500 mb-8">Connectez-vous à votre compte.</p>
+
+          <form onSubmit={soumettreFormulaire} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe</label>
+              <input
+                type="password"
+                value={motDePasse}
+                onChange={(e) => setMotDePasse(e.target.value)}
+                required
+                autoComplete="current-password"
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+              />
+            </div>
+
+            {erreur && <p className="text-red-600 text-sm">{erreur}</p>}
+
+            <button
+              type="submit"
+              disabled={chargement}
+              className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white py-2.5 rounded-xl font-bold text-sm shadow-md shadow-indigo-200/60 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+            >
+              {chargement ? "Connexion..." : "Se connecter"}
+            </button>
+          </form>
+
+          <p className="text-center text-sm text-gray-500 mt-6">
+            Pas encore de compte ?{" "}
+            <Link href="/register" className="text-indigo-600 hover:underline font-medium">
+              S&apos;inscrire gratuitement
+            </Link>
+          </p>
+        </div>
       </div>
+
+      {/* Colonne droite — preuve sociale */}
+      <div className="hidden lg:flex flex-1 bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-700 flex-col items-center justify-center px-12 py-12">
+        <div className="max-w-md">
+          <div className="flex gap-1 mb-6">
+            {[...Array(5)].map((_, i) => (
+              <svg key={i} className="w-5 h-5 text-amber-300" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+            ))}
+          </div>
+
+          <blockquote className="text-white text-xl font-medium leading-relaxed mb-8">
+            &ldquo;{TEMOIGNAGE.citation}&rdquo;
+          </blockquote>
+
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-white/20 text-white font-bold text-sm flex items-center justify-center shrink-0">
+              {TEMOIGNAGE.initiales}
+            </div>
+            <div>
+              <p className="text-white font-semibold text-sm">{TEMOIGNAGE.prenom}</p>
+              <p className="text-indigo-200 text-xs">{TEMOIGNAGE.poste}</p>
+            </div>
+          </div>
+
+          <div className="mt-12 grid grid-cols-3 gap-6 border-t border-white/20 pt-10">
+            {[
+              { chiffre: "+2 400", label: "CVs analysés" },
+              { chiffre: "92 %", label: "trouvent des mots-clés manquants" },
+              { chiffre: "3×", label: "plus rapide qu'une réécriture manuelle" },
+            ].map(({ chiffre, label }) => (
+              <div key={label} className="text-center">
+                <p className="text-white text-2xl font-extrabold">{chiffre}</p>
+                <p className="text-indigo-200 text-xs mt-1">{label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }

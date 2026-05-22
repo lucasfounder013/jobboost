@@ -135,18 +135,17 @@ export default function PagePrincipale() {
         <section className="bg-gradient-to-b from-blue-50 to-white px-6 pt-20 pb-20 text-center">
           <div className="max-w-3xl mx-auto">
             <h1 className="text-5xl sm:text-6xl font-extrabold tracking-tight text-gray-900 leading-[1.1] mb-6">
-              Votre CV passe-t-il
-              <br />
+              Votre prochain entretien{" "}
               <span
                 className="bg-gradient-to-r from-violet-500 via-indigo-500 to-indigo-600 bg-clip-text text-transparent animate-shimmer"
                 style={{ backgroundSize: "200% auto" }}
               >
-                le filtre ATS ?
+                commence ici
               </span>
             </h1>
 
             <p className="text-gray-500 text-lg sm:text-xl max-w-xl mx-auto leading-relaxed mb-10">
-              Collez votre CV et une offre d&apos;emploi. JobBoost analyse la correspondance en 10 secondes et adapte votre CV pour les recruteurs.
+              Votre CV analysé, optimisé pour les ATS et adapté à chaque offre. En quelques secondes.
             </p>
 
             <button
