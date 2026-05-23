@@ -7,6 +7,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 5,
+    categorie: "CV & ATS",
+    titre: "Comment savoir si une entreprise utilise un ATS avant de postuler",
+    extrait:
+      "Avant d'envoyer votre CV, vous pouvez souvent deviner si un ATS va le recevoir. Voici comment.",
+    slug: "/ressources/cv-ats/comment-savoir-si-entreprise-utilise-ats",
+    date: "23 mai 2026",
+  },
+  {
     id: 4,
     categorie: "CV & ATS",
     titre: "Les ATS les plus utilisés en France, et ce que ça change pour vous",
