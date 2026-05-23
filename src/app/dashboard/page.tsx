@@ -7,6 +7,7 @@ import { useSession, signOut } from "@/lib/auth-client";
 import { usePostHog } from "posthog-js/react";
 import CVPreview from "@/components/CVPreview";
 import { CVStructure } from "@/types/cv";
+import { OffreFT, OffreSauvegardee } from "@/types/offres";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -121,6 +122,30 @@ function ringScore(score: number | null | undefined): string {
 }
 const formaterDate = (iso: string) => new Date(iso).toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" });
 
+const DEPARTEMENTS = [
+  ["01","Ain"],["02","Aisne"],["03","Allier"],["04","Alpes-de-Haute-Provence"],["05","Hautes-Alpes"],
+  ["06","Alpes-Maritimes"],["07","Ardèche"],["08","Ardennes"],["09","Ariège"],["10","Aube"],
+  ["11","Aude"],["12","Aveyron"],["13","Bouches-du-Rhône"],["14","Calvados"],["15","Cantal"],
+  ["16","Charente"],["17","Charente-Maritime"],["18","Cher"],["19","Corrèze"],["2A","Corse-du-Sud"],
+  ["2B","Haute-Corse"],["21","Côte-d'Or"],["22","Côtes-d'Armor"],["23","Creuse"],["24","Dordogne"],
+  ["25","Doubs"],["26","Drôme"],["27","Eure"],["28","Eure-et-Loir"],["29","Finistère"],
+  ["30","Gard"],["31","Haute-Garonne"],["32","Gers"],["33","Gironde"],["34","Hérault"],
+  ["35","Ille-et-Vilaine"],["36","Indre"],["37","Indre-et-Loire"],["38","Isère"],["39","Jura"],
+  ["40","Landes"],["41","Loir-et-Cher"],["42","Loire"],["43","Haute-Loire"],["44","Loire-Atlantique"],
+  ["45","Loiret"],["46","Lot"],["47","Lot-et-Garonne"],["48","Lozère"],["49","Maine-et-Loire"],
+  ["50","Manche"],["51","Marne"],["52","Haute-Marne"],["53","Mayenne"],["54","Meurthe-et-Moselle"],
+  ["55","Meuse"],["56","Morbihan"],["57","Moselle"],["58","Nièvre"],["59","Nord"],
+  ["60","Oise"],["61","Orne"],["62","Pas-de-Calais"],["63","Puy-de-Dôme"],["64","Pyrénées-Atlantiques"],
+  ["65","Hautes-Pyrénées"],["66","Pyrénées-Orientales"],["67","Bas-Rhin"],["68","Haut-Rhin"],["69","Rhône"],
+  ["70","Haute-Saône"],["71","Saône-et-Loire"],["72","Sarthe"],["73","Savoie"],["74","Haute-Savoie"],
+  ["75","Paris"],["76","Seine-Maritime"],["77","Seine-et-Marne"],["78","Yvelines"],["79","Deux-Sèvres"],
+  ["80","Somme"],["81","Tarn"],["82","Tarn-et-Garonne"],["83","Var"],["84","Vaucluse"],
+  ["85","Vendée"],["86","Vienne"],["87","Haute-Vienne"],["88","Vosges"],["89","Yonne"],
+  ["90","Territoire de Belfort"],["91","Essonne"],["92","Hauts-de-Seine"],["93","Seine-Saint-Denis"],
+  ["94","Val-de-Marne"],["95","Val-d'Oise"],["971","Guadeloupe"],["972","Martinique"],
+  ["973","Guyane"],["974","La Réunion"],["976","Mayotte"],
+] as const;
+
 // ─── Composant ────────────────────────────────────────────────────────────────
 
 export default function Dashboard() {
@@ -129,7 +154,7 @@ export default function Dashboard() {
   const posthog = usePostHog();
 
   // Vue active
-  const [vue, setVue] = useState<"historique" | "nouvelle-analyse" | "preparer-entretien">("historique");
+  const [vue, setVue] = useState<"historique" | "nouvelle-analyse" | "preparer-entretien" | "trouver-offres">("historique");
 
   // ── Données historique
   const [analyses, setAnalyses] = useState<AnalyseSauvegardee[]>([]);
@@ -169,6 +194,25 @@ export default function Dashboard() {
   const [lmCreditsRestants, setLmCreditsRestants] = useState<number | null>(null);
   const [generationLmEnCours, setGenerationLmEnCours] = useState<string | null>(null);
   const [exportLmEnCours, setExportLmEnCours] = useState<"pdf" | "docx" | null>(null);
+
+  // ── Trouver des offres
+  const [rechercheMetier, setRechercheMetier] = useState("");
+  const [rechercheVille, setRechercheVille] = useState("");
+  const [offresResultats, setOffresResultats] = useState<OffreFT[]>([]);
+  const [offresSauvegardees, setOffresSauvegardees] = useState<OffreSauvegardee[]>([]);
+  const [chargementOffres, setChargementOffres] = useState(false);
+  const [erreurOffres, setErreurOffres] = useState("");
+  const [ongletOffres, setOngletOffres] = useState<"recherche" | "sauvegardees">("recherche");
+  const [offresSauvegardeesIds, setOffresSauvegardeesIds] = useState<Set<string>>(new Set());
+
+  // ── Upload CV pour recherche d'offres
+  const [modeRechercheOffres, setModeRechercheOffres] = useState<"manuelle" | "cv">("manuelle");
+  const [cvPourOffres, setCvPourOffres] = useState("");
+  const [nomFichierOffres, setNomFichierOffres] = useState("");
+  const [extractionOffresEnCours, setExtractionOffresEnCours] = useState(false);
+  const [suggestionEnCours, setSuggestionEnCours] = useState(false);
+  const [dragActifOffres, setDragActifOffres] = useState(false);
+  const [erreurUploadOffres, setErreurUploadOffres] = useState("");
 
   // ── Entretien
   const [cvEntretien, setCvEntretien] = useState("");
@@ -590,6 +634,119 @@ export default function Dashboard() {
     setErreurEntretien("");
   }
 
+  // ── Offres d'emploi
+  async function rechercherOffres() {
+    if (!rechercheMetier.trim()) {
+      setErreurOffres("Veuillez indiquer un métier visé.");
+      return;
+    }
+    setErreurOffres("");
+    setChargementOffres(true);
+    setOffresResultats([]);
+    try {
+      const reponse = await fetch("/api/offres/rechercher", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ motsCles: rechercheMetier, localisation: rechercheVille }),
+      });
+      const data = await reponse.json();
+      if (!reponse.ok) throw new Error(data.error);
+      setOffresResultats(data.offres ?? []);
+      setOngletOffres("recherche");
+    } catch (e) {
+      setErreurOffres(e instanceof Error ? e.message : "Erreur lors de la recherche.");
+    } finally {
+      setChargementOffres(false);
+    }
+  }
+
+  async function chargerOffresSauvegardees() {
+    try {
+      const reponse = await fetch("/api/offres/sauvegardees");
+      const data = await reponse.json();
+      const offres: OffreSauvegardee[] = data.offres ?? [];
+      setOffresSauvegardees(offres);
+      setOffresSauvegardeesIds(new Set(offres.map((o) => o.id)));
+    } catch {}
+  }
+
+  async function sauvegarderOffre(offre: OffreFT) {
+    await fetch("/api/offres/sauvegarder", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(offre),
+    });
+    setOffresSauvegardeesIds((prev) => new Set([...prev, offre.id]));
+  }
+
+  async function supprimerOffreSauvegardee(dbId: string, offreId: string) {
+    await fetch("/api/offres/sauvegarder", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ dbId }),
+    });
+    setOffresSauvegardees((prev) => prev.filter((o) => o.dbId !== dbId));
+    setOffresSauvegardeesIds((prev) => {
+      const next = new Set(prev);
+      next.delete(offreId);
+      return next;
+    });
+  }
+
+  async function suggererMetier(cvTexte: string) {
+    setSuggestionEnCours(true);
+    try {
+      const reponse = await fetch("/api/offres/suggerer-metier", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cv: cvTexte }),
+      });
+      const data = await reponse.json();
+      if (reponse.ok && data.metierSuggere) {
+        setRechercheMetier(data.metierSuggere);
+      }
+    } catch {}
+    finally {
+      setSuggestionEnCours(false);
+    }
+  }
+
+  async function traiterFichierOffres(fichier: File) {
+    const ext = fichier.name.split(".").pop()?.toLowerCase();
+    if (ext !== "pdf" && ext !== "docx") {
+      setErreurUploadOffres("Format non supporté. Utilisez un fichier PDF ou Word (.docx).");
+      return;
+    }
+    setErreurUploadOffres("");
+    setExtractionOffresEnCours(true);
+    const formData = new FormData();
+    formData.append("fichier", fichier);
+    try {
+      const reponse = await fetch("/api/extraire-cv", { method: "POST", body: formData });
+      const data = await reponse.json();
+      if (!reponse.ok) throw new Error(data.error);
+      setCvPourOffres(data.texte);
+      setNomFichierOffres(fichier.name);
+      await suggererMetier(data.texte);
+    } catch (e) {
+      setErreurUploadOffres(e instanceof Error ? e.message : "Impossible d'extraire le texte du fichier.");
+    } finally {
+      setExtractionOffresEnCours(false);
+    }
+  }
+
+  function utiliserOffrePourAnalyse(offre: OffreFT) {
+    setOffre(offre.offreTexteComplet || offre.descriptionCourte);
+    setCv("");
+    setNomFichier("");
+    setModeCV("upload");
+    setResultat(null);
+    setCvAdapte(null);
+    setErreur("");
+    setAnalyseId(null);
+    setVue("nouvelle-analyse");
+  }
+
   const prenom = session?.user.name?.split(" ")[0] ?? "vous";
 
   if (isPending || !session) return null;
@@ -685,6 +842,16 @@ export default function Dashboard() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
             </svg>
             Préparer mon entretien
+          </button>
+
+          <button
+            onClick={() => { setVue("trouver-offres"); setOngletOffres("recherche"); chargerOffresSauvegardees(); }}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm w-full text-left transition-colors ${vue === "trouver-offres" ? "bg-indigo-800 text-white" : "text-indigo-200 hover:bg-indigo-800/60 hover:text-white"}`}
+          >
+            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            Trouver des offres
           </button>
 
           <Link
@@ -1357,6 +1524,331 @@ export default function Dashboard() {
                 )}
               </div>
             ) }
+          </div>
+        )}
+
+        {/* ── Vue : Trouver des offres ──────────────────────────────────────── */}
+        {vue === "trouver-offres" && (
+          <div className="max-w-4xl mx-auto px-8 py-10">
+            <div className="mb-8">
+              <h1 className="text-2xl font-bold text-gray-900">Trouver des offres</h1>
+              <p className="text-gray-400 text-sm mt-1">Recherchez des offres cadres et analysez votre CV en un clic.</p>
+            </div>
+
+            {!estAbonne ? (
+              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-10 flex flex-col items-center text-center gap-5">
+                <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center">
+                  <svg className="w-7 h-7 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-lg font-bold text-gray-900">Fonctionnalité réservée aux abonnés</p>
+                  <p className="text-gray-500 text-sm mt-2 max-w-sm">
+                    Cherchez des offres cadres directement depuis JobBoost et lancez une analyse CV en un clic.
+                  </p>
+                </div>
+                <Link
+                  href="/pricing"
+                  className="bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-indigo-200/60 transition-all"
+                >
+                  Voir les abonnements →
+                </Link>
+              </div>
+            ) : (
+              <>
+                {/* Toggle mode de recherche */}
+                <div className="flex gap-2 mb-4">
+                  <button
+                    onClick={() => { setModeRechercheOffres("manuelle"); setCvPourOffres(""); setNomFichierOffres(""); setErreurUploadOffres(""); setOffresResultats([]); setRechercheMetier(""); }}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border transition-colors ${modeRechercheOffres === "manuelle" ? "bg-indigo-600 text-white border-indigo-600" : "bg-white text-gray-500 border-gray-200 hover:border-indigo-300 hover:text-indigo-600"}`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    Recherche manuelle
+                  </button>
+                  <button
+                    onClick={() => { setModeRechercheOffres("cv"); setRechercheMetier(""); setOffresResultats([]); setErreurOffres(""); }}
+                    className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold border transition-colors ${modeRechercheOffres === "cv" ? "bg-indigo-600 text-white border-indigo-600" : "bg-white text-gray-500 border-gray-200 hover:border-indigo-300 hover:text-indigo-600"}`}
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                    Rechercher par mon CV
+                  </button>
+                </div>
+
+                {/* Mode manuelle */}
+                {modeRechercheOffres === "manuelle" && (
+                  <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-5 mb-6">
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <input
+                        type="text"
+                        placeholder="Métier visé (ex : chef de projet, contrôleur de gestion...)"
+                        value={rechercheMetier}
+                        onChange={(e) => setRechercheMetier(e.target.value)}
+                        onKeyDown={(e) => { if (e.key === "Enter") rechercherOffres(); }}
+                        className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                      />
+                      <select
+                        value={rechercheVille}
+                        onChange={(e) => setRechercheVille(e.target.value)}
+                        className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white"
+                      >
+                        <option value="">Tous les départements</option>
+                        {DEPARTEMENTS.map(([code, nom]) => (
+                          <option key={code} value={code}>{code} — {nom}</option>
+                        ))}
+                      </select>
+                      <button
+                        onClick={rechercherOffres}
+                        disabled={chargementOffres}
+                        className="bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-all shadow-md shadow-indigo-200/50 disabled:opacity-60 whitespace-nowrap flex items-center gap-2"
+                      >
+                        {chargementOffres ? (
+                          <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                        ) : (
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        )}
+                        Rechercher
+                      </button>
+                    </div>
+                    {erreurOffres && <p className="text-rose-500 text-sm mt-3">{erreurOffres}</p>}
+                  </div>
+                )}
+
+                {/* Mode CV */}
+                {modeRechercheOffres === "cv" && (
+                  <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-5 mb-6 flex flex-col gap-4">
+                    {/* Zone upload */}
+                    {cvPourOffres ? (
+                      <div className="flex items-center justify-between gap-3 bg-emerald-50 ring-1 ring-emerald-100 rounded-xl px-4 py-3">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <svg className="w-4 h-4 text-emerald-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
+                          <span className="text-sm text-emerald-700 font-medium truncate">{nomFichierOffres}</span>
+                          {suggestionEnCours && <span className="text-xs text-emerald-600 shrink-0 animate-pulse">Analyse du profil...</span>}
+                          {!suggestionEnCours && rechercheMetier && (
+                            <span className="text-xs text-emerald-600 shrink-0">· Poste détecté : <span className="font-semibold">{rechercheMetier}</span></span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => { setCvPourOffres(""); setNomFichierOffres(""); setErreurUploadOffres(""); setRechercheMetier(""); }}
+                          className="text-emerald-400 hover:text-emerald-700 transition-colors shrink-0"
+                          title="Retirer le CV"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                      </div>
+                    ) : (
+                      <label
+                        className={`flex flex-col items-center justify-center gap-2 border-2 border-dashed rounded-xl px-6 py-8 cursor-pointer transition-colors ${dragActifOffres ? "border-indigo-400 bg-indigo-50" : "border-gray-200 hover:border-indigo-300 hover:bg-gray-50"}`}
+                        onDragOver={(e) => { e.preventDefault(); setDragActifOffres(true); }}
+                        onDragLeave={() => setDragActifOffres(false)}
+                        onDrop={(e) => { e.preventDefault(); setDragActifOffres(false); const f = e.dataTransfer.files[0]; if (f) traiterFichierOffres(f); }}
+                      >
+                        <input type="file" accept=".pdf,.docx" className="hidden" onChange={(e) => { const f = e.target.files?.[0]; if (f) traiterFichierOffres(f); }} />
+                        {extractionOffresEnCours ? (
+                          <div className="flex items-center gap-2 text-sm text-gray-500">
+                            <svg className="animate-spin w-4 h-4 text-indigo-500" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                            Lecture du CV...
+                          </div>
+                        ) : (
+                          <>
+                            <svg className="w-8 h-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                            <p className="text-sm text-gray-600 font-medium">Glissez votre CV ici ou <span className="text-indigo-600">parcourir</span></p>
+                            <p className="text-xs text-gray-400">PDF ou Word — JobBoost détecte votre métier automatiquement</p>
+                          </>
+                        )}
+                      </label>
+                    )}
+                    {erreurUploadOffres && <p className="text-rose-500 text-xs">{erreurUploadOffres}</p>}
+
+                    {/* Département + bouton chercher */}
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <select
+                        value={rechercheVille}
+                        onChange={(e) => setRechercheVille(e.target.value)}
+                        className="flex-1 rounded-xl border border-gray-200 px-4 py-2.5 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-300 bg-white"
+                      >
+                        <option value="">Tous les départements</option>
+                        {DEPARTEMENTS.map(([code, nom]) => (
+                          <option key={code} value={code}>{code} — {nom}</option>
+                        ))}
+                      </select>
+                      <button
+                        onClick={rechercherOffres}
+                        disabled={chargementOffres || !cvPourOffres || suggestionEnCours}
+                        className="bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold text-sm px-5 py-2.5 rounded-xl transition-all shadow-md shadow-indigo-200/50 disabled:opacity-50 whitespace-nowrap flex items-center gap-2"
+                      >
+                        {chargementOffres ? (
+                          <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                        ) : (
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        )}
+                        {suggestionEnCours ? "Analyse en cours..." : "Chercher des offres"}
+                      </button>
+                    </div>
+                    {erreurOffres && <p className="text-rose-500 text-sm">{erreurOffres}</p>}
+                  </div>
+                )}
+
+                {/* Onglets */}
+                <div className="flex items-center justify-between mb-5">
+                  <div className="flex gap-1">
+                    <button
+                      onClick={() => setOngletOffres("recherche")}
+                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${ongletOffres === "recherche" ? "bg-indigo-600 text-white" : "text-gray-500 hover:bg-gray-100"}`}
+                    >
+                      Résultats {offresResultats.length > 0 ? `(${offresResultats.length})` : ""}
+                    </button>
+                    <button
+                      onClick={() => { setOngletOffres("sauvegardees"); chargerOffresSauvegardees(); }}
+                      className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${ongletOffres === "sauvegardees" ? "bg-indigo-600 text-white" : "text-gray-500 hover:bg-gray-100"}`}
+                    >
+                      Mes offres sauvegardées {offresSauvegardees.length > 0 ? `(${offresSauvegardees.length})` : ""}
+                    </button>
+                  </div>
+                  {offresResultats.length > 0 && ongletOffres === "recherche" && (
+                    <button
+                      onClick={() => { setOffresResultats([]); setRechercheMetier(""); setCvPourOffres(""); setNomFichierOffres(""); }}
+                      className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-sky-50 text-sky-600 hover:bg-sky-100 border border-sky-200 transition-colors"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                      Nouvelle recherche
+                    </button>
+                  )}
+                </div>
+
+                {/* Onglet Résultats */}
+                {ongletOffres === "recherche" && (
+                  <>
+                    {offresResultats.length === 0 && !chargementOffres && (
+                      <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-xl">🔍</div>
+                        <p className="text-gray-500 text-sm">Lancez une recherche pour découvrir des offres.</p>
+                      </div>
+                    )}
+                    {offresResultats.length > 0 && (
+                      <div className="flex flex-col gap-4">
+                        {offresResultats.map((offre) => {
+                          const dejaSauvegardee = offresSauvegardeesIds.has(offre.id);
+                          return (
+                            <div key={offre.id} className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-5 flex flex-col gap-3">
+                              <div className="flex items-start justify-between gap-4">
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-base font-bold text-gray-900 leading-tight">{offre.titre}</p>
+                                  <p className="text-sm text-gray-500 mt-0.5">{offre.entreprise}</p>
+                                </div>
+                                <a
+                                  href={offre.urlOffre}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-indigo-500 hover:text-indigo-700 font-medium shrink-0"
+                                >
+                                  Voir l&apos;offre →
+                                </a>
+                              </div>
+                              <div className="flex items-center gap-3 text-xs text-gray-400">
+                                {offre.localisation && (
+                                  <span className="flex items-center gap-1">
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                    {offre.localisation}
+                                  </span>
+                                )}
+                                {offre.datePublication && (
+                                  <span className="flex items-center gap-1">
+                                    <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                                    {formaterDate(offre.datePublication)}
+                                  </span>
+                                )}
+                              </div>
+                              {offre.descriptionCourte && (
+                                <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">{offre.descriptionCourte}</p>
+                              )}
+                              <div className="flex items-center gap-2 pt-1">
+                                <button
+                                  onClick={() => utiliserOffrePourAnalyse(offre)}
+                                  className="flex-1 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white text-sm font-bold py-2 px-4 rounded-xl transition-all shadow-sm"
+                                >
+                                  Analyser mon CV pour ce poste
+                                </button>
+                                <button
+                                  onClick={() => { if (!dejaSauvegardee) sauvegarderOffre(offre); }}
+                                  disabled={dejaSauvegardee}
+                                  className={`px-4 py-2 rounded-xl text-sm font-semibold border transition-colors ${dejaSauvegardee ? "border-emerald-200 text-emerald-500 bg-emerald-50 cursor-default" : "border-gray-200 text-gray-500 hover:border-indigo-300 hover:text-indigo-600 hover:bg-indigo-50"}`}
+                                >
+                                  {dejaSauvegardee ? "✓ Sauvegardée" : "Sauvegarder"}
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </>
+                )}
+
+                {/* Onglet Offres sauvegardées */}
+                {ongletOffres === "sauvegardees" && (
+                  <>
+                    {offresSauvegardees.length === 0 ? (
+                      <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+                        <div className="w-12 h-12 rounded-xl bg-gray-50 flex items-center justify-center text-xl">🔖</div>
+                        <p className="text-gray-500 text-sm">Aucune offre sauvegardée pour l&apos;instant.</p>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-4">
+                        {offresSauvegardees.map((offre) => (
+                          <div key={offre.dbId} className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-5 flex flex-col gap-3">
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-base font-bold text-gray-900 leading-tight">{offre.titre}</p>
+                                <p className="text-sm text-gray-500 mt-0.5">{offre.entreprise}</p>
+                              </div>
+                              {offre.urlOffre && (
+                                <a
+                                  href={offre.urlOffre}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-indigo-500 hover:text-indigo-700 font-medium shrink-0"
+                                >
+                                  Voir l&apos;offre →
+                                </a>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-3 text-xs text-gray-400">
+                              {offre.localisation && (
+                                <span className="flex items-center gap-1">
+                                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                  {offre.localisation}
+                                </span>
+                              )}
+                              {offre.savedAt && (
+                                <span>Sauvegardée le {formaterDate(offre.savedAt)}</span>
+                              )}
+                            </div>
+                            {offre.descriptionCourte && (
+                              <p className="text-sm text-gray-600 leading-relaxed line-clamp-3">{offre.descriptionCourte}</p>
+                            )}
+                            <div className="flex items-center gap-2 pt-1">
+                              <button
+                                onClick={() => utiliserOffrePourAnalyse(offre)}
+                                className="flex-1 bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white text-sm font-bold py-2 px-4 rounded-xl transition-all shadow-sm"
+                              >
+                                Analyser mon CV pour ce poste
+                              </button>
+                              <button
+                                onClick={() => supprimerOffreSauvegardee(offre.dbId, offre.id)}
+                                className="px-4 py-2 rounded-xl text-sm font-semibold border border-gray-200 text-gray-400 hover:border-rose-200 hover:text-rose-500 hover:bg-rose-50 transition-colors"
+                              >
+                                Supprimer
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                )}
+              </>
+            )}
           </div>
         )}
 
