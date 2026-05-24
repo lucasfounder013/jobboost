@@ -8,16 +8,15 @@ import { useRouter } from "next/navigation";
 const FEATURES_GRATUIT = [
   "5 analyses CV gratuites",
   "1 adaptation CV gratuite",
-  "Export PDF ATS",
-  "Export Word (.docx)",
+  "Export PDF & Word (.docx)",
 ];
 
 const FEATURES_PREMIUM = [
   "Analyses CV illimitées",
   "Adaptations CV illimitées",
-  "Export PDF ATS",
-  "Export Word (.docx)",
-  "Score de correspondance détaillé",
+  "Export PDF & Word (.docx)",
+  "Préparation aux entretiens",
+  "Recherche d'offres d'emploi selon votre CV",
 ];
 
 function Check({ color = "emerald" }: { color?: "emerald" | "gray" }) {
