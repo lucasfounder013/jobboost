@@ -14,17 +14,23 @@ export async function POST(req: NextRequest) {
 
   const message = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
-    max_tokens: 256,
+    max_tokens: 512,
     messages: [
       {
         role: "user",
-        content: `Tu es un expert en recrutement de cadres. Analyse ce CV et identifie le métier cadre le plus pertinent à rechercher pour ce profil.
+        content: `Tu es un expert en recrutement. Analyse ce CV et génère des termes de recherche d'emploi adaptés pour France Travail.
+
+Réponds UNIQUEMENT avec un objet JSON :
+{
+  "metierSuggere": "intitulé principal (2-4 mots, le plus précis)",
+  "termesAlternatifs": ["terme plus large 1", "terme connexe 2", "terme générique 3"]
+}
 
 Règles :
-- Réponds UNIQUEMENT avec un objet JSON : {"metierSuggere": "..."}
-- L'intitulé doit faire 2 à 5 mots maximum
-- Utilise un intitulé générique et recherchable (ex: "chef de projet digital", "directeur financier", "responsable ressources humaines")
-- En français uniquement
+- "metierSuggere" : intitulé le plus précis correspondant au profil
+- "termesAlternatifs" : 3 variantes en ordre décroissant de précision (plus larges ou connexes)
+- Tous en français, simples et recherchables (pas d'acronymes)
+- Max 4 mots par terme
 
 CV :
 ${cv.slice(0, 3000)}`,
@@ -38,7 +44,7 @@ ${cv.slice(0, 3000)}`,
   }
 
   const texte = contenu.text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
-  const { metierSuggere } = JSON.parse(texte);
+  const { metierSuggere, termesAlternatifs } = JSON.parse(texte);
 
-  return NextResponse.json({ metierSuggere });
+  return NextResponse.json({ metierSuggere, termesAlternatifs: termesAlternatifs ?? [] });
 }

@@ -41,29 +41,38 @@ async function obtenirTokenFT(): Promise<string> {
   return tokenCache.token;
 }
 
-export async function POST(req: NextRequest) {
-  const session = await auth.api.getSession({ headers: await headers() });
-  if (!session) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+function parseOffres(resultats: Record<string, unknown>[]): OffreFT[] {
+  return resultats.map((o) => {
+    const entreprise = o.entreprise as Record<string, string> | undefined;
+    const lieuTravail = o.lieuTravail as Record<string, string> | undefined;
+    const origineOffre = o.origineOffre as Record<string, string> | undefined;
+    const description = (o.description as string | undefined) ?? "";
 
-  const { rows } = await pool.query('SELECT is_subscribed FROM "user" WHERE id = $1', [session.user.id]);
-  if (!rows[0]?.is_subscribed) {
-    return NextResponse.json({ error: "Fonctionnalité réservée aux abonnés" }, { status: 403 });
-  }
+    return {
+      id: o.id as string,
+      titre: (o.intitule as string | undefined) ?? "",
+      entreprise: entreprise?.nom ?? "Entreprise non précisée",
+      localisation: lieuTravail?.libelle ?? "",
+      datePublication: (o.dateCreation as string | undefined) ?? "",
+      descriptionCourte: description.slice(0, 300),
+      urlOffre: origineOffre?.urlOrigine ?? `https://www.francetravail.fr/offre-emploi/${o.id}`,
+      offreTexteComplet: description,
+    };
+  });
+}
 
-  const { motsCles, localisation } = await req.json();
-  if (!motsCles?.trim()) {
-    return NextResponse.json({ error: "Le métier visé est requis" }, { status: 400 });
-  }
-
-  const token = await obtenirTokenFT();
-
+async function rechercherParTerme(
+  token: string,
+  motsCles: string,
+  localisation: string,
+  nombreResultats = 20
+): Promise<OffreFT[]> {
   const params = new URLSearchParams({
     motsCles: motsCles.trim(),
-    nombreResultats: "20",
+    nombreResultats: String(nombreResultats),
     sort: "1",
   });
 
-  // Localisation : code département (2-3 chiffres, ou 2A/2B pour la Corse)
   if (localisation?.trim()) {
     const loc = localisation.trim();
     if (/^\d{5}$/.test(loc)) {
@@ -84,29 +93,57 @@ export async function POST(req: NextRequest) {
   );
 
   if (!reponseFT.ok) {
-    const erreur = await reponseFT.text();
-    console.error("Erreur France Travail:", erreur);
-    return NextResponse.json({ error: "Erreur lors de la recherche d'offres" }, { status: 502 });
+    const erreurTexte = await reponseFT.text();
+    console.error(`Erreur France Travail (${motsCles}):`, erreurTexte);
+    return [];
   }
 
   const data = await reponseFT.json();
-  const resultats: OffreFT[] = (data.resultats ?? []).map((o: Record<string, unknown>) => {
-    const entreprise = o.entreprise as Record<string, string> | undefined;
-    const lieuTravail = o.lieuTravail as Record<string, string> | undefined;
-    const origineOffre = o.origineOffre as Record<string, string> | undefined;
-    const description = (o.description as string | undefined) ?? "";
+  if (!Array.isArray(data.resultats)) return [];
 
-    return {
-      id: o.id as string,
-      titre: (o.intitule as string | undefined) ?? "",
-      entreprise: entreprise?.nom ?? "Entreprise non précisée",
-      localisation: lieuTravail?.libelle ?? "",
-      datePublication: (o.dateCreation as string | undefined) ?? "",
-      descriptionCourte: description.slice(0, 300),
-      urlOffre: origineOffre?.urlOrigine ?? `https://www.francetravail.fr/offre-emploi/${o.id}`,
-      offreTexteComplet: description,
-    };
-  });
+  return parseOffres(data.resultats as Record<string, unknown>[]);
+}
 
-  return NextResponse.json({ offres: resultats });
+export async function POST(req: NextRequest) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+
+  const { rows } = await pool.query('SELECT is_subscribed FROM "user" WHERE id = $1', [session.user.id]);
+  if (!rows[0]?.is_subscribed) {
+    return NextResponse.json({ error: "Fonctionnalité réservée aux abonnés" }, { status: 403 });
+  }
+
+  const { motsCles, localisation, termesAlternatifs } = await req.json();
+  if (!motsCles?.trim()) {
+    return NextResponse.json({ error: "Le métier visé est requis" }, { status: 400 });
+  }
+
+  try {
+    const token = await obtenirTokenFT();
+
+    // Recherche principale
+    let resultats = await rechercherParTerme(token, motsCles, localisation ?? "");
+    const idsVus = new Set(resultats.map((o) => o.id));
+
+    // Si moins de 5 résultats et qu'on a des termes alternatifs, on complète
+    const alternatives: string[] = Array.isArray(termesAlternatifs) ? termesAlternatifs : [];
+    if (resultats.length < 5 && alternatives.length > 0) {
+      for (const terme of alternatives) {
+        if (!terme?.trim()) continue;
+        const complement = await rechercherParTerme(token, terme, localisation ?? "", 20);
+        for (const offre of complement) {
+          if (!idsVus.has(offre.id)) {
+            idsVus.add(offre.id);
+            resultats.push(offre);
+          }
+        }
+        if (resultats.length >= 10) break;
+      }
+    }
+
+    return NextResponse.json({ offres: resultats });
+  } catch (e) {
+    console.error("Erreur recherche offres:", e);
+    return NextResponse.json({ error: "Erreur lors de la recherche d'offres" }, { status: 502 });
+  }
 }
