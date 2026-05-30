@@ -7,6 +7,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 6,
+    categorie: "CV & ATS",
+    titre: "Ce qui se passe vraiment après que vous avez postulé",
+    extrait:
+      "Entre le clic sur « Envoyer » et le premier appel du recruteur, il se passe beaucoup de choses que vous ne voyez pas.",
+    slug: "/ressources/cv-ats/ce-qui-se-passe-apres-avoir-postule",
+    date: "30 mai 2026",
+  },
+  {
     id: 5,
     categorie: "CV & ATS",
     titre: "Comment savoir si une entreprise utilise un ATS avant de postuler",
