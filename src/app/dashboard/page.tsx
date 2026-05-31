@@ -895,7 +895,7 @@ export default function Dashboard() {
                 </div>
                 <div className="flex items-center justify-between text-xs mt-0.5">
                   <span className="text-indigo-300">Candidature spontanée</span>
-                  <span className={`font-bold ${(rhCreditsRestants ?? 0) === 0 ? "text-rose-400" : "text-white"}`}>{(rhCreditsRestants ?? 0) > 0 ? `${rhCreditsRestants} recherche${(rhCreditsRestants ?? 0) > 1 ? "s" : ""}` : "0 recherche"}</span>
+                  <span className={`font-bold ${(rhCreditsRestants ?? 0) === 0 ? "text-rose-400" : "text-white"}`}>{(rhCreditsRestants ?? 0) > 0 ? `${rhCreditsRestants} email${(rhCreditsRestants ?? 0) > 1 ? "s" : ""}` : "0 email"}</span>
                 </div>
                 {((scansRestants ?? 0) <= 2 || (creditsRestants ?? 0) === 0 || (lmCreditsRestants ?? 0) === 0) && (
                   <Link href="/pricing" className="mt-1 text-center text-xs font-semibold text-indigo-300 hover:text-white bg-indigo-800/60 hover:bg-indigo-700/60 rounded-lg py-1.5 transition-colors">
