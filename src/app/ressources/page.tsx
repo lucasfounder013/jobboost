@@ -7,6 +7,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 7,
+    categorie: "CV & ATS",
+    titre: "Les rubriques indispensables d'un CV en 2026",
+    extrait:
+      "Certaines rubriques sont attendues par tous les recruteurs. D'autres sont inutiles ou contre-productives. Voici ce qui doit vraiment figurer sur votre CV.",
+    slug: "/ressources/cv-ats/rubriques-indispensables-cv-2026",
+    date: "31 mai 2026",
+  },
+  {
     id: 6,
     categorie: "CV & ATS",
     titre: "Ce qui se passe vraiment après que vous avez postulé",
