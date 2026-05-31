@@ -11,6 +11,7 @@ const FEATURES_GRATUIT = [
   "1 adaptation CV offerte",
   "Export PDF ATS",
   "Export Word (.docx)",
+  "1 révélation d'email (candidature spontanée)",
 ];
 
 const FEATURES_PREMIUM = [
@@ -18,7 +19,9 @@ const FEATURES_PREMIUM = [
   "Adaptations CV illimitées",
   "Export PDF ATS",
   "Export Word (.docx)",
-  "Score de correspondance détaillé",
+  "Préparation aux entretiens",
+  "Recherche d'offres selon votre CV",
+  "20 révélations d'email / mois (candidature spontanée)",
 ];
 
 function Check({ dim = false }: { dim?: boolean }) {

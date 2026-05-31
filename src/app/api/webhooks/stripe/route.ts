@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
       if (userId && subscriptionId) {
         await pool.query(
-          'UPDATE "user" SET is_subscribed = true, stripe_subscription_id = $1 WHERE id = $2',
+          'UPDATE "user" SET is_subscribed = true, stripe_subscription_id = $1, rh_credits = 20 WHERE id = $2',
           [subscriptionId, userId]
         );
       }
@@ -52,6 +52,18 @@ export async function POST(req: NextRequest) {
         'UPDATE "user" SET is_subscribed = $1 WHERE stripe_subscription_id = $2',
         [actif, subscription.id]
       );
+      break;
+    }
+
+    case "invoice.payment_succeeded": {
+      const invoice = event.data.object as Stripe.Invoice;
+      const subId = (invoice as unknown as { subscription: string }).subscription;
+      if (subId) {
+        await pool.query(
+          'UPDATE "user" SET rh_credits = 20 WHERE stripe_subscription_id = $1 AND is_subscribed = true',
+          [subId]
+        );
+      }
       break;
     }
 

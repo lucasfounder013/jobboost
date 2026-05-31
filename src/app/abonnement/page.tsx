@@ -9,6 +9,7 @@ const FEATURES_GRATUIT = [
   "5 analyses CV gratuites",
   "1 adaptation CV gratuite",
   "Export PDF & Word (.docx)",
+  "1 révélation d'email (candidature spontanée)",
 ];
 
 const FEATURES_PREMIUM = [
@@ -17,6 +18,7 @@ const FEATURES_PREMIUM = [
   "Export PDF & Word (.docx)",
   "Préparation aux entretiens",
   "Recherche d'offres d'emploi selon votre CV",
+  "20 révélations d'email / mois (candidature spontanée)",
 ];
 
 function Check({ color = "emerald" }: { color?: "emerald" | "gray" }) {

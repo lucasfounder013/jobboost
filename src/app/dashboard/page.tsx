@@ -197,18 +197,27 @@ export default function Dashboard() {
   const [rhCreditsRestants, setRhCreditsRestants] = useState<number | null>(null);
 
   // ── Trouver un RH
-  type ContactRH = { prenom: string; nom: string; poste: string; email: string; statut: string; linkedin?: string };
-  const [modeRH, setModeRH] = useState<"domaine" | "personne">("domaine");
+  type ContactRH = { prenom: string; nom: string; poste: string; linkedin?: string; searchEmailsStart?: string; email?: string };
   const [inputEntrepriseRH, setInputEntrepriseRH] = useState("");
   const [inputDomaineRH, setInputDomaineRH] = useState("");
-  const [inputPrenomRH, setInputPrenomRH] = useState("");
-  const [inputNomRH, setInputNomRH] = useState("");
+
   const [resultatsRH, setResultatsRH] = useState<ContactRH[]>([]);
   const [domaineTrouveRH, setDomaineTrouveRH] = useState("");
   const [filtreRHActif, setFiltreRHActif] = useState(false);
   const [chargementRH, setChargementRH] = useState(false);
   const [erreurRH, setErreurRH] = useState("");
   const [emailCopie, setEmailCopie] = useState<string | null>(null);
+  const [emailsReveles, setEmailsReveles] = useState<Record<number, { email: string; statut: string }>>({});
+  const [emailChargement, setEmailChargement] = useState<Record<number, boolean>>({});
+  const [emailsEchec, setEmailsEchec] = useState<Record<number, boolean>>({});
+  type ContactSauvegarde = { id: string; prenom: string; nom: string; poste: string; linkedin: string; email: string; domaine: string };
+  const [contactsSauvegardes, setContactsSauvegardes] = useState<ContactSauvegarde[]>([]);
+  const [sauvegardeIds, setSauvegardeIds] = useState<Record<string, string>>({});
+  const [vueRH, setVueRH] = useState<"recherche" | "sauvegardes">("recherche");
+  const [emailsSauvegardesChargement, setEmailsSauvegardesChargement] = useState<Record<string, boolean>>({});
+  const [emailsSauvegardesEchec, setEmailsSauvegardesEchec] = useState<Record<string, boolean>>({});
+  const [pageProspects, setPageProspects] = useState(0);
+  const PROSPECTS_PAR_PAGE = 20;
   type SuggestionEntreprise = { name: string; domain: string; logo: string };
   const [suggestionsRH, setSuggestionsRH] = useState<SuggestionEntreprise[]>([]);
   const [showSuggestionsRH, setShowSuggestionsRH] = useState(false);
@@ -316,6 +325,15 @@ export default function Dashboard() {
   useEffect(() => {
     if (!session) return;
     chargerHistorique();
+    fetch("/api/contacts-sauvegardes")
+      .then(r => r.json())
+      .then(data => {
+        const contacts: ContactSauvegarde[] = data.contacts ?? [];
+        setContactsSauvegardes(contacts);
+        const ids: Record<string, string> = {};
+        contacts.forEach(c => { ids[`${c.prenom}|${c.nom}|${c.domaine}`] = c.id; });
+        setSauvegardeIds(ids);
+      });
   }, [session]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Récupère pendingAnalysis depuis la page d'accueil (après inscription)
@@ -739,6 +757,31 @@ export default function Dashboard() {
       next.delete(offreId);
       return next;
     });
+  }
+
+  async function sauvegarderContact(contact: { prenom: string; nom: string; poste: string; linkedin?: string; searchEmailsStart?: string }, emailRevele?: { email: string; statut: string }) {
+    const key = `${contact.prenom}|${contact.nom}|${domaineTrouveRH}`;
+    const res = await fetch("/api/contacts-sauvegardes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prenom: contact.prenom, nom: contact.nom, poste: contact.poste, linkedin: contact.linkedin ?? "", email: emailRevele?.email ?? "", domaine: domaineTrouveRH }),
+    });
+    const data = await res.json();
+    if (data.id) {
+      setSauvegardeIds(prev => ({ ...prev, [key]: data.id }));
+      const newContact = { id: data.id, prenom: contact.prenom, nom: contact.nom, poste: contact.poste, linkedin: contact.linkedin ?? "", email: emailRevele?.email ?? "", domaine: domaineTrouveRH };
+      setContactsSauvegardes(prev => [newContact, ...prev]);
+    }
+  }
+
+  async function supprimerContactSauvegarde(key: string, id: string) {
+    await fetch("/api/contacts-sauvegardes", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    });
+    setSauvegardeIds(prev => { const next = { ...prev }; delete next[key]; return next; });
+    setContactsSauvegardes(prev => prev.filter(c => c.id !== id));
   }
 
   async function suggererMetier(cvTexte: string) {
@@ -1918,44 +1961,136 @@ export default function Dashboard() {
         {/* ── Vue : Trouver un RH ──────────────────────────────────────────── */}
         {vue === "trouver-rh" && (
           <div className="max-w-3xl mx-auto px-8 py-10">
-            <div className="mb-8">
-              <h1 className="text-2xl font-bold text-gray-900">Candidature spontanée</h1>
-              <p className="text-gray-400 text-sm mt-1">Trouvez les contacts d&apos;une entreprise pour envoyer une candidature spontanée — RH en priorité, ou tout autre profil pertinent.</p>
+            <div className="mb-8 flex items-start justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">Candidature spontanée</h1>
+                <p className="text-gray-400 text-sm mt-1">Trouvez les contacts d&apos;une entreprise pour envoyer une candidature spontanée — RH en priorité, ou tout autre profil pertinent.</p>
+              </div>
+              <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 shrink-0">
+                <button
+                  onClick={() => setVueRH("recherche")}
+                  className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors ${vueRH === "recherche" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                >Recherche</button>
+                <button
+                  onClick={() => setVueRH("sauvegardes")}
+                  className={`px-4 py-1.5 rounded-lg text-sm font-semibold transition-colors flex items-center gap-1.5 ${vueRH === "sauvegardes" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                >
+                  Sauvegardés
+                  {contactsSauvegardes.length > 0 && (
+                    <span className="text-xs font-bold bg-indigo-100 text-indigo-600 rounded-full px-1.5 py-0.5">{contactsSauvegardes.length}</span>
+                  )}
+                </button>
+              </div>
             </div>
 
-            {/* Onglets mode */}
-            <div className="flex gap-2 mb-6">
-              <button
-                onClick={() => { setModeRH("domaine"); setResultatsRH([]); setErreurRH(""); }}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${modeRH === "domaine" ? "bg-indigo-600 text-white shadow-md shadow-indigo-200" : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50"}`}
-              >
-                Par entreprise
-              </button>
-              <button
-                onClick={() => { setModeRH("personne"); setResultatsRH([]); setErreurRH(""); }}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${modeRH === "personne" ? "bg-indigo-600 text-white shadow-md shadow-indigo-200" : "bg-white text-gray-600 ring-1 ring-gray-200 hover:bg-gray-50"}`}
-              >
-                Par personne
-              </button>
-            </div>
+            {/* Vue contacts sauvegardés */}
+            {vueRH === "sauvegardes" && (
+              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden">
+                {contactsSauvegardes.length === 0 ? (
+                  <div className="px-6 py-12 text-center text-gray-400 text-sm">
+                    <svg className="w-8 h-8 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 4a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 20V4z"/></svg>
+                    Aucun contact sauvegardé pour l&apos;instant.
+                  </div>
+                ) : contactsSauvegardes.map((contact, idx) => {
+                  const key = `${contact.prenom}|${contact.nom}|${contact.domaine}`;
+                  return (
+                    <div key={contact.id} className={`px-5 py-4 flex items-center gap-4 ${idx !== contactsSauvegardes.length - 1 ? "border-b border-gray-100" : ""}`}>
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-600 font-bold text-sm shrink-0">
+                        {contact.prenom?.[0]?.toUpperCase() ?? "?"}{contact.nom?.[0]?.toUpperCase() ?? ""}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900">{contact.prenom} {contact.nom}</p>
+                        {contact.poste && <p className="text-xs text-gray-500 mt-0.5">{contact.poste}</p>}
+                        {contact.domaine && <p className="text-xs text-gray-400 mt-0.5">{contact.domaine}</p>}
+                        {contact.email && (
+                          <p className="text-xs text-indigo-600 font-medium mt-1 flex items-center gap-1">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                            {contact.email}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {contact.linkedin && (
+                          <a href={contact.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-xs font-semibold bg-[#0A66C2] hover:bg-[#004182] text-white px-3 py-1.5 rounded-lg transition-colors">
+                            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                            LinkedIn
+                          </a>
+                        )}
+                        {contact.email ? (
+                          <button
+                            onClick={() => { navigator.clipboard.writeText(contact.email); setEmailCopie(contact.email); setTimeout(() => setEmailCopie(null), 2000); }}
+                            className="flex items-center gap-1 text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1.5 rounded-lg transition-colors"
+                          >
+                            {emailCopie === contact.email ? (
+                              <><svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>Copié</>
+                            ) : (
+                              <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>Copier</>
+                            )}
+                          </button>
+                        ) : emailsSauvegardesEchec[contact.id] ? (
+                          <span className="text-xs font-medium px-2 py-1.5 rounded-lg bg-gray-100 text-gray-400">Non disponible</span>
+                        ) : (
+                          <button
+                            disabled={emailsSauvegardesChargement[contact.id] || (rhCreditsRestants ?? 0) === 0}
+                            onClick={async () => {
+                              setEmailsSauvegardesChargement(prev => ({ ...prev, [contact.id]: true }));
+                              try {
+                                const res = await fetch("/api/trouver-rh", {
+                                  method: "POST",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ mode: "email", prenom: contact.prenom, nom: contact.nom, domaine: contact.domaine }),
+                                });
+                                const data = await res.json();
+                                if (!res.ok || !data.email) { setEmailsSauvegardesEchec(prev => ({ ...prev, [contact.id]: true })); return; }
+                                setContactsSauvegardes(prev => prev.map(c => c.id === contact.id ? { ...c, email: data.email } : c));
+                                if (data.rhCreditsRestants !== undefined && data.rhCreditsRestants !== null) setRhCreditsRestants(data.rhCreditsRestants);
+                                await fetch("/api/contacts-sauvegardes", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: contact.id, email: data.email }) });
+                              } catch { setEmailsSauvegardesEchec(prev => ({ ...prev, [contact.id]: true })); }
+                              finally { setEmailsSauvegardesChargement(prev => ({ ...prev, [contact.id]: false })); }
+                            }}
+                            className="flex items-center gap-1 text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {emailsSauvegardesChargement[contact.id] ? (
+                              <><svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Recherche...</>
+                            ) : (
+                              <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>Révéler l&apos;email</>
+                            )}
+                          </button>
+                        )}
+                        <button
+                          onClick={() => supprimerContactSauvegarde(key, contact.id)}
+                          title="Retirer des contacts sauvegardés"
+                          className="p-1.5 rounded-lg text-indigo-500 bg-indigo-50 hover:bg-rose-50 hover:text-rose-500 transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M5 4a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 20V4z"/></svg>
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
 
-            {/* Compteur crédits non-abonné */}
-            {!estAbonne && (
+            {/* Contenu principal : recherche */}
+            {vueRH === "recherche" && (<div>
+
+            {/* Compteur crédits */}
+            {rhCreditsRestants !== null && (
               <div className={`mb-5 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium ${(rhCreditsRestants ?? 0) === 0 ? "bg-rose-50 text-rose-600 ring-1 ring-rose-200" : "bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100"}`}>
                 <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 {(rhCreditsRestants ?? 0) === 0
-                  ? "Vous n'avez plus de recherches gratuites."
-                  : `${rhCreditsRestants} recherche${(rhCreditsRestants ?? 0) > 1 ? "s" : ""} gratuite${(rhCreditsRestants ?? 0) > 1 ? "s" : ""} restante${(rhCreditsRestants ?? 0) > 1 ? "s" : ""}`}
-                {(rhCreditsRestants ?? 0) === 0 && (
+                  ? "Vous n'avez plus de crédits email ce mois-ci."
+                  : `${rhCreditsRestants} révélation${(rhCreditsRestants ?? 0) > 1 ? "s" : ""} d'email restante${(rhCreditsRestants ?? 0) > 1 ? "s" : ""} ce mois`}
+                {(rhCreditsRestants ?? 0) === 0 && !estAbonne && (
                   <Link href="/pricing" className="ml-auto text-indigo-600 font-semibold hover:text-indigo-800 transition-colors">Passer à l&apos;abonnement →</Link>
                 )}
               </div>
             )}
 
             {/* Formulaire mode "Par entreprise" */}
-            {modeRH === "domaine" && (
+            {(
               <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6 mb-6">
                 <p className="text-sm font-semibold text-gray-700 mb-4">Trouvez les contacts d&apos;une entreprise</p>
                 <div className="flex flex-col gap-3">
@@ -2005,7 +2140,7 @@ export default function Dashboard() {
                   <button
                     onClick={async () => {
                       if (!inputEntrepriseRH && !inputDomaineRH) return;
-                      setChargementRH(true); setErreurRH(""); setResultatsRH([]); setDomaineTrouveRH("");
+                      setChargementRH(true); setErreurRH(""); setResultatsRH([]); setDomaineTrouveRH(""); setEmailsReveles({}); setEmailChargement({}); setEmailsEchec({}); setPageProspects(0);
                       try {
                         const res = await fetch("/api/trouver-rh", {
                           method: "POST",
@@ -2014,13 +2149,18 @@ export default function Dashboard() {
                         });
                         const data = await res.json();
                         if (!res.ok) { setErreurRH(data.error ?? "Erreur lors de la recherche."); return; }
-                        setResultatsRH(data.contacts ?? []);
+                        const contacts: ContactRH[] = data.contacts ?? [];
+                        setResultatsRH(contacts);
                         setDomaineTrouveRH(data.domaineTrouve ?? "");
                         if (data.rhCreditsRestants !== undefined && data.rhCreditsRestants !== null) setRhCreditsRestants(data.rhCreditsRestants);
+                        // Pré-populer les emails déjà connus (domain emails sans profil)
+                        const preReveles: Record<number, { email: string; statut: string }> = {};
+                        contacts.forEach((c, idx) => { if (c.email) preReveles[idx] = { email: c.email, statut: "unknown" }; });
+                        if (Object.keys(preReveles).length > 0) setEmailsReveles(preReveles);
                       } catch { setErreurRH("Erreur réseau. Veuillez réessayer."); }
                       finally { setChargementRH(false); }
                     }}
-                    disabled={chargementRH || (!inputEntrepriseRH && !inputDomaineRH) || (!estAbonne && (rhCreditsRestants ?? 0) === 0)}
+                    disabled={chargementRH || (!inputEntrepriseRH && !inputDomaineRH)}
                     className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold text-sm py-2.5 px-4 rounded-xl transition-all shadow-lg shadow-indigo-900/10 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {chargementRH ? (
@@ -2037,110 +2177,6 @@ export default function Dashboard() {
               </div>
             )}
 
-            {/* Formulaire mode "Par personne" */}
-            {modeRH === "personne" && (
-              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6 mb-6">
-                <p className="text-sm font-semibold text-gray-700 mb-4">Trouvez l&apos;email d&apos;un contact précis</p>
-                <div className="flex flex-col gap-3">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Prénom</label>
-                      <input
-                        type="text"
-                        value={inputPrenomRH}
-                        onChange={e => setInputPrenomRH(e.target.value)}
-                        placeholder="Ex : Sophie"
-                        className="w-full px-4 py-2.5 rounded-xl ring-1 ring-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Nom</label>
-                      <input
-                        type="text"
-                        value={inputNomRH}
-                        onChange={e => setInputNomRH(e.target.value)}
-                        placeholder="Ex : Martin"
-                        className="w-full px-4 py-2.5 rounded-xl ring-1 ring-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
-                      />
-                    </div>
-                  </div>
-                  <div className="relative">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Entreprise</label>
-                    <input
-                      type="text"
-                      value={inputEntrepriseRH}
-                      onChange={e => { setInputEntrepriseRH(e.target.value); setInputDomaineRH(""); setDomainResoluRH(""); }}
-                      onFocus={() => { if (suggestionsRH.length > 0) setShowSuggestionsRH(true); }}
-                      placeholder="Ex : L'Oréal, BNP Paribas..."
-                      className="w-full px-4 py-2.5 rounded-xl ring-1 ring-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
-                    />
-                    {showSuggestionsRH && suggestionsRH.length > 0 && (
-                      <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl ring-1 ring-gray-200 overflow-hidden">
-                        {suggestionsRH.map((s) => (
-                          <button
-                            key={s.domain}
-                            type="button"
-                            onMouseDown={e => { e.preventDefault(); setInputEntrepriseRH(s.name); setDomainResoluRH(s.domain); setInputDomaineRH(s.domain); setShowSuggestionsRH(false); }}
-                            className="flex items-center gap-3 w-full px-4 py-2.5 hover:bg-indigo-50 transition-colors text-left"
-                          >
-                            <div className="flex-1 min-w-0">
-                              <span className="text-sm font-semibold text-gray-900">{s.name}</span>
-                              <span className="text-xs text-gray-400 ml-2">{s.domain}</span>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <div className="flex-1 h-px bg-gray-200" />
-                    <span>ou domaine</span>
-                    <div className="flex-1 h-px bg-gray-200" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Domaine (si connu)</label>
-                    <input
-                      type="text"
-                      value={inputDomaineRH}
-                      onChange={e => { setInputDomaineRH(e.target.value); setInputEntrepriseRH(""); }}
-                      placeholder="Ex : loreal.com"
-                      className="w-full px-4 py-2.5 rounded-xl ring-1 ring-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
-                    />
-                  </div>
-                  <button
-                    onClick={async () => {
-                      if (!inputPrenomRH || !inputNomRH || (!inputEntrepriseRH && !inputDomaineRH)) return;
-                      setChargementRH(true); setErreurRH(""); setResultatsRH([]); setDomaineTrouveRH("");
-                      try {
-                        const res = await fetch("/api/trouver-rh", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ mode: "personne", prenom: inputPrenomRH, nom: inputNomRH, entreprise: domainResoluRH ? undefined : (inputEntrepriseRH || undefined), domaine: domainResoluRH || inputDomaineRH || undefined }),
-                        });
-                        const data = await res.json();
-                        if (!res.ok) { setErreurRH(data.error ?? "Erreur lors de la recherche."); return; }
-                        setResultatsRH(data.contacts ?? []);
-                        setDomaineTrouveRH(data.domaineTrouve ?? "");
-                        if (data.rhCreditsRestants !== undefined && data.rhCreditsRestants !== null) setRhCreditsRestants(data.rhCreditsRestants);
-                      } catch { setErreurRH("Erreur réseau. Veuillez réessayer."); }
-                      finally { setChargementRH(false); }
-                    }}
-                    disabled={chargementRH || !inputPrenomRH || !inputNomRH || (!inputEntrepriseRH && !inputDomaineRH) || (!estAbonne && (rhCreditsRestants ?? 0) === 0)}
-                    className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold text-sm py-2.5 px-4 rounded-xl transition-all shadow-lg shadow-indigo-900/10 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {chargementRH ? (
-                      <>
-                        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                        </svg>
-                        Recherche en cours...
-                      </>
-                    ) : "Rechercher"}
-                  </button>
-                </div>
-              </div>
-            )}
 
             {/* Message d'erreur */}
             {erreurRH && (
@@ -2151,7 +2187,10 @@ export default function Dashboard() {
             )}
 
             {/* Résultats */}
-            {resultatsRH.length > 0 && (
+            {resultatsRH.length > 0 && (() => {
+              const nbEchecs = Object.values(emailsEchec).filter(Boolean).length;
+              const emailsIndisponibles = nbEchecs >= 5;
+              return (
               <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden">
                 {domaineTrouveRH && (
                   <div className="px-5 py-3 bg-indigo-50/60 border-b border-indigo-100 flex items-center gap-2">
@@ -2162,67 +2201,153 @@ export default function Dashboard() {
                     </span>
                   </div>
                 )}
-                {resultatsRH.map((contact, i) => (
-                  <div key={i} className={`px-5 py-4 flex items-center gap-4 ${i !== resultatsRH.length - 1 ? "border-b border-gray-100" : ""}`}>
-                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-600 font-bold text-sm shrink-0">
-                      {contact.prenom?.[0]?.toUpperCase() ?? "?"}{contact.nom?.[0]?.toUpperCase() ?? ""}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-gray-900">{contact.prenom} {contact.nom}</p>
-                      {contact.poste && <p className="text-xs text-gray-500 mt-0.5">{contact.poste}</p>}
-                      {contact.email && (
-                        <p className="text-xs text-indigo-600 font-medium mt-1 flex items-center gap-1">
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                          {contact.email}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {contact.statut && (
-                        <span className={`text-xs font-medium px-2 py-1 rounded-lg ${contact.statut === "valid" ? "bg-emerald-50 text-emerald-700" : contact.statut === "invalid" ? "bg-rose-50 text-rose-600" : contact.statut === "guessed" ? "bg-amber-50 text-amber-700" : "bg-gray-100 text-gray-500"}`}>
-                          {contact.statut === "valid" ? "Vérifié" : contact.statut === "invalid" ? "Invalide" : contact.statut === "guessed" ? "Email estimé" : "Non vérifié"}
-                        </span>
-                      )}
-                      {contact.linkedin && (
-                        <a
-                          href={contact.linkedin}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-xs font-semibold bg-[#0A66C2] hover:bg-[#004182] text-white px-3 py-1.5 rounded-lg transition-colors"
-                        >
-                          <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-                          LinkedIn
-                        </a>
-                      )}
-                      {contact.email && (
-                        <button
-                          onClick={() => { navigator.clipboard.writeText(contact.email); setEmailCopie(contact.email); setTimeout(() => setEmailCopie(null), 2000); }}
-                          className="flex items-center gap-1 text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1.5 rounded-lg transition-colors"
-                        >
-                          {emailCopie === contact.email ? (
-                            <><svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>Copié</>
+                {emailsIndisponibles && (
+                  <div className="px-5 py-3 bg-amber-50 border-b border-amber-100 flex items-center gap-2">
+                    <svg className="w-4 h-4 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
+                    <span className="text-xs text-amber-700 font-medium">JobBoost n&apos;a pas trouvé d&apos;email pour ce contact. Les autres contacts de ce domaine pourraient également être indisponibles.</span>
+                  </div>
+                )}
+                {resultatsRH.slice(pageProspects * PROSPECTS_PAR_PAGE, (pageProspects + 1) * PROSPECTS_PAR_PAGE).map((contact, j) => {
+                  const i = pageProspects * PROSPECTS_PAR_PAGE + j;
+                  const emailRevele = emailsReveles[i];
+                  const enChargement = emailChargement[i] ?? false;
+                  const emailEchec = emailsEchec[i] ?? false;
+                  return (
+                    <div key={i} className={`px-5 py-4 flex items-center gap-4 ${j !== Math.min(PROSPECTS_PAR_PAGE, resultatsRH.length - pageProspects * PROSPECTS_PAR_PAGE) - 1 ? "border-b border-gray-100" : ""}`}>
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-600 font-bold text-sm shrink-0">
+                        {contact.prenom?.[0]?.toUpperCase() ?? "?"}{contact.nom?.[0]?.toUpperCase() ?? ""}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-semibold text-gray-900">{contact.prenom} {contact.nom}</p>
+                        {contact.poste && <p className="text-xs text-gray-500 mt-0.5">{contact.poste}</p>}
+                        {emailRevele && (
+                          <p className="text-xs text-indigo-600 font-medium mt-1 flex items-center gap-1">
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                            {emailRevele.email}
+                            {emailRevele.statut === "valid" && (
+                              <span className="ml-1 text-xs font-medium px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700">Vérifié</span>
+                            )}
+                            {emailRevele.statut === "not_valid" && (
+                              <span className="ml-1 text-xs font-medium px-1.5 py-0.5 rounded bg-rose-50 text-rose-600">Invalide</span>
+                            )}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        {contact.linkedin && (
+                          <a
+                            href={contact.linkedin}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-xs font-semibold bg-[#0A66C2] hover:bg-[#004182] text-white px-3 py-1.5 rounded-lg transition-colors"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+                            LinkedIn
+                          </a>
+                        )}
+                        {emailRevele ? (
+                          <button
+                            onClick={() => { navigator.clipboard.writeText(emailRevele.email); setEmailCopie(emailRevele.email); setTimeout(() => setEmailCopie(null), 2000); }}
+                            className="flex items-center gap-1 text-xs font-semibold bg-gray-100 hover:bg-gray-200 text-gray-600 px-3 py-1.5 rounded-lg transition-colors"
+                          >
+                            {emailCopie === emailRevele.email ? (
+                              <><svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>Copié</>
+                            ) : (
+                              <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>Copier</>
+                            )}
+                          </button>
+                        ) : emailEchec ? (
+                          <span className="text-xs font-medium px-2 py-1.5 rounded-lg bg-gray-100 text-gray-400">Non disponible</span>
+                        ) : contact.searchEmailsStart ? (
+                          <button
+                            onClick={async () => {
+                              if (!domaineTrouveRH) return;
+                              setEmailChargement(prev => ({ ...prev, [i]: true }));
+                              setErreurRH("");
+                              try {
+                                const res = await fetch("/api/trouver-rh", {
+                                  method: "POST",
+                                  headers: { "Content-Type": "application/json" },
+                                  body: JSON.stringify({ mode: "email", prenom: contact.prenom, nom: contact.nom, domaine: domaineTrouveRH, searchEmailsUrl: contact.searchEmailsStart }),
+                                });
+                                const data = await res.json();
+                                if (!res.ok) { setEmailsEchec(prev => ({ ...prev, [i]: true })); return; }
+                                setEmailsReveles(prev => ({ ...prev, [i]: { email: data.email, statut: data.statut ?? "" } }));
+                                if (data.rhCreditsRestants !== undefined && data.rhCreditsRestants !== null) setRhCreditsRestants(data.rhCreditsRestants);
+                              } catch { setEmailsEchec(prev => ({ ...prev, [i]: true })); }
+                              finally { setEmailChargement(prev => ({ ...prev, [i]: false })); }
+                            }}
+                            disabled={enChargement || (rhCreditsRestants ?? 0) === 0}
+                            className="flex items-center gap-1 text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {enChargement ? (
+                              <><svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Recherche...</>
+                            ) : (
+                              <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>Révéler l&apos;email</>
+                            )}
+                          </button>
+                        ) : null}
+                        {/* Bouton sauvegarder */}
+                        {(() => {
+                          const key = `${contact.prenom}|${contact.nom}|${domaineTrouveRH}`;
+                          const savedId = sauvegardeIds[key];
+                          return savedId ? (
+                            <button
+                              onClick={() => supprimerContactSauvegarde(key, savedId)}
+                              className="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-indigo-50 text-indigo-600 hover:bg-rose-50 hover:text-rose-500 transition-colors"
+                            >
+                              <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M5 4a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 20V4z"/></svg>
+                              Sauvegardé
+                            </button>
                           ) : (
-                            <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>Copier</>
-                          )}
-                        </button>
-                      )}
+                            <button
+                              onClick={() => sauvegarderContact(contact, emailsReveles[i])}
+                              className="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg bg-gray-100 hover:bg-indigo-50 text-gray-500 hover:text-indigo-600 transition-colors"
+                            >
+                              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 4a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 20V4z"/></svg>
+                              Sauvegarder
+                            </button>
+                          );
+                        })()}
+                      </div>
+                    </div>
+                  );
+                })}
+                {resultatsRH.length > PROSPECTS_PAR_PAGE && (
+                  <div className="px-5 py-3 border-t border-gray-100 flex items-center justify-between">
+                    <span className="text-xs text-gray-400">
+                      {pageProspects * PROSPECTS_PAR_PAGE + 1}–{Math.min((pageProspects + 1) * PROSPECTS_PAR_PAGE, resultatsRH.length)} sur {resultatsRH.length}
+                    </span>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => setPageProspects(p => p - 1)}
+                        disabled={pageProspects === 0}
+                        className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      >← Précédent</button>
+                      <button
+                        onClick={() => setPageProspects(p => p + 1)}
+                        disabled={(pageProspects + 1) * PROSPECTS_PAR_PAGE >= resultatsRH.length}
+                        className="px-3 py-1.5 text-xs font-semibold rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                      >Suivant →</button>
                     </div>
                   </div>
-                ))}
+                )}
               </div>
-            )}
+              );
+            })()}
 
             {/* Résultat vide */}
             {!chargementRH && resultatsRH.length === 0 && !erreurRH && domaineTrouveRH && (
               <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-10 flex flex-col items-center text-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-xl">🔍</div>
                 <p className="text-gray-700 font-semibold">Aucun contact trouvé</p>
-                <p className="text-gray-400 text-sm">Snov.io n&apos;a pas trouvé de contacts pour ce domaine. Essayez avec un autre nom d&apos;entreprise ou domaine.</p>
+                <p className="text-gray-400 text-sm">JobBoost n&apos;a pas trouvé de profils pour ce domaine. Cela peut arriver pour les petites entreprises peu présentes sur LinkedIn. Essayez avec le nom de l&apos;entreprise ou un autre domaine.</p>
               </div>
             )}
 
             {/* Info bas de page */}
-            <p className="text-xs text-gray-400 mt-5 text-center">Données fournies par Snov.io — contacts RH prioritaires, tous profils en fallback. Emails estimés à vérifier avant envoi.</p>
+            <p className="text-xs text-gray-400 mt-5 text-center">Contacts RH prioritaires, tous profils en fallback. Chaque révélation d&apos;email consomme 1 crédit.</p>
+            </div>)}
           </div>
         )}
 
