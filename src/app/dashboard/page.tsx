@@ -197,7 +197,7 @@ export default function Dashboard() {
   const [rhCreditsRestants, setRhCreditsRestants] = useState<number | null>(null);
 
   // ── Trouver un RH
-  type ContactRH = { prenom: string; nom: string; poste: string; linkedin?: string; searchEmailsStart?: string; email?: string };
+  type ContactRH = { prenom: string; nom: string; poste: string; linkedin?: string; email?: string };
   const [inputEntrepriseRH, setInputEntrepriseRH] = useState("");
   const [inputDomaineRH, setInputDomaineRH] = useState("");
 
@@ -207,7 +207,7 @@ export default function Dashboard() {
   const [chargementRH, setChargementRH] = useState(false);
   const [erreurRH, setErreurRH] = useState("");
   const [emailCopie, setEmailCopie] = useState<string | null>(null);
-  const [emailsReveles, setEmailsReveles] = useState<Record<number, { email: string; statut: string }>>({});
+  const [emailsReveles, setEmailsReveles] = useState<Record<number, { email: string; certitude: number }>>({});
   const [emailChargement, setEmailChargement] = useState<Record<number, boolean>>({});
   const [emailsEchec, setEmailsEchec] = useState<Record<number, boolean>>({});
   type ContactSauvegarde = { id: string; prenom: string; nom: string; poste: string; linkedin: string; email: string; domaine: string };
@@ -218,6 +218,13 @@ export default function Dashboard() {
   const [emailsSauvegardesEchec, setEmailsSauvegardesEchec] = useState<Record<string, boolean>>({});
   const [pageProspects, setPageProspects] = useState(0);
   const PROSPECTS_PAR_PAGE = 20;
+  const [sousModRH, setSousModRH] = useState<"entreprise" | "personne">("entreprise");
+  const [inputPrenomDirect, setInputPrenomDirect] = useState("");
+  const [inputNomDirect, setInputNomDirect] = useState("");
+  const [inputEntrepriseDirect, setInputEntrepriseDirect] = useState("");
+  const [resultatDirect, setResultatDirect] = useState<{ email: string; certitude: number } | null>(null);
+  const [chargementDirect, setChargementDirect] = useState(false);
+  const [erreurDirect, setErreurDirect] = useState("");
   type SuggestionEntreprise = { name: string; domain: string; logo: string };
   const [suggestionsRH, setSuggestionsRH] = useState<SuggestionEntreprise[]>([]);
   const [showSuggestionsRH, setShowSuggestionsRH] = useState(false);
@@ -759,7 +766,7 @@ export default function Dashboard() {
     });
   }
 
-  async function sauvegarderContact(contact: { prenom: string; nom: string; poste: string; linkedin?: string; searchEmailsStart?: string }, emailRevele?: { email: string; statut: string }) {
+  async function sauvegarderContact(contact: { prenom: string; nom: string; poste: string; linkedin?: string }, emailRevele?: { email: string; certitude: number }) {
     const key = `${contact.prenom}|${contact.nom}|${domaineTrouveRH}`;
     const res = await fetch("/api/contacts-sauvegardes", {
       method: "POST",
@@ -1964,7 +1971,6 @@ export default function Dashboard() {
             <div className="mb-8 flex items-start justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Candidature spontanée</h1>
-                <p className="text-gray-400 text-sm mt-1">Trouvez les contacts d&apos;une entreprise pour envoyer une candidature spontanée — RH en priorité, ou tout autre profil pertinent.</p>
               </div>
               <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 shrink-0">
                 <button
@@ -2051,7 +2057,7 @@ export default function Dashboard() {
                             className="flex items-center gap-1 text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {emailsSauvegardesChargement[contact.id] ? (
-                              <><svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Recherche...</>
+                              <><svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Jusqu&apos;à 2 min...</>
                             ) : (
                               <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>Révéler l&apos;email</>
                             )}
@@ -2074,23 +2080,46 @@ export default function Dashboard() {
             {/* Contenu principal : recherche */}
             {vueRH === "recherche" && (<div>
 
+            {/* Onglets Par entreprise / Par personne */}
+            <div className="flex gap-1 mb-5 bg-gray-100 p-1 rounded-xl">
+              <button
+                onClick={() => setSousModRH("entreprise")}
+                className={`flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all ${sousModRH === "entreprise" ? "bg-white text-indigo-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+              >
+                Par entreprise
+              </button>
+              <button
+                onClick={() => { setSousModRH("personne"); setResultatDirect(null); setErreurDirect(""); }}
+                className={`flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all ${sousModRH === "personne" ? "bg-white text-indigo-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+              >
+                Par personne
+              </button>
+            </div>
+
             {/* Compteur crédits */}
             {rhCreditsRestants !== null && (
-              <div className={`mb-5 flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium ${(rhCreditsRestants ?? 0) === 0 ? "bg-rose-50 text-rose-600 ring-1 ring-rose-200" : "bg-indigo-50 text-indigo-700 ring-1 ring-indigo-100"}`}>
-                <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {(rhCreditsRestants ?? 0) === 0
-                  ? "Vous n'avez plus de crédits email ce mois-ci."
-                  : `${rhCreditsRestants} révélation${(rhCreditsRestants ?? 0) > 1 ? "s" : ""} d'email restante${(rhCreditsRestants ?? 0) > 1 ? "s" : ""} ce mois`}
+              <div className={`mb-5 flex items-center gap-3 px-5 py-3.5 rounded-2xl ${(rhCreditsRestants ?? 0) === 0 ? "bg-rose-50 ring-1 ring-rose-200" : "bg-gradient-to-r from-indigo-50 to-violet-50 ring-1 ring-indigo-100"}`}>
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${(rhCreditsRestants ?? 0) === 0 ? "bg-rose-100" : "bg-indigo-100"}`}>
+                  <svg className={`w-4.5 h-4.5 ${(rhCreditsRestants ?? 0) === 0 ? "text-rose-500" : "text-indigo-600"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-xs font-semibold uppercase tracking-wide mb-0.5 ${(rhCreditsRestants ?? 0) === 0 ? "text-rose-400" : "text-indigo-400"}`}>Crédits email</p>
+                  <p className={`text-base font-bold ${(rhCreditsRestants ?? 0) === 0 ? "text-rose-600" : "text-indigo-700"}`}>
+                    {(rhCreditsRestants ?? 0) === 0
+                      ? "Plus de crédits ce mois-ci"
+                      : `${rhCreditsRestants} révélation${(rhCreditsRestants ?? 0) > 1 ? "s" : ""} restante${(rhCreditsRestants ?? 0) > 1 ? "s" : ""} ce mois`}
+                  </p>
+                </div>
                 {(rhCreditsRestants ?? 0) === 0 && !estAbonne && (
-                  <Link href="/pricing" className="ml-auto text-indigo-600 font-semibold hover:text-indigo-800 transition-colors">Passer à l&apos;abonnement →</Link>
+                  <Link href="/pricing" className="shrink-0 text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl transition-colors">Upgrader →</Link>
                 )}
               </div>
             )}
 
             {/* Formulaire mode "Par entreprise" */}
-            {(
+            {sousModRH === "entreprise" && (
               <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6 mb-6">
                 <p className="text-sm font-semibold text-gray-700 mb-4">Trouvez les contacts d&apos;une entreprise</p>
                 <div className="flex flex-col gap-3">
@@ -2154,8 +2183,8 @@ export default function Dashboard() {
                         setDomaineTrouveRH(data.domaineTrouve ?? "");
                         if (data.rhCreditsRestants !== undefined && data.rhCreditsRestants !== null) setRhCreditsRestants(data.rhCreditsRestants);
                         // Pré-populer les emails déjà connus (domain emails sans profil)
-                        const preReveles: Record<number, { email: string; statut: string }> = {};
-                        contacts.forEach((c, idx) => { if (c.email) preReveles[idx] = { email: c.email, statut: "unknown" }; });
+                        const preReveles: Record<number, { email: string; certitude: number }> = {};
+                        contacts.forEach((c, idx) => { if (c.email) preReveles[idx] = { email: c.email, certitude: 0 }; });
                         if (Object.keys(preReveles).length > 0) setEmailsReveles(preReveles);
                       } catch { setErreurRH("Erreur réseau. Veuillez réessayer."); }
                       finally { setChargementRH(false); }
@@ -2178,16 +2207,106 @@ export default function Dashboard() {
             )}
 
 
-            {/* Message d'erreur */}
-            {erreurRH && (
+            {/* Formulaire mode "Par personne" */}
+            {sousModRH === "personne" && (
+              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6 mb-6">
+                <p className="text-sm font-semibold text-gray-700 mb-4">Trouver l&apos;adresse email d&apos;une personne</p>
+                <div className="flex flex-col gap-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Prénom</label>
+                      <input
+                        type="text"
+                        value={inputPrenomDirect}
+                        onChange={e => setInputPrenomDirect(e.target.value)}
+                        placeholder="Ex : Marie"
+                        className="w-full px-4 py-2.5 rounded-xl ring-1 ring-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Nom</label>
+                      <input
+                        type="text"
+                        value={inputNomDirect}
+                        onChange={e => setInputNomDirect(e.target.value)}
+                        placeholder="Ex : Dupont"
+                        className="w-full px-4 py-2.5 rounded-xl ring-1 ring-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">URL du site de l&apos;entreprise</label>
+                    <input
+                      type="text"
+                      value={inputEntrepriseDirect}
+                      onChange={e => setInputEntrepriseDirect(e.target.value)}
+                      placeholder="Ex : https://www.jobboost.fr"
+                      className="w-full px-4 py-2.5 rounded-xl ring-1 ring-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
+                    />
+                  </div>
+                  <button
+                    onClick={async () => {
+                      if (!inputPrenomDirect || !inputNomDirect || !inputEntrepriseDirect) return;
+                      setChargementDirect(true); setErreurDirect(""); setResultatDirect(null);
+                      try {
+                        const res = await fetch("/api/trouver-rh", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ mode: "personne", prenom: inputPrenomDirect, nom: inputNomDirect, entreprise: inputEntrepriseDirect }),
+                        });
+                        const data = await res.json();
+                        if (!res.ok) { setErreurDirect(data.error ?? "Aucun email trouvé."); return; }
+                        setResultatDirect({ email: data.email, certitude: data.certitude ?? 0 });
+                        if (data.rhCreditsRestants !== undefined && data.rhCreditsRestants !== null) setRhCreditsRestants(data.rhCreditsRestants);
+                      } catch { setErreurDirect("Erreur réseau. Veuillez réessayer."); }
+                      finally { setChargementDirect(false); }
+                    }}
+                    disabled={chargementDirect || !inputPrenomDirect || !inputNomDirect || !inputEntrepriseDirect || (rhCreditsRestants !== null && rhCreditsRestants === 0)}
+                    className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold text-sm py-2.5 px-4 rounded-xl transition-all shadow-lg shadow-indigo-900/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {chargementDirect ? (
+                      <><svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Recherche en cours — peut prendre jusqu&apos;à 2 min...</>
+                    ) : "Trouver l'adresse email"}
+                  </button>
+                </div>
+                {erreurDirect && (
+                  <div className="mt-4 flex items-start gap-3 bg-rose-50 text-rose-700 rounded-xl px-4 py-3 text-sm ring-1 ring-rose-200">
+                    <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    {erreurDirect}
+                  </div>
+                )}
+                {resultatDirect && (
+                  <div className="mt-4 flex items-center gap-3 bg-emerald-50 rounded-xl px-4 py-3 ring-1 ring-emerald-100">
+                    <svg className="w-4 h-4 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    <span className="text-sm font-semibold text-gray-900 flex-1">{resultatDirect.email}</span>
+                    {resultatDirect.certitude >= 70 && (
+                      <span className="text-xs font-semibold px-2 py-1 rounded-lg bg-emerald-100 text-emerald-700">{resultatDirect.certitude}%</span>
+                    )}
+                    <button
+                      onClick={() => { navigator.clipboard.writeText(resultatDirect!.email); setEmailCopie(resultatDirect!.email); setTimeout(() => setEmailCopie(null), 2000); }}
+                      className="flex items-center gap-1 text-xs font-semibold bg-white hover:bg-gray-50 text-gray-600 px-3 py-1.5 rounded-lg ring-1 ring-gray-200 transition-colors"
+                    >
+                      {emailCopie === resultatDirect.email ? (
+                        <><svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>Copié</>
+                      ) : (
+                        <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>Copier</>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Message d'erreur (mode entreprise) */}
+            {sousModRH === "entreprise" && erreurRH && (
               <div className="mb-5 flex items-start gap-3 bg-rose-50 text-rose-700 rounded-xl px-4 py-3 text-sm ring-1 ring-rose-200">
                 <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 {erreurRH}
               </div>
             )}
 
-            {/* Résultats */}
-            {resultatsRH.length > 0 && (() => {
+            {/* Résultats (mode entreprise) */}
+            {sousModRH === "entreprise" && resultatsRH.length > 0 && (() => {
               const nbEchecs = Object.values(emailsEchec).filter(Boolean).length;
               const emailsIndisponibles = nbEchecs >= 5;
               return (
@@ -2224,11 +2343,8 @@ export default function Dashboard() {
                           <p className="text-xs text-indigo-600 font-medium mt-1 flex items-center gap-1">
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                             {emailRevele.email}
-                            {emailRevele.statut === "valid" && (
-                              <span className="ml-1 text-xs font-medium px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700">Vérifié</span>
-                            )}
-                            {emailRevele.statut === "not_valid" && (
-                              <span className="ml-1 text-xs font-medium px-1.5 py-0.5 rounded bg-rose-50 text-rose-600">Invalide</span>
+                            {emailRevele.certitude >= 70 && (
+                              <span className="ml-1 text-xs font-medium px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700">{emailRevele.certitude}%</span>
                             )}
                           </p>
                         )}
@@ -2258,7 +2374,7 @@ export default function Dashboard() {
                           </button>
                         ) : emailEchec ? (
                           <span className="text-xs font-medium px-2 py-1.5 rounded-lg bg-gray-100 text-gray-400">Non disponible</span>
-                        ) : contact.searchEmailsStart ? (
+                        ) : (
                           <button
                             onClick={async () => {
                               if (!domaineTrouveRH) return;
@@ -2268,11 +2384,11 @@ export default function Dashboard() {
                                 const res = await fetch("/api/trouver-rh", {
                                   method: "POST",
                                   headers: { "Content-Type": "application/json" },
-                                  body: JSON.stringify({ mode: "email", prenom: contact.prenom, nom: contact.nom, domaine: domaineTrouveRH, searchEmailsUrl: contact.searchEmailsStart }),
+                                  body: JSON.stringify({ mode: "email", prenom: contact.prenom, nom: contact.nom, domaine: domaineTrouveRH }),
                                 });
                                 const data = await res.json();
                                 if (!res.ok) { setEmailsEchec(prev => ({ ...prev, [i]: true })); return; }
-                                setEmailsReveles(prev => ({ ...prev, [i]: { email: data.email, statut: data.statut ?? "" } }));
+                                setEmailsReveles(prev => ({ ...prev, [i]: { email: data.email, certitude: data.certitude ?? 0 } }));
                                 if (data.rhCreditsRestants !== undefined && data.rhCreditsRestants !== null) setRhCreditsRestants(data.rhCreditsRestants);
                               } catch { setEmailsEchec(prev => ({ ...prev, [i]: true })); }
                               finally { setEmailChargement(prev => ({ ...prev, [i]: false })); }
@@ -2281,12 +2397,12 @@ export default function Dashboard() {
                             className="flex items-center gap-1 text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-600 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             {enChargement ? (
-                              <><svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Recherche...</>
+                              <><svg className="animate-spin w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>Jusqu&apos;à 2 min...</>
                             ) : (
                               <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>Révéler l&apos;email</>
                             )}
                           </button>
-                        ) : null}
+                        )}
                         {/* Bouton sauvegarder */}
                         {(() => {
                           const key = `${contact.prenom}|${contact.nom}|${domaineTrouveRH}`;
@@ -2337,7 +2453,7 @@ export default function Dashboard() {
             })()}
 
             {/* Résultat vide */}
-            {!chargementRH && resultatsRH.length === 0 && !erreurRH && domaineTrouveRH && (
+            {sousModRH === "entreprise" && !chargementRH && resultatsRH.length === 0 && !erreurRH && domaineTrouveRH && (
               <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-10 flex flex-col items-center text-center gap-3">
                 <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-xl">🔍</div>
                 <p className="text-gray-700 font-semibold">Aucun contact trouvé</p>
@@ -2346,7 +2462,6 @@ export default function Dashboard() {
             )}
 
             {/* Info bas de page */}
-            <p className="text-xs text-gray-400 mt-5 text-center">Contacts RH prioritaires, tous profils en fallback. Chaque révélation d&apos;email consomme 1 crédit.</p>
             </div>)}
           </div>
         )}
