@@ -25,12 +25,14 @@ export async function POST(req: NextRequest) {
     case "checkout.session.completed": {
       const checkoutSession = event.data.object as Stripe.Checkout.Session;
       const userId = checkoutSession.metadata?.userId;
+      const plan = checkoutSession.metadata?.plan ?? "starter";
       const subscriptionId = checkoutSession.subscription as string;
+      const rhCredits = plan === "pro" ? 80 : 20;
 
       if (userId && subscriptionId) {
         await pool.query(
-          'UPDATE "user" SET is_subscribed = true, stripe_subscription_id = $1, rh_credits = 20 WHERE id = $2',
-          [subscriptionId, userId]
+          'UPDATE "user" SET is_subscribed = true, stripe_subscription_id = $1, plan_type = $2, rh_credits = $3 WHERE id = $4',
+          [subscriptionId, plan, rhCredits, userId]
         );
       }
       break;
@@ -39,7 +41,7 @@ export async function POST(req: NextRequest) {
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
       await pool.query(
-        'UPDATE "user" SET is_subscribed = false, stripe_subscription_id = NULL WHERE stripe_subscription_id = $1',
+        'UPDATE "user" SET is_subscribed = false, stripe_subscription_id = NULL, plan_type = NULL WHERE stripe_subscription_id = $1',
         [subscription.id]
       );
       break;
@@ -60,7 +62,8 @@ export async function POST(req: NextRequest) {
       const subId = (invoice as unknown as { subscription: string }).subscription;
       if (subId) {
         await pool.query(
-          'UPDATE "user" SET rh_credits = 20 WHERE stripe_subscription_id = $1 AND is_subscribed = true',
+          `UPDATE "user" SET rh_credits = CASE WHEN plan_type = 'pro' THEN 80 ELSE 20 END
+           WHERE stripe_subscription_id = $1 AND is_subscribed = true`,
           [subId]
         );
       }

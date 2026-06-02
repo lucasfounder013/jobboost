@@ -14,6 +14,15 @@ const FEATURES_GRATUIT = [
   "1 révélation d'email (candidature spontanée)",
 ];
 
+const FEATURES_STANDARD = [
+  "Analyses CV illimitées",
+  "Adaptations CV illimitées",
+  "Export PDF ATS",
+  "Export Word (.docx)",
+  "Recherche d'offres selon votre CV",
+  "20 révélations d'email / mois",
+];
+
 const FEATURES_PREMIUM = [
   "Analyses CV illimitées",
   "Adaptations CV illimitées",
@@ -21,7 +30,7 @@ const FEATURES_PREMIUM = [
   "Export Word (.docx)",
   "Préparation aux entretiens",
   "Recherche d'offres selon votre CV",
-  "20 révélations d'email / mois (candidature spontanée)",
+  "80 révélations d'email / mois",
 ];
 
 function Check({ dim = false }: { dim?: boolean }) {
@@ -32,11 +41,11 @@ function Check({ dim = false }: { dim?: boolean }) {
   );
 }
 
-function PlanPayant({ plan, label, prix, periode, recommande }: {
-  plan: "hebdo" | "mensuel";
+function PlanPayant({ plan, label, prix, features, recommande }: {
+  plan: "starter" | "pro";
   label: string;
   prix: string;
-  periode: string;
+  features: string[];
   recommande?: boolean;
 }) {
   const { data: session } = useSession();
@@ -70,11 +79,11 @@ function PlanPayant({ plan, label, prix, periode, recommande }: {
         <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">{label}</p>
         <div className="flex items-end gap-1">
           <span className="text-4xl font-extrabold text-gray-900">{prix}</span>
-          <span className="text-gray-400 text-sm mb-1">/{periode}</span>
+          <span className="text-gray-400 text-sm mb-1">/mois</span>
         </div>
       </div>
       <ul className="flex flex-col gap-3 flex-1">
-        {FEATURES_PREMIUM.map((f) => (
+        {features.map((f) => (
           <li key={f} className="flex items-center gap-2 text-sm text-gray-700">
             <Check />
             {f}
@@ -100,7 +109,6 @@ export default function PagePricing() {
       <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-1.5 group">
-            
             <span className="text-base font-bold tracking-tight text-gray-900 group-hover:text-indigo-600 transition-colors">JobBoost</span>
           </Link>
           <nav className="flex items-center gap-3 text-sm">
@@ -155,8 +163,8 @@ export default function PagePricing() {
               </Link>
             </div>
 
-            <PlanPayant plan="hebdo" label="Hebdomadaire" prix="4,99€" periode="semaine" />
-            <PlanPayant plan="mensuel" label="Mensuel" prix="9,99€" periode="mois" recommande />
+            <PlanPayant plan="starter" label="Starter" prix="9,99€" features={FEATURES_STANDARD} />
+            <PlanPayant plan="pro" label="Pro" prix="14,99€" features={FEATURES_PREMIUM} recommande />
           </div>
 
           <p className="mt-8 text-xs text-gray-400">
@@ -171,6 +179,7 @@ export default function PagePricing() {
               { q: "Puis-je annuler à tout moment ?", r: "Oui, vous pouvez annuler votre abonnement à tout moment depuis votre espace Stripe. L'accès reste actif jusqu'à la fin de la période en cours." },
               { q: "Les 5 analyses gratuites sont-elles renouvelées ?", r: "Non, les analyses gratuites sont données une seule fois à l'inscription. Un abonnement donne accès à des analyses illimitées." },
               { q: "Mes données sont-elles sécurisées ?", r: "Oui. Le contenu de votre CV n'est jamais stocké en base de données — il transite uniquement en mémoire pendant l'analyse." },
+              { q: "Quelle est la différence entre Starter et Pro ?", r: "Le plan Pro inclut la préparation aux entretiens (pitch, questions probables, questions à poser) et 80 révélations d'email par mois au lieu de 20." },
             ].map(({ q, r }) => (
               <div key={q} className="bg-white rounded-xl ring-1 ring-gray-200 p-5">
                 <p className="font-semibold text-gray-900 text-sm mb-1">{q}</p>

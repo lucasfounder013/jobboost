@@ -10,8 +10,8 @@ export async function POST(req: NextRequest) {
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
     const PRICE_IDS: Record<string, string> = {
-      hebdo: process.env.STRIPE_PRICE_ID_HEBDO!,
-      mensuel: process.env.STRIPE_PRICE_ID_MENSUEL!,
+      starter: process.env.STRIPE_PRICE_ID_STARTER!,
+      pro: process.env.STRIPE_PRICE_ID_PRO!,
     };
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session) {
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
         line_items: [{ price: priceId, quantity: 1 }],
         success_url: `${baseUrl}/success`,
         cancel_url: `${baseUrl}/pricing`,
-        metadata: { userId: session.user.id },
+        metadata: { userId: session.user.id, plan },
       });
     } catch {
       const newCustomer = await stripe.customers.create({
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
         line_items: [{ price: priceId, quantity: 1 }],
         success_url: `${baseUrl}/success`,
         cancel_url: `${baseUrl}/pricing`,
-        metadata: { userId: session.user.id },
+        metadata: { userId: session.user.id, plan },
       });
     }
 

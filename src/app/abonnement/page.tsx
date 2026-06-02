@@ -12,13 +12,21 @@ const FEATURES_GRATUIT = [
   "1 révélation d'email (candidature spontanée)",
 ];
 
+const FEATURES_STANDARD = [
+  "Analyses CV illimitées",
+  "Adaptations CV illimitées",
+  "Export PDF & Word (.docx)",
+  "Recherche d'offres selon votre CV",
+  "20 révélations d'email / mois",
+];
+
 const FEATURES_PREMIUM = [
   "Analyses CV illimitées",
   "Adaptations CV illimitées",
   "Export PDF & Word (.docx)",
   "Préparation aux entretiens",
-  "Recherche d'offres d'emploi selon votre CV",
-  "20 révélations d'email / mois (candidature spontanée)",
+  "Recherche d'offres selon votre CV",
+  "80 révélations d'email / mois",
 ];
 
 function Check({ color = "emerald" }: { color?: "emerald" | "gray" }) {
@@ -35,13 +43,14 @@ function Check({ color = "emerald" }: { color?: "emerald" | "gray" }) {
 export default function PageAbonnement() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
-  const [chargementPlan, setChargementPlan] = useState<"hebdo" | "mensuel" | null>(null);
+  const [chargementPlan, setChargementPlan] = useState<"starter" | "pro" | null>(null);
   const [chargementPortail, setChargementPortail] = useState(false);
   const [erreur, setErreur] = useState("");
 
-  const estAbonne = (session?.user as { isSubscribed?: boolean } | undefined)?.isSubscribed ?? false;
+  const planType = (session?.user as { planType?: string } | undefined)?.planType ?? null;
+  const estAbonne = planType !== null;
 
-  async function souscrire(plan: "hebdo" | "mensuel") {
+  async function souscrire(plan: "starter" | "pro") {
     if (!session) {
       router.push("/register");
       return;
@@ -103,7 +112,6 @@ export default function PageAbonnement() {
       <header className="bg-white border-b border-gray-100">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-1.5">
-            
             <span className="text-base font-bold tracking-tight text-gray-900">JobBoost</span>
           </Link>
           <Link href="/" className="text-sm text-gray-500 hover:text-gray-900 font-medium transition-colors">
@@ -152,19 +160,24 @@ export default function PageAbonnement() {
             </div>
           </div>
 
-          {/* Plan Hebdomadaire */}
+          {/* Plan Standard */}
           <div className={`relative bg-white rounded-2xl p-6 flex flex-col gap-4 ${
-            estAbonne ? "ring-1 ring-gray-200" : "ring-1 ring-gray-200"
+            planType === "starter" ? "ring-2 ring-emerald-400" : "ring-1 ring-gray-200"
           }`}>
+            {planType === "starter" && (
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-xs font-bold px-3 py-0.5 rounded-full">
+                Plan actuel
+              </span>
+            )}
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Hebdomadaire</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Starter</p>
               <div className="flex items-end gap-1">
-                <span className="text-3xl font-extrabold text-gray-900">4,99€</span>
-                <span className="text-gray-400 text-xs mb-1">/sem</span>
+                <span className="text-3xl font-extrabold text-gray-900">9,99€</span>
+                <span className="text-gray-400 text-xs mb-1">/mois</span>
               </div>
             </div>
             <ul className="flex flex-col gap-2 flex-1">
-              {FEATURES_PREMIUM.map((f) => (
+              {FEATURES_STANDARD.map((f) => (
                 <li key={f} className="flex items-center gap-2 text-xs text-gray-600">
                   <Check />
                   {f}
@@ -181,24 +194,32 @@ export default function PageAbonnement() {
               </button>
             ) : (
               <button
-                onClick={() => souscrire("hebdo")}
+                onClick={() => souscrire("starter")}
                 disabled={chargementPlan !== null}
                 className="w-full py-2.5 rounded-xl text-xs font-bold bg-gray-900 text-white hover:bg-gray-700 transition-colors disabled:opacity-60"
               >
-                {chargementPlan === "hebdo" ? "Redirection…" : "Choisir ce plan"}
+                {chargementPlan === "starter" ? "Redirection…" : "Choisir ce plan"}
               </button>
             )}
           </div>
 
-          {/* Plan Mensuel */}
-          <div className="relative bg-white rounded-2xl p-6 flex flex-col gap-4 ring-2 ring-indigo-500">
-            <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs font-bold px-3 py-0.5 rounded-full">
-              Recommandé
-            </span>
+          {/* Plan Premium */}
+          <div className={`relative bg-white rounded-2xl p-6 flex flex-col gap-4 ${
+            planType === "pro" ? "ring-2 ring-emerald-400" : "ring-2 ring-indigo-500"
+          }`}>
+            {planType === "pro" ? (
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-xs font-bold px-3 py-0.5 rounded-full">
+                Plan actuel
+              </span>
+            ) : (
+              <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-indigo-600 text-white text-xs font-bold px-3 py-0.5 rounded-full">
+                Recommandé
+              </span>
+            )}
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-indigo-400 mb-1">Mensuel</p>
+              <p className={`text-xs font-semibold uppercase tracking-widest mb-1 ${planType === "pro" ? "text-gray-400" : "text-indigo-400"}`}>Pro</p>
               <div className="flex items-end gap-1">
-                <span className="text-3xl font-extrabold text-gray-900">9,99€</span>
+                <span className="text-3xl font-extrabold text-gray-900">14,99€</span>
                 <span className="text-gray-400 text-xs mb-1">/mois</span>
               </div>
             </div>
@@ -220,28 +241,20 @@ export default function PageAbonnement() {
               </button>
             ) : (
               <button
-                onClick={() => souscrire("mensuel")}
+                onClick={() => souscrire("pro")}
                 disabled={chargementPlan !== null}
                 className="w-full py-2.5 rounded-xl text-xs font-bold bg-gradient-to-r from-indigo-500 to-violet-500 text-white hover:opacity-90 transition-opacity shadow-sm disabled:opacity-60"
               >
-                {chargementPlan === "mensuel" ? "Redirection…" : "Choisir ce plan"}
+                {chargementPlan === "pro" ? "Redirection…" : "Choisir ce plan"}
               </button>
             )}
           </div>
 
         </div>
 
-        {estAbonne && (
-          <p className="text-center text-xs text-gray-400 mt-8">
-            Paiement sécurisé par Stripe · Résiliation en 1 clic depuis le portail
-          </p>
-        )}
-
-        {!estAbonne && (
-          <p className="text-center text-xs text-gray-400 mt-8">
-            Paiement sécurisé par Stripe · Sans engagement · Résiliation en 1 clic
-          </p>
-        )}
+        <p className="text-center text-xs text-gray-400 mt-8">
+          Paiement sécurisé par Stripe · Sans engagement · Résiliation en 1 clic
+        </p>
       </main>
     </div>
   );

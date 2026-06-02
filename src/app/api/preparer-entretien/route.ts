@@ -38,14 +38,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "CV et offre d'emploi requis." }, { status: 400 });
   }
 
-  // Réservé aux abonnés uniquement
+  // Réservé au plan Premium uniquement
   const { rows: rowsUser } = await pool.query(
-    'SELECT is_subscribed FROM "user" WHERE id = $1',
+    'SELECT plan_type FROM "user" WHERE id = $1',
     [session.user.id]
   );
-  const estAbonne: boolean = rowsUser[0]?.is_subscribed ?? false;
-  if (!estAbonne) {
-    return NextResponse.json({ error: "Fonctionnalité réservée aux abonnés." }, { status: 403 });
+  const planType: string | null = rowsUser[0]?.plan_type ?? null;
+  if (planType !== "pro") {
+    return NextResponse.json({ error: "Fonctionnalité réservée au plan Pro." }, { status: 403 });
   }
 
   // Scraping URL entreprise (silencieux si échec)

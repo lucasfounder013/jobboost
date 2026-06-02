@@ -523,7 +523,7 @@ export default function PagePrincipale() {
               {[
                 {
                   q: "JobBoost est-il vraiment gratuit ?",
-                  r: "Oui. L'analyse CV vs offre (score + mots-clés manquants) est gratuite pour les 5 premières analyses. L'adaptation du CV par l'IA inclut 1 essai gratuit. Au-delà, un abonnement hebdomadaire (4,99 €) ou mensuel (9,99 €) débloque les analyses et adaptations illimitées.",
+                  r: "Oui. L'analyse CV vs offre (score + mots-clés manquants) est gratuite pour les 5 premières analyses. L'adaptation du CV par l'IA inclut 1 essai gratuit. Au-delà, un abonnement Starter (9,99 €/mois) ou Pro (14,99 €/mois) débloque les analyses et adaptations illimitées.",
                 },
                 {
                   q: "Qu'est-ce qu'un ATS et pourquoi est-ce important ?",

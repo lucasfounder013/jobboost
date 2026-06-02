@@ -45,10 +45,10 @@ export async function GET() {
   );
 
   const { rows: userRows } = await pool.query(
-    'SELECT scans, credits, lm_credits, rh_credits, is_subscribed FROM "user" WHERE id = $1',
+    'SELECT scans, credits, lm_credits, rh_credits, is_subscribed, plan_type FROM "user" WHERE id = $1',
     [session.user.id]
   );
-  const utilisateur = userRows[0] ?? { scans: 0, credits: 0, lm_credits: 0, rh_credits: 3, is_subscribed: false };
+  const utilisateur = userRows[0] ?? { scans: 0, credits: 0, lm_credits: 0, rh_credits: 3, is_subscribed: false, plan_type: null };
 
   return NextResponse.json({
     analyses,
@@ -59,5 +59,6 @@ export async function GET() {
     lmCredits: utilisateur.lm_credits,
     rhCredits: utilisateur.rh_credits,
     estAbonne: utilisateur.is_subscribed,
+    planType: utilisateur.plan_type ?? null,
   });
 }

@@ -47,6 +47,10 @@ export const auth = betterAuth({
         defaultValue: 3,
         fieldName: "rh_credits",
       },
+      planType: {
+        type: "string",
+        fieldName: "plan_type",
+      },
     },
   },
   plugins: [nextCookies()],

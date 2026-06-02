@@ -182,6 +182,7 @@ export default function Dashboard() {
   const [creditsRestants, setCreditsRestants] = useState<number | null>(null);
   const [scansRestants, setScansRestants] = useState<number | null>(null);
   const [estAbonne, setEstAbonne] = useState(false);
+  const [planType, setPlanType] = useState<"starter" | "pro" | null>(null);
   const [exportEnCoursAnalyse, setExportEnCoursAnalyse] = useState<"pdf" | "docx" | null>(null);
   const [analyseId, setAnalyseId] = useState<string | null>(null);
   const [nomPosteEnregistre, setNomPosteEnregistre] = useState("");
@@ -313,6 +314,8 @@ export default function Dashboard() {
         setAnalyses(data.analyses ?? []);
         setCvsAdaptes(data.cvsAdaptes ?? []);
         setEntretiens(data.entretiens ?? []);
+        const pt = data.planType as "starter" | "pro" | null ?? null;
+        setPlanType(pt);
         if (data.estAbonne) {
           setEstAbonne(true);
           setScansRestants(null);
@@ -1428,8 +1431,8 @@ export default function Dashboard() {
               <p className="text-gray-400 text-sm mt-1">Générez une roadmap personnalisée pour décrocher le poste.</p>
             </div>
 
-            {!estAbonne ? (
-              /* CTA abonnement */
+            {planType !== "pro" ? (
+              /* CTA upgrade Pro */
               <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-10 flex flex-col items-center text-center gap-5">
                 <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center">
                   <svg className="w-7 h-7 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1437,9 +1440,9 @@ export default function Dashboard() {
                   </svg>
                 </div>
                 <div>
-                  <p className="text-lg font-bold text-gray-900">Fonctionnalité réservée aux abonnés</p>
+                  <p className="text-lg font-bold text-gray-900">Fonctionnalité réservée au plan Pro</p>
                   <p className="text-gray-500 text-sm mt-2 max-w-sm">
-                    La préparation d&apos;entretien est incluse dans l&apos;abonnement JobBoost. Pitch, questions probables, questions à poser et message de relance générés par l&apos;IA.
+                    La préparation d&apos;entretien est incluse dans le plan Pro. Pitch, questions probables, questions à poser et message de relance générés par l&apos;IA.
                   </p>
                 </div>
                 <Link
@@ -1971,6 +1974,13 @@ export default function Dashboard() {
             <div className="mb-8 flex items-start justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Candidature spontanée</h1>
+                {!estAbonne && rhCreditsRestants !== null && (
+                  <p className={`text-sm mt-1 font-medium ${rhCreditsRestants === 0 ? "text-rose-500" : "text-indigo-600"}`}>
+                    {rhCreditsRestants === 0
+                      ? "Plus de crédits ce mois-ci"
+                      : `${rhCreditsRestants} crédit${rhCreditsRestants > 1 ? "s" : ""} restant${rhCreditsRestants > 1 ? "s" : ""}`}
+                  </p>
+                )}
               </div>
               <div className="flex items-center gap-1 bg-gray-100 rounded-xl p-1 shrink-0">
                 <button
