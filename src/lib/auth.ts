@@ -44,7 +44,7 @@ export const auth = betterAuth({
       },
       rhCredits: {
         type: "number",
-        defaultValue: 3,
+        defaultValue: 1,
         fieldName: "rh_credits",
       },
       planType: {
