@@ -226,6 +226,8 @@ export default function Dashboard() {
   const [resultatDirect, setResultatDirect] = useState<{ email: string; certitude: number } | null>(null);
   const [chargementDirect, setChargementDirect] = useState(false);
   const [erreurDirect, setErreurDirect] = useState("");
+  const [contactDirectSauvegardeId, setContactDirectSauvegardeId] = useState<string | null>(null);
+  const [chargementSauvegardeDirect, setChargementSauvegardeDirect] = useState(false);
   type SuggestionEntreprise = { name: string; domain: string; logo: string };
   const [suggestionsRH, setSuggestionsRH] = useState<SuggestionEntreprise[]>([]);
   const [showSuggestionsRH, setShowSuggestionsRH] = useState(false);
@@ -316,17 +318,16 @@ export default function Dashboard() {
         setEntretiens(data.entretiens ?? []);
         const pt = data.planType as "starter" | "pro" | null ?? null;
         setPlanType(pt);
+        setRhCreditsRestants(data.rhCredits ?? 0);
         if (data.estAbonne) {
           setEstAbonne(true);
           setScansRestants(null);
           setCreditsRestants(null);
           setLmCreditsRestants(null);
-          setRhCreditsRestants(null);
         } else {
           setScansRestants(data.scans ?? 0);
           setCreditsRestants(data.credits ?? 0);
           setLmCreditsRestants(data.lmCredits ?? 0);
-          setRhCreditsRestants(data.rhCredits ?? 0);
         }
       })
       .finally(() => setChargementHistorique(false));
@@ -1974,7 +1975,7 @@ export default function Dashboard() {
             <div className="mb-8 flex items-start justify-between">
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Candidature spontanée</h1>
-                {!estAbonne && rhCreditsRestants !== null && (
+                {rhCreditsRestants !== null && (
                   <p className={`text-sm mt-1 font-medium ${rhCreditsRestants === 0 ? "text-rose-500" : "text-indigo-600"}`}>
                     {rhCreditsRestants === 0
                       ? "Plus de crédits ce mois-ci"
@@ -2257,7 +2258,7 @@ export default function Dashboard() {
                   <button
                     onClick={async () => {
                       if (!inputPrenomDirect || !inputNomDirect || !inputEntrepriseDirect) return;
-                      setChargementDirect(true); setErreurDirect(""); setResultatDirect(null);
+                      setChargementDirect(true); setErreurDirect(""); setResultatDirect(null); setContactDirectSauvegardeId(null);
                       try {
                         const res = await fetch("/api/trouver-rh", {
                           method: "POST",
@@ -2300,6 +2301,32 @@ export default function Dashboard() {
                         <><svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>Copié</>
                       ) : (
                         <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>Copier</>
+                      )}
+                    </button>
+                    <button
+                      disabled={!!contactDirectSauvegardeId || chargementSauvegardeDirect}
+                      onClick={async () => {
+                        setChargementSauvegardeDirect(true);
+                        const domaine = inputEntrepriseDirect.replace(/^https?:\/\//i, "").replace(/^www\./i, "").replace(/\/.*$/, "").trim().toLowerCase();
+                        const res = await fetch("/api/contacts-sauvegardes", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ prenom: inputPrenomDirect, nom: inputNomDirect, poste: "", linkedin: "", email: resultatDirect!.email, domaine }),
+                        });
+                        const data = await res.json();
+                        if (data.id) {
+                          setContactDirectSauvegardeId(data.id);
+                          const newContact = { id: data.id, prenom: inputPrenomDirect, nom: inputNomDirect, poste: "", linkedin: "", email: resultatDirect!.email, domaine };
+                          setContactsSauvegardes(prev => [newContact, ...prev]);
+                        }
+                        setChargementSauvegardeDirect(false);
+                      }}
+                      className="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg ring-1 transition-colors disabled:cursor-not-allowed bg-white hover:bg-indigo-50 text-indigo-600 ring-indigo-200 disabled:opacity-50"
+                    >
+                      {contactDirectSauvegardeId ? (
+                        <><svg className="w-3.5 h-3.5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>Sauvegardé</>
+                      ) : (
+                        <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 4a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 20V4z"/></svg>Sauvegarder</>
                       )}
                     </button>
                   </div>
