@@ -1,7 +1,10 @@
 import Link from "next/link";
 import Footer from "@/components/Footer";
 
-export const metadata = { title: "Conditions Générales de Vente — JobBoost" };
+export const metadata = {
+  title: "Conditions Générales de Vente | JobBoost",
+  description: "Consultez les CGV de JobBoost : tarifs, modalités de souscription et de résiliation de nos offres Pro d'optimisation de CV.",
+};
 
 export default function CGV() {
   return (

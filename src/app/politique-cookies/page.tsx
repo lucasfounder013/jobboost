@@ -1,7 +1,10 @@
 import Link from "next/link";
 import Footer from "@/components/Footer";
 
-export const metadata = { title: "Politique de cookies — JobBoost" };
+export const metadata = {
+  title: "Politique de cookies | JobBoost",
+  description: "Informations sur les cookies utilisés par JobBoost : cookies essentiels, analytiques et comment les gérer ou les désactiver.",
+};
 
 export default function PolitiqueCookies() {
   return (

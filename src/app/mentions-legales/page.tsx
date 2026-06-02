@@ -1,7 +1,10 @@
 import Link from "next/link";
 import Footer from "@/components/Footer";
 
-export const metadata = { title: "Mentions légales — JobBoost" };
+export const metadata = {
+  title: "Mentions légales | JobBoost",
+  description: "Mentions légales de JobBoost : éditeur, hébergeur, propriété intellectuelle et responsabilités liées à l'utilisation de l'outil d'optimisation de CV.",
+};
 
 export default function MentionsLegales() {
   return (

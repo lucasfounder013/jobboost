@@ -12,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "JobBoost — Optimisez votre CV",
-  description: "Analysez la correspondance entre votre CV et une offre d'emploi. Score instantané + mots-clés manquants.",
+  title: "Analysez votre CV face à une offre d'emploi | JobBoost",
+  description: "Collez votre CV et une offre d'emploi pour obtenir votre score de correspondance, les mots-clés manquants et un CV adapté en quelques secondes.",
   verification: {
     other: {
       "ahrefs-site-verification": "823a7c82006d70b462570506b8d4daa23b741b165360fe97b16e548e574a0fe9",

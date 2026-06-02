@@ -1,7 +1,10 @@
 import Link from "next/link";
 import Footer from "@/components/Footer";
 
-export const metadata = { title: "Politique de confidentialité — JobBoost" };
+export const metadata = {
+  title: "Politique de confidentialité | JobBoost",
+  description: "Découvrez comment JobBoost collecte, utilise et protège vos données personnelles conformément au RGPD.",
+};
 
 export default function PolitiqueConfidentialite() {
   return (

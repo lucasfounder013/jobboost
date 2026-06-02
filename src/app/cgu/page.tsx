@@ -1,7 +1,10 @@
 import Link from "next/link";
 import Footer from "@/components/Footer";
 
-export const metadata = { title: "Conditions Générales d'Utilisation — JobBoost" };
+export const metadata = {
+  title: "Conditions Générales d'Utilisation | JobBoost",
+  description: "Consultez les CGU de JobBoost : conditions d'accès, droits et obligations des utilisateurs de l'outil d'analyse et d'optimisation de CV.",
+};
 
 export default function CGU() {
   return (
