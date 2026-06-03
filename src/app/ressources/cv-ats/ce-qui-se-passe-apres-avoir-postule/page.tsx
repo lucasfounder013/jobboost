@@ -131,6 +131,9 @@ export default function ArticleCeQuiSePasseApresPostule() {
               Votre mise en page disparaît.
               Ce qui reste, c&apos;est votre contenu.
             </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Pour comprendre exactement ce que contient cette fiche et ce que le recruteur voit dans son interface, consultez notre article sur <Link href="/ressources/cv-ats/ce-que-voit-le-recruteur-dans-son-ats" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">ce que voit vraiment le recruteur dans son ATS</Link>.
+            </p>
 
             {/* Étape 2 */}
             <div id="etape-2-attente" className="mt-16 mb-5">
@@ -179,6 +182,9 @@ export default function ArticleCeQuiSePasseApresPostule() {
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               C&apos;est à cette étape que se joue l&apos;essentiel pour votre candidature. Pas à l&apos;étape du parsing, pas à celle du score, mais ici, quand un humain cherche activement un profil comme le vôtre.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              C&apos;est pourquoi <Link href="/ressources/cv-ats/quest-ce-qu-un-ats" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">l&apos;idée d&apos;un robot qui rejette automatiquement votre CV est un mythe</Link> : c&apos;est toujours un humain qui décide.
             </p>
 
             {/* Étape 4 */}
@@ -253,6 +259,9 @@ export default function ArticleCeQuiSePasseApresPostule() {
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Les mots-clés de l&apos;offre doivent apparaître dans votre CV, ce sont ceux que le recruteur tapera dans sa barre de recherche.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Pour structurer chaque rubrique de votre CV de façon à être trouvé, consultez notre guide sur <Link href="/ressources/cv-ats/rubriques-indispensables-cv-2026" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">les rubriques indispensables d&apos;un CV en 2026</Link>.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               La patience est nécessaire, entre votre candidature et le premier contact il peut se passer plusieurs semaines sans que cela signifie un refus.

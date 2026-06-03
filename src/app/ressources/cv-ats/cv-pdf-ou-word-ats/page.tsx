@@ -123,6 +123,9 @@ export default function ArticlePDFouWord() {
               Il le lit, en extrait le texte, et stocke les informations dans une base de données. Ce processus s&apos;appelle le parsing.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Pour comprendre ce que fait exactement un ATS avec ces informations et comment un recruteur les consulte ensuite, lisez notre article sur <Link href="/ressources/cv-ats/ce-que-voit-le-recruteur-dans-son-ats" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">ce que voit vraiment le recruteur dans son ATS</Link>.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
               Et c&apos;est là que le format de votre fichier devient crucial, pas pour des raisons esthétiques, mais pour des raisons techniques.
             </p>
             <blockquote className="bg-violet-50/40 rounded-xl p-6 my-8 relative">
@@ -201,6 +204,9 @@ export default function ArticlePDFouWord() {
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Si vous ne savez pas, envoyez les deux. Certains recruteurs apprécient d&apos;avoir le choix.
             </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Si vous cherchez d&apos;abord à savoir si une entreprise utilise bien un ATS avant de postuler, notre guide sur <Link href="/ressources/cv-ats/comment-savoir-si-entreprise-utilise-ats" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">comment détecter les ATS avant de postuler</Link> vous donnera des indices concrets.
+            </p>
 
             {/* Section 5 */}
             <h2 id="ce-qui-compte" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
@@ -218,6 +224,9 @@ export default function ArticlePDFouWord() {
                 La vraie question n&apos;est pas PDF ou Word. C&apos;est : est-ce que mon CV est lisible par une machine ?
               </p>
             </blockquote>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Pour savoir exactement quelles rubriques structurer et comment les nommer pour être bien parsé, consultez <Link href="/ressources/cv-ats/rubriques-indispensables-cv-2026" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">les rubriques indispensables d&apos;un CV en 2026</Link>.
+            </p>
 
             {/* Section 6 */}
             <h2 id="regles-mise-en-page" className="text-3xl font-bold text-gray-900 mt-16 mb-5">

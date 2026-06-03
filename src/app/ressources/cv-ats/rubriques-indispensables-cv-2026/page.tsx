@@ -114,6 +114,9 @@ export default function ArticleRubriquesCV() {
               Les ignorer, c&apos;est prendre le risque de ne pas être pris au sérieux. Les mal nommer, c&apos;est risquer de ne pas être trouvé dans une base de données ATS.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Si vous n&apos;avez pas encore lu notre article sur <Link href="/ressources/cv-ats/quest-ce-qu-un-ats" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">le fonctionnement réel d&apos;un ATS</Link>, c&apos;est utile pour comprendre pourquoi ces rubriques comptent autant.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
               Voici ce qui doit figurer sur votre CV en 2026, et dans quel ordre.
             </p>
 
@@ -149,6 +152,9 @@ export default function ArticleRubriquesCV() {
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Et pourtant c&apos;est souvent la première chose qu&apos;un recruteur lit dans une fiche ATS, et le premier mot-clé qu&apos;il tape dans sa barre de recherche.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Pour comprendre exactement comment un recruteur navigue dans son ATS et ce qu&apos;il voit en premier, notre article sur <Link href="/ressources/cv-ats/ce-que-voit-le-recruteur-dans-son-ats" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">ce que voit vraiment le recruteur dans son interface</Link> vous donnera une vision concrète.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Votre titre de poste doit correspondre exactement au poste que vous visez, pas à votre titre officiel si celui-ci est peu lisible ou propre à votre entreprise.
@@ -239,6 +245,9 @@ export default function ArticleRubriquesCV() {
                 Vos compétences en étoiles ou en barres sont invisibles pour un ATS. Seul le texte compte.
               </p>
             </blockquote>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Sur le lien entre format de fichier et lisibilité machine, notre article sur <Link href="/ressources/cv-ats/cv-pdf-ou-word-ats" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">PDF ou Word pour les ATS</Link> explique aussi pourquoi certaines mises en page compliquent le parsing.
+            </p>
 
             {/* Section 7 */}
             <h2 id="langues" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
@@ -286,6 +295,9 @@ export default function ArticleRubriquesCV() {
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Et adaptez le contenu de chaque rubrique aux mots-clés de l&apos;offre à laquelle vous postulez.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Pour comprendre ce qui se passe une fois votre CV reçu par l&apos;entreprise, lisez <Link href="/ressources/cv-ats/ce-qui-se-passe-apres-avoir-postule" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">ce qui se passe vraiment après avoir postulé</Link>.
             </p>
 
             {/* Section 10 */}

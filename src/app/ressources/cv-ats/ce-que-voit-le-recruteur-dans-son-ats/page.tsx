@@ -125,6 +125,9 @@ export default function ArticleCeQueVoitLeRecruteur() {
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Tout le monde a la même fiche. Peu importe si votre CV original était sobre ou créatif, en une colonne ou deux, avec ou sans photo.
             </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Ce processus de parsing et ce qu&apos;il fait réellement sont expliqués dans notre article sur <Link href="/ressources/cv-ats/quest-ce-qu-un-ats" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">ce qu&apos;est vraiment un ATS</Link>.
+            </p>
             <blockquote className="bg-violet-50/40 rounded-xl p-6 my-8 relative">
               <span className="text-violet-200 text-6xl font-serif absolute top-3 left-5 leading-none select-none">&ldquo;</span>
               <p className="text-gray-700 italic leading-8 pt-4 text-lg">
@@ -196,6 +199,9 @@ export default function ArticleCeQueVoitLeRecruteur() {
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Mais seulement à cette étape. Seulement si vous avez d&apos;abord été trouvé.
             </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Pour une vue complète de ce parcours, de la réception de votre candidature jusqu&apos;au premier contact, lisez <Link href="/ressources/cv-ats/ce-qui-se-passe-apres-avoir-postule" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">ce qui se passe vraiment après avoir postulé</Link>.
+            </p>
 
             {/* Section 5 */}
             <h2 id="ne-voit-pas" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
@@ -230,6 +236,9 @@ export default function ArticleCeQueVoitLeRecruteur() {
               <li><strong>Vos compétences</strong>, listées en texte, pas en graphiques.</li>
               <li><strong>Vos coordonnées</strong>, dans le corps du document, pas dans l&apos;en-tête.</li>
             </ul>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Pour une liste complète des rubriques à inclure et comment les nommer pour les ATS, consultez <Link href="/ressources/cv-ats/rubriques-indispensables-cv-2026" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">les rubriques indispensables d&apos;un CV en 2026</Link>.
+            </p>
 
             {/* Section 7 */}
             <h2 id="ce-que-fait-jobboost" className="text-3xl font-bold text-gray-900 mt-16 mb-5">

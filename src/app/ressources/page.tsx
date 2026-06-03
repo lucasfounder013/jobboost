@@ -7,6 +7,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 8,
+    categorie: "CV & ATS",
+    titre: "Mots-clés CV Chef de Projet : liste complète 2026 pour passer les ATS",
+    extrait:
+      "30+ mots-clés indispensables organisés par catégorie, avec des exemples concrets pour les intégrer naturellement dans votre CV.",
+    slug: "/ressources/cv-ats/mots-cles-cv-chef-de-projet",
+    date: "3 juin 2026",
+  },
+  {
     id: 7,
     categorie: "CV & ATS",
     titre: "Les rubriques indispensables d'un CV en 2026",

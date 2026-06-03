@@ -113,6 +113,9 @@ export default function ArticleSavoirSiATS() {
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Et cette information change votre façon de préparer votre candidature.
             </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Si vous n&apos;êtes pas encore familier avec le fonctionnement d&apos;un ATS, notre article sur <Link href="/ressources/cv-ats/quest-ce-qu-un-ats" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">ce qu&apos;est vraiment un ATS</Link> est un bon point de départ avant de lire celui-ci.
+            </p>
 
             {/* Section 1 */}
             <h2 id="url-candidature" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
@@ -139,6 +142,9 @@ export default function ArticleSavoirSiATS() {
             </ul>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Si l&apos;URL vous redirige vers un domaine que vous ne reconnaissez pas, cherchez le nom de domaine sur Google. La plupart du temps vous trouverez rapidement de quel ATS il s&apos;agit.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Pour en savoir plus sur les caractéristiques de chaque ATS et ce qu&apos;ils changent concrètement, consultez notre article sur <Link href="/ressources/cv-ats/ats-les-plus-utilises-en-france" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">les ATS les plus utilisés en France</Link>.
             </p>
             <blockquote className="bg-violet-50/40 rounded-xl p-6 my-8 relative">
               <span className="text-violet-200 text-6xl font-serif absolute top-3 left-5 leading-none select-none">&ldquo;</span>
@@ -223,6 +229,9 @@ export default function ArticleSavoirSiATS() {
                 ATS ou pas, un CV adapté à l&apos;offre est toujours plus efficace qu&apos;un CV générique.
               </p>
             </blockquote>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Pour comprendre précisément ce qui se passe entre votre candidature et le premier contact du recruteur, lisez notre article sur <Link href="/ressources/cv-ats/ce-qui-se-passe-apres-avoir-postule" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">ce qui se passe vraiment après avoir postulé</Link>.
+            </p>
 
             {/* Section 6 */}
             <h2 id="jobboost" className="text-3xl font-bold text-gray-900 mt-16 mb-5">

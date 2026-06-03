@@ -121,10 +121,13 @@ export default function ArticleATS() {
               Un ATS, Applicant Tracking System, est avant tout une base de données.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Quand vous postulez en ligne, votre CV est reçu, lu et découpé par le logiciel. Il en extrait les informations clés : nom, coordonnées, expériences, formations, compétences. C&apos;est ce qu&apos;on appelle le "parsing".
+              Quand vous postulez en ligne, votre CV est reçu, lu et découpé par le logiciel. Il en extrait les informations clés : nom, coordonnées, expériences, formations, compétences. C&apos;est ce qu&apos;on appelle le &ldquo;parsing&rdquo;.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Ces informations sont ensuite stockées dans une fiche candidat, dans une base de données consultable par le recruteur.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Pour comprendre exactement ce que voit le recruteur dans cette fiche, consultez notre article sur <Link href="/ressources/cv-ats/ce-que-voit-le-recruteur-dans-son-ats" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">ce que voit vraiment le recruteur dans son ATS</Link>.
             </p>
             <blockquote className="bg-violet-50/40 rounded-xl p-6 my-8 relative">
               <span className="text-violet-200 text-6xl font-serif absolute top-3 left-5 leading-none select-none">&ldquo;</span>
@@ -164,7 +167,7 @@ export default function ArticleATS() {
               C&apos;est là que la désinformation est la plus répandue.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Certains outils, dont des concurrents directs de JobBoost, vous donnent un score "compatibilité ATS" de 67%, 82%, 94%... en vous laissant croire que l&apos;ATS de l&apos;entreprise calcule ce même score et élimine votre CV s&apos;il est trop bas.
+              Certains outils, dont des concurrents directs de JobBoost, vous donnent un score &ldquo;compatibilité ATS&rdquo; de 67%, 82%, 94%... en vous laissant croire que l&apos;ATS de l&apos;entreprise calcule ce même score et élimine votre CV s&apos;il est trop bas.
             </p>
             <blockquote className="bg-violet-50/40 rounded-xl p-6 my-8 relative">
               <span className="text-violet-200 text-6xl font-serif absolute top-3 left-5 leading-none select-none">&ldquo;</span>
@@ -207,7 +210,7 @@ export default function ArticleATS() {
               Si l&apos;ennemi n&apos;est pas un robot mais une barre de recherche humaine, la stratégie change.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Il ne s&apos;agit pas de "battre un algorithme". Il s&apos;agit de parler le même langage que le recruteur qui cherche votre profil.
+              Il ne s&apos;agit pas de &ldquo;battre un algorithme&rdquo;. Il s&apos;agit de parler le même langage que le recruteur qui cherche votre profil.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Concrètement :
@@ -217,6 +220,9 @@ export default function ArticleATS() {
               <li>Privilégiez un format simple et lisible (le parsing rate les tableaux et les colonnes)</li>
               <li>Adaptez votre CV à chaque offre, pas de façon robotique, mais naturelle</li>
             </ul>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Sur la question du format, PDF ou Word, <Link href="/ressources/cv-ats/cv-pdf-ou-word-ats" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">notre comparatif sur le format de CV le mieux parsé par les ATS</Link> vous donnera une réponse claire.
+            </p>
             <blockquote className="bg-violet-50/40 rounded-xl p-6 my-8 relative">
               <span className="text-violet-200 text-6xl font-serif absolute top-3 left-5 leading-none select-none">&ldquo;</span>
               <p className="text-gray-700 italic leading-8 pt-4 text-lg">
@@ -264,6 +270,9 @@ export default function ArticleATS() {
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Il y a un recruteur qui cherche des mots-clés, et votre CV doit contenir les bons.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Pour comprendre toutes les étapes entre votre candidature et le premier appel du recruteur, lisez <Link href="/ressources/cv-ats/ce-qui-se-passe-apres-avoir-postule" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">ce qui se passe vraiment après avoir postulé</Link>.
             </p>
 
             <div className="mt-16 pt-10 border-t border-gray-100">

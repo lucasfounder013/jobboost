@@ -109,6 +109,9 @@ export default function ArticleATSLesPlusUtilises() {
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Mais tous les ATS ne fonctionnent pas exactement de la même façon. Et savoir lequel utilise l&apos;entreprise où vous postulez peut vous donner une longueur d&apos;avance.
             </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Si vous n&apos;avez pas encore lu notre article sur <Link href="/ressources/cv-ats/quest-ce-qu-un-ats" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">ce qu&apos;est vraiment un ATS</Link>, commencez par là pour comprendre les bases.
+            </p>
 
             {/* Section 1 */}
             <h2 id="savoir-quel-ats" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
@@ -128,6 +131,9 @@ export default function ArticleATSLesPlusUtilises() {
             </ul>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Pour les grandes entreprises françaises, l&apos;URL de la page carrière suffit souvent à identifier le logiciel utilisé.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Pour aller plus loin sur cette méthode de détection, nous avons consacré un guide complet à <Link href="/ressources/cv-ats/comment-savoir-si-entreprise-utilise-ats" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">comment savoir si une entreprise utilise un ATS avant de postuler</Link>.
             </p>
             <blockquote className="bg-violet-50/40 rounded-xl p-6 my-8 relative">
               <span className="text-violet-200 text-6xl font-serif absolute top-3 left-5 leading-none select-none">&ldquo;</span>
@@ -233,6 +239,9 @@ export default function ArticleATSLesPlusUtilises() {
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Mais le vrai travail reste le même partout : un CV dont le contenu correspond à ce que le recruteur cherche.
+            </p>
+            <p className="text-gray-700 leading-8 mb-6 text-lg">
+              Pour une liste complète de ces rubriques et comment les optimiser quel que soit l&apos;ATS, consultez notre guide sur <Link href="/ressources/cv-ats/rubriques-indispensables-cv-2026" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">les rubriques indispensables d&apos;un CV en 2026</Link>.
             </p>
 
             {/* Section 8 */}
