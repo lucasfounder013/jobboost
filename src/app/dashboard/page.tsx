@@ -281,6 +281,16 @@ function DashboardInner() {
     }
   }, [session, posthog]);
 
+  // ── Plan utilisateur en propriété PostHog (filtre cohorte free/payant)
+  useEffect(() => {
+    if (planType !== undefined) {
+      posthog?.setPersonProperties({
+        plan: planType ?? "free",
+        est_abonne: estAbonne,
+      });
+    }
+  }, [planType, estAbonne, posthog]);
+
   // ── Réinitialiser l'onglet du drawer à chaque ouverture
   useEffect(() => {
     if (analyseOuverte) setOngletAnalyse("resultats");

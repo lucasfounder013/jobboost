@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer";
 import { useSession } from "@/lib/auth-client";
+import { usePostHog } from "posthog-js/react";
 
 const FEATURES_GRATUIT = [
   "5 analyses CV offertes",
@@ -51,10 +52,12 @@ function PlanPayant({ plan, label, prix, features, recommande }: {
   const { data: session } = useSession();
   const router = useRouter();
   const [chargement, setChargement] = useState(false);
+  const posthog = usePostHog();
 
   async function souscrire() {
     if (!session) { router.push("/register"); return; }
     setChargement(true);
+    posthog?.capture("checkout_started", { plan });
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",

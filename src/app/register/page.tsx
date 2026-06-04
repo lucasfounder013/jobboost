@@ -4,6 +4,7 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signUp } from "@/lib/auth-client";
+import { usePostHog } from "posthog-js/react";
 
 const TEMOIGNAGE = {
   citation: "L'adaptation automatique est bluffante. Mon CV correspond maintenant exactement au vocabulaire de l'offre. J'ai eu 3 entretiens en deux semaines.",
@@ -21,6 +22,7 @@ function FormulaireInscription() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectApres = searchParams.get("redirect");
+  const posthog = usePostHog();
 
   async function soumettreFormulaire(e: React.FormEvent) {
     e.preventDefault();
@@ -52,6 +54,8 @@ function FormulaireInscription() {
             : "Une erreur est survenue. Veuillez réessayer."
         );
       } else {
+        posthog?.identify(email, { email, name: nom });
+        posthog?.capture("user_registered", { redirect: redirectApres ?? "/dashboard" });
         router.push(redirectApres ?? "/dashboard");
       }
     } catch {
