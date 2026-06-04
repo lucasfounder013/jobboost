@@ -83,71 +83,71 @@ export default function PagePrincipale() {
 
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-xl border-b border-white/60 shadow-sm shadow-indigo-50">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between w-full">
+        {/* Bandeau scrollable horizontalement sur mobile, fixe sur desktop */}
+        <div className="overflow-x-auto scrollbar-hide sm:overflow-x-visible">
+          <div className="min-w-max sm:min-w-0 max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center gap-1 sm:justify-between">
 
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 group">
-
-            <span className="text-lg font-extrabold tracking-tight text-gray-900 group-hover:text-indigo-600 transition-colors duration-200">
-              JobBoost
-            </span>
-          </Link>
-
-          {/* Nav */}
-          <nav className="flex items-center gap-1 text-sm">
-            <Link
-              href="/ressources"
-              className="hidden sm:block px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150"
-            >
-              Ressources
-            </Link>
-            <Link
-              href="/pricing"
-              className="hidden sm:block px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150"
-            >
-              Tarifs
+            {/* Logo */}
+            <Link href="/" className="flex items-center gap-2 group flex-shrink-0 mr-4">
+              <span className="text-lg font-extrabold tracking-tight text-gray-900 group-hover:text-indigo-600 transition-colors duration-200">
+                JobBoost
+              </span>
             </Link>
 
-            {session ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  className="px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150 hidden sm:block"
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  href="/abonnement"
-                  className="px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150 hidden sm:block"
-                >
-                  Mon abonnement
-                </Link>
-                <span className="text-gray-300 mx-1 hidden sm:block">·</span>
-                <span className="text-gray-400 text-sm font-medium hidden sm:block">{session.user.email}</span>
-                <button
-                  onClick={() => signOut()}
-                  className="ml-2 px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150"
-                >
-                  Déconnexion
-                </button>
-              </>
-            ) : (
-              <div className="flex items-center gap-2 ml-2">
-                <Link
-                  href="/login"
-                  className="px-3 py-2 rounded-lg text-gray-600 hover:text-gray-900 font-semibold transition-colors duration-150"
-                >
-                  Connexion
-                </Link>
-                <Link
-                  href="/register"
-                  className="hidden sm:block bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white px-5 py-2 rounded-xl font-bold text-sm shadow-lg shadow-indigo-200/60 hover:shadow-indigo-300/60 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                >
-                  S&apos;inscrire gratuitement
-                </Link>
-              </div>
-            )}
-          </nav>
+            {/* Nav */}
+            <nav className="flex items-center gap-1 text-sm">
+              <Link
+                href="/ressources"
+                className="px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150 whitespace-nowrap"
+              >
+                Ressources
+              </Link>
+              <Link
+                href="/pricing"
+                className="px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150 whitespace-nowrap"
+              >
+                Tarifs
+              </Link>
+
+              {session ? (
+                <>
+                  <Link
+                    href="/dashboard"
+                    className="px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150 whitespace-nowrap"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/abonnement"
+                    className="px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150 whitespace-nowrap hidden sm:block"
+                  >
+                    Mon abonnement
+                  </Link>
+                  <button
+                    onClick={() => signOut()}
+                    className="ml-2 px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150 whitespace-nowrap"
+                  >
+                    Déconnexion
+                  </button>
+                </>
+              ) : (
+                <div className="flex items-center gap-2 ml-2">
+                  <Link
+                    href="/login"
+                    className="px-3 py-2 rounded-lg text-gray-600 hover:text-gray-900 font-semibold transition-colors duration-150 whitespace-nowrap"
+                  >
+                    Connexion
+                  </Link>
+                  <Link
+                    href="/register"
+                    className="bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white px-5 py-2 rounded-xl font-bold text-sm shadow-lg shadow-indigo-200/60 hover:shadow-indigo-300/60 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200 whitespace-nowrap"
+                  >
+                    S&apos;inscrire gratuitement
+                  </Link>
+                </div>
+              )}
+            </nav>
+          </div>
         </div>
       </header>
 
