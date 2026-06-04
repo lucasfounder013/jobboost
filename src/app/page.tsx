@@ -212,44 +212,74 @@ export default function PagePrincipale() {
               </p>
             </div>
 
-            <div className="flex items-start gap-6 xl:gap-10">
+            <div className="flex items-stretch gap-6 xl:gap-10">
 
               {/* Annotations gauche */}
-              <div className="w-44 xl:w-52 shrink-0 hidden lg:flex flex-col text-right">
+              <div className="w-48 xl:w-56 shrink-0 hidden lg:block relative">
                 {ongletCV === "avant" ? (
                   <>
-                    <div className="pt-[88px] pb-5">
-                      <p className="text-xs italic leading-snug text-red-500">✕ Titre vague, aucun mot-clé ATS. Le poste exact n&apos;apparaît pas.</p>
+                    {/* → badge "Chef de projet" */}
+                    <div className="absolute top-[185px] right-0 w-full text-right">
+                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ Titre vague, aucun mot-clé ATS. Le poste exact n&apos;apparaît pas.</p>
+                      </span>
                     </div>
-                    <div className="pb-5">
-                      <p className="text-xs italic leading-snug text-red-500">✕ &ldquo;Motivée&rdquo; est un buzzword. Aucune preuve chiffrée.</p>
+                    {/* → texte résumé "Motivée", "passionnée"... */}
+                    <div className="absolute top-[295px] right-0 w-full text-right">
+                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ &ldquo;Motivée&rdquo; est un buzzword. Aucune preuve chiffrée.</p>
+                      </span>
                     </div>
-                    <div className="pb-5">
-                      <p className="text-xs italic leading-snug text-red-500">✕ Compétences génériques non indexées par les ATS.</p>
+                    {/* → section Compétences clés */}
+                    <div className="absolute top-[400px] right-0 w-full text-right">
+                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ Compétences génériques non indexées par les ATS.</p>
+                      </span>
                     </div>
-                    <div className="pb-5">
-                      <p className="text-xs italic leading-snug text-red-500">✕ Tâche basique que tout candidat peut écrire. Aucun résultat.</p>
+                    {/* → premier bullet Acme */}
+                    <div className="absolute top-[492px] right-0 w-full text-right">
+                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ Tâche basique que tout candidat peut écrire. Aucun résultat.</p>
+                      </span>
                     </div>
-                    <div>
-                      <p className="text-xs italic leading-snug text-red-500">✕ Aucun outil cité (JIRA ? Trello ?). Impossible à évaluer.</p>
+                    {/* → dernier bullet Acme */}
+                    <div className="absolute top-[580px] right-0 w-full text-right">
+                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ Aucun outil cité (JIRA ? Trello ?). Impossible à évaluer.</p>
+                      </span>
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="pt-[88px] pb-5">
-                      <p className="text-xs italic leading-snug text-emerald-600">✓ Titre aligné mot pour mot avec l&apos;offre d&apos;emploi visée.</p>
+                    {/* → titre "Chef de projet digital — Transformation..." */}
+                    <div className="absolute top-[95px] right-0 w-full text-right">
+                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Titre aligné mot pour mot avec l&apos;offre d&apos;emploi visée.</p>
+                      </span>
                     </div>
-                    <div className="pb-5">
-                      <p className="text-xs italic leading-snug text-emerald-600">✓ Résumé chiffré. La valeur ajoutée est visible en 3 secondes.</p>
+                    {/* → profil chiffré "6 ans, 250K€, 94%" */}
+                    <div className="absolute top-[188px] right-0 w-full text-right">
+                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Résumé chiffré. La valeur ajoutée est visible en 3 secondes.</p>
+                      </span>
                     </div>
-                    <div className="pb-5">
-                      <p className="text-xs italic leading-snug text-emerald-600">✓ Compétences techniques recherchées par les ATS du secteur.</p>
+                    {/* → bullet Acme "3 projets, budget 250K€, 94% dans les délais" */}
+                    <div className="absolute top-[295px] right-0 w-full text-right">
+                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Budget + taux de livraison = preuve de résultat concret.</p>
+                      </span>
                     </div>
-                    <div className="pb-5">
-                      <p className="text-xs italic leading-snug text-emerald-600">✓ Budget + taux de livraison = preuve de résultat concret.</p>
+                    {/* → bullet Acme "sprints Agile, 8 équipes, JIRA" + bullet KPI */}
+                    <div className="absolute top-[400px] right-0 w-full text-right">
+                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Outils nommés + méthode = scope de responsabilité immédiat.</p>
+                      </span>
                     </div>
-                    <div>
-                      <p className="text-xs italic leading-snug text-emerald-600">✓ Outils nommés + méthode = scope de responsabilité immédiat.</p>
+                    {/* → section Compétences (Agile/Scrum, JIRA, KPI...) */}
+                    <div className="absolute top-[495px] right-0 w-full text-right">
+                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Compétences techniques recherchées par les ATS du secteur.</p>
+                      </span>
                     </div>
                   </>
                 )}
@@ -495,41 +525,71 @@ export default function PagePrincipale() {
               </div>
 
               {/* Annotations droite */}
-              <div className="w-44 xl:w-52 shrink-0 hidden lg:flex flex-col text-left">
+              <div className="w-48 xl:w-56 shrink-0 hidden lg:block relative">
                 {ongletCV === "avant" ? (
                   <>
-                    <div className="pt-[88px] pb-5">
-                      <p className="text-xs italic leading-snug text-red-500">✕ Résumé sans chiffre. Les recruteurs ignorent ce type de profil en 3 s.</p>
+                    {/* → corps du résumé professionnel */}
+                    <div className="absolute top-[290px] left-0 w-full">
+                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ Résumé sans chiffre. Les recruteurs ignorent ce type de profil en 3 s.</p>
+                      </span>
                     </div>
-                    <div className="pb-5">
-                      <p className="text-xs italic leading-snug text-red-500">✕ &ldquo;Synergique&rdquo;, &ldquo;team player&rdquo; : mots vides non indexés par les ATS.</p>
+                    {/* → section Compétences clés (pills génériques) */}
+                    <div className="absolute top-[390px] left-0 w-full">
+                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ Aucun outil cité (JIRA ? Asana ?). Niveau de compétence non évaluable.</p>
+                      </span>
                     </div>
-                    <div className="pb-5">
-                      <p className="text-xs italic leading-snug text-red-500">✕ Aucun outil cité (JIRA ? Asana ?). Niveau de compétence non évaluable.</p>
+                    {/* → bullets Acme (tâches vagues) */}
+                    <div className="absolute top-[480px] left-0 w-full">
+                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ Tâche vague. Aucune méthodologie ni scope de responsabilité.</p>
+                      </span>
                     </div>
-                    <div className="pb-5">
-                      <p className="text-xs italic leading-snug text-red-500">✕ Tâche vague. Aucune méthodologie ni scope de responsabilité.</p>
+                    {/* → bullet StartupXYZ "synergiques" */}
+                    <div className="absolute top-[560px] left-0 w-full">
+                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ &ldquo;Synergique&rdquo;, &ldquo;team player&rdquo; : mots vides non indexés par les ATS.</p>
+                      </span>
                     </div>
-                    <div>
-                      <p className="text-xs italic leading-snug text-red-500">✕ Aucun résultat chiffré. Impossible de mesurer la valeur ajoutée.</p>
+                    {/* → bullets StartupXYZ / Conseil Régional (aucun chiffre) */}
+                    <div className="absolute top-[640px] left-0 w-full">
+                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ Aucun résultat chiffré. Impossible de mesurer la valeur ajoutée.</p>
+                      </span>
                     </div>
                   </>
                 ) : (
                   <>
-                    <div className="pt-[88px] pb-5">
-                      <p className="text-xs italic leading-snug text-emerald-600">✓ Chiffres + certification = crédibilité immédiate pour les recruteurs.</p>
+                    {/* → profil "6 ans, 250K€, 94%, PMP, PSM I" */}
+                    <div className="absolute top-[185px] left-0 w-full">
+                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Chiffres + certification = crédibilité immédiate pour les recruteurs.</p>
+                      </span>
                     </div>
-                    <div className="pb-5">
-                      <p className="text-xs italic leading-snug text-emerald-600">✓ Mots-clés sectoriels détectés et indexés par tous les ATS.</p>
+                    {/* → bullet Acme "sprints Agile, 8 équipes, JIRA" */}
+                    <div className="absolute top-[295px] left-0 w-full">
+                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Outils nommés + impact = preuve de valeur immédiatement visible.</p>
+                      </span>
                     </div>
-                    <div className="pb-5">
-                      <p className="text-xs italic leading-snug text-emerald-600">✓ Outils nommés + impact = preuve de valeur immédiatement visible.</p>
+                    {/* → bullet Acme "tableaux de bord KPI, -40%" */}
+                    <div className="absolute top-[390px] left-0 w-full">
+                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ KPIs + chiffre d&apos;impact = preuve de contribution mesurable.</p>
+                      </span>
                     </div>
-                    <div className="pb-5">
-                      <p className="text-xs italic leading-snug text-emerald-600">✓ Méthode Agile + taille d&apos;équipe = scope de responsabilité clair.</p>
+                    {/* → bullet StartupXYZ "roadmap, 12 sprints, -25%" */}
+                    <div className="absolute top-[480px] left-0 w-full">
+                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Méthode Agile + taille d&apos;équipe = scope de responsabilité clair.</p>
+                      </span>
                     </div>
-                    <div>
-                      <p className="text-xs italic leading-snug text-emerald-600">✓ KPIs + chiffre d&apos;impact = preuve de contribution mesurable.</p>
+                    {/* → section Compétences (Agile/Scrum, JIRA, KPI...) */}
+                    <div className="absolute top-[565px] left-0 w-full">
+                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
+                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Mots-clés sectoriels détectés et indexés par tous les ATS.</p>
+                      </span>
                     </div>
                   </>
                 )}
