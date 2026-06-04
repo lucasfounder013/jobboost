@@ -223,7 +223,6 @@ function DashboardInner() {
   const [emailsSauvegardesEchec, setEmailsSauvegardesEchec] = useState<Record<string, boolean>>({});
   const [pageProspects, setPageProspects] = useState(0);
   const PROSPECTS_PAR_PAGE = 20;
-  const [sousModRH, setSousModRH] = useState<"entreprise" | "personne">("entreprise");
   const [inputPrenomDirect, setInputPrenomDirect] = useState("");
   const [inputNomDirect, setInputNomDirect] = useState("");
   const [inputEntrepriseDirect, setInputEntrepriseDirect] = useState("");
@@ -2095,22 +2094,6 @@ function DashboardInner() {
             {/* Contenu principal : recherche */}
             {vueRH === "recherche" && (<div>
 
-            {/* Onglets Par entreprise / Par personne */}
-            <div className="flex gap-1 mb-5 bg-gray-100 p-1 rounded-xl">
-              <button
-                onClick={() => setSousModRH("entreprise")}
-                className={`flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all ${sousModRH === "entreprise" ? "bg-white text-indigo-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-              >
-                Par entreprise
-              </button>
-              <button
-                onClick={() => { setSousModRH("personne"); setResultatDirect(null); setErreurDirect(""); }}
-                className={`flex-1 py-2 px-3 rounded-lg text-sm font-semibold transition-all ${sousModRH === "personne" ? "bg-white text-indigo-700 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-              >
-                Par personne
-              </button>
-            </div>
-
             {/* Compteur crédits */}
             {rhCreditsRestants !== null && (
               <div className={`mb-5 flex items-center gap-3 px-5 py-3.5 rounded-2xl ${(rhCreditsRestants ?? 0) === 0 ? "bg-rose-50 ring-1 ring-rose-200" : "bg-gradient-to-r from-indigo-50 to-violet-50 ring-1 ring-indigo-100"}`}>
@@ -2133,98 +2116,8 @@ function DashboardInner() {
               </div>
             )}
 
-            {/* Formulaire mode "Par entreprise" */}
-            {sousModRH === "entreprise" && (
-              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6 mb-6">
-                <p className="text-sm font-semibold text-gray-700 mb-4">Trouvez les contacts d&apos;une entreprise</p>
-                <div className="flex flex-col gap-3">
-                  <div ref={suggestionRefRH} className="relative">
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Nom de l&apos;entreprise</label>
-                    <input
-                      type="text"
-                      value={inputEntrepriseRH}
-                      onChange={e => { setInputEntrepriseRH(e.target.value); setInputDomaineRH(""); setDomainResoluRH(""); }}
-                      onFocus={() => { if (suggestionsRH.length > 0) setShowSuggestionsRH(true); }}
-                      placeholder="Ex : L'Oréal, BNP Paribas, Capgemini..."
-                      className="w-full px-4 py-2.5 rounded-xl ring-1 ring-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
-                    />
-                    {showSuggestionsRH && suggestionsRH.length > 0 && (
-                      <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-xl ring-1 ring-gray-200 overflow-hidden">
-                        {suggestionsRH.map((s) => (
-                          <button
-                            key={s.domain}
-                            type="button"
-                            onMouseDown={e => { e.preventDefault(); setInputEntrepriseRH(s.name); setDomainResoluRH(s.domain); setInputDomaineRH(s.domain); setShowSuggestionsRH(false); }}
-                            className="flex items-center gap-3 w-full px-4 py-2.5 hover:bg-indigo-50 transition-colors text-left"
-                          >
-                            <div className="flex-1 min-w-0">
-                              <span className="text-sm font-semibold text-gray-900">{s.name}</span>
-                              <span className="text-xs text-gray-400 ml-2">{s.domain}</span>
-                            </div>
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-gray-400">
-                    <div className="flex-1 h-px bg-gray-200" />
-                    <span>ou domaine direct</span>
-                    <div className="flex-1 h-px bg-gray-200" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 block">Domaine (si connu)</label>
-                    <input
-                      type="text"
-                      value={inputDomaineRH}
-                      onChange={e => { setInputDomaineRH(e.target.value); setInputEntrepriseRH(""); setDomainResoluRH(""); }}
-                      placeholder="Ex : loreal.com, bnpparibas.com..."
-                      className="w-full px-4 py-2.5 rounded-xl ring-1 ring-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
-                    />
-                  </div>
-                  <button
-                    onClick={async () => {
-                      if (!inputEntrepriseRH && !inputDomaineRH) return;
-                      setChargementRH(true); setErreurRH(""); setResultatsRH([]); setDomaineTrouveRH(""); setEmailsReveles({}); setEmailChargement({}); setEmailsEchec({}); setPageProspects(0);
-                      try {
-                        const res = await fetch("/api/trouver-rh", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({ mode: "domaine", entreprise: domainResoluRH ? undefined : (inputEntrepriseRH || undefined), domaine: domainResoluRH || inputDomaineRH || undefined }),
-                        });
-                        const data = await res.json();
-                        if (!res.ok) { setErreurRH(data.error ?? "Erreur lors de la recherche."); return; }
-                        const contacts: ContactRH[] = data.contacts ?? [];
-                        setResultatsRH(contacts);
-                        setDomaineTrouveRH(data.domaineTrouve ?? "");
-                        if (data.rhCreditsRestants !== undefined && data.rhCreditsRestants !== null) setRhCreditsRestants(data.rhCreditsRestants);
-                        // Pré-populer les emails déjà connus (domain emails sans profil)
-                        const preReveles: Record<number, { email: string; certitude: number }> = {};
-                        contacts.forEach((c, idx) => { if (c.email) preReveles[idx] = { email: c.email, certitude: 0 }; });
-                        if (Object.keys(preReveles).length > 0) setEmailsReveles(preReveles);
-                      } catch { setErreurRH("Erreur réseau. Veuillez réessayer."); }
-                      finally { setChargementRH(false); }
-                    }}
-                    disabled={chargementRH || (!inputEntrepriseRH && !inputDomaineRH)}
-                    className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold text-sm py-2.5 px-4 rounded-xl transition-all shadow-lg shadow-indigo-900/10 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {chargementRH ? (
-                      <>
-                        <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                        </svg>
-                        Recherche en cours...
-                      </>
-                    ) : "Rechercher"}
-                  </button>
-                </div>
-              </div>
-            )}
-
-
-            {/* Formulaire mode "Par personne" */}
-            {sousModRH === "personne" && (
-              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6 mb-6">
+            {/* Formulaire recherche par personne */}
+            <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6 mb-6">
                 <p className="text-sm font-semibold text-gray-700 mb-4">Trouver l&apos;adresse email d&apos;une personne</p>
                 <div className="flex flex-col gap-3">
                   <div className="grid grid-cols-2 gap-3">
@@ -2336,18 +2229,9 @@ function DashboardInner() {
                   </div>
                 )}
               </div>
-            )}
 
-            {/* Message d'erreur (mode entreprise) */}
-            {sousModRH === "entreprise" && erreurRH && (
-              <div className="mb-5 flex items-start gap-3 bg-rose-50 text-rose-700 rounded-xl px-4 py-3 text-sm ring-1 ring-rose-200">
-                <svg className="w-4 h-4 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                {erreurRH}
-              </div>
-            )}
-
-            {/* Résultats (mode entreprise) */}
-            {sousModRH === "entreprise" && resultatsRH.length > 0 && (() => {
+            {/* Résultats (mode entreprise) — supprimé */}
+            {false && (() => {
               const nbEchecs = Object.values(emailsEchec).filter(Boolean).length;
               const emailsIndisponibles = nbEchecs >= 5;
               return (
@@ -2492,15 +2376,6 @@ function DashboardInner() {
               </div>
               );
             })()}
-
-            {/* Résultat vide */}
-            {sousModRH === "entreprise" && !chargementRH && resultatsRH.length === 0 && !erreurRH && domaineTrouveRH && (
-              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-10 flex flex-col items-center text-center gap-3">
-                <div className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-xl">🔍</div>
-                <p className="text-gray-700 font-semibold">Aucun contact trouvé</p>
-                <p className="text-gray-400 text-sm">JobBoost n&apos;a pas trouvé de profils pour ce domaine. Cela peut arriver pour les petites entreprises peu présentes sur LinkedIn. Essayez avec le nom de l&apos;entreprise ou un autre domaine.</p>
-              </div>
-            )}
 
             {/* Info bas de page */}
             </div>)}
