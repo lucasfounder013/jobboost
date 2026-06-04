@@ -52,8 +52,7 @@ function FormulaireInscription() {
             : "Une erreur est survenue. Veuillez réessayer."
         );
       } else {
-        const hasPending = Boolean(localStorage.getItem("pendingAnalysis"));
-        router.push(redirectApres ?? (hasPending ? "/dashboard" : "/"));
+        router.push(redirectApres ?? "/dashboard");
       }
     } catch {
       setErreur("Une erreur est survenue. Veuillez réessayer.");

@@ -101,10 +101,26 @@ function PlanPayant({ plan, label, prix, features, recommande }: {
   );
 }
 
+function LienRetourDashboard() {
+  const { data: session } = useSession();
+  if (!session) return null;
+  return (
+    <div className="max-w-5xl mx-auto px-6 pt-6">
+      <Link href="/dashboard" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 transition-colors">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        Retour au dashboard
+      </Link>
+    </div>
+  );
+}
+
 export default function PagePricing() {
   return (
     <div className="min-h-screen flex flex-col">
       <main className="flex-1 bg-gradient-to-b from-blue-50 to-white">
+        <LienRetourDashboard />
         <section className="max-w-5xl mx-auto px-6 py-20 text-center">
           <p className="text-xs font-semibold uppercase tracking-widest text-indigo-500 mb-4">Tarifs</p>
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900 mb-4">
