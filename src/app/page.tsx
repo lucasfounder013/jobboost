@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession, signOut } from "@/lib/auth-client";
@@ -18,6 +18,28 @@ export default function PagePrincipale() {
   const [nomFichier, setNomFichier] = useState("");
   const [extractionEnCours, setExtractionEnCours] = useState(false);
   const [dragActif, setDragActif] = useState(false);
+  const [ongletCV, setOngletCV] = useState<"avant" | "apres">("avant");
+  const refSectionDemo = useRef<HTMLElement>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  useEffect(() => {
+    const el = refSectionDemo.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          intervalRef.current = setInterval(() => {
+            setOngletCV(prev => prev === "avant" ? "apres" : "avant");
+          }, 3500);
+        } else {
+          if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+        }
+      },
+      { threshold: 0.25 }
+    );
+    observer.observe(el);
+    return () => { observer.disconnect(); if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, []);
 
   async function traiterFichier(fichier: File) {
     const ext = fichier.name.split(".").pop()?.toLowerCase();
@@ -158,118 +180,410 @@ export default function PagePrincipale() {
           </div>
         </section>
 
-        {/* Mockup produit */}
-        <section className="bg-white border-t border-gray-100 px-6 pt-16 pb-16">
-          <div className="max-w-4xl mx-auto">
+        {/* Démo avant / après CV */}
+        <section ref={refSectionDemo} className="bg-white border-t border-gray-100 px-6 pt-16 pb-16">
+          <div className="max-w-6xl mx-auto">
 
-            {/* Texte au-dessus du mockup */}
-            <div className="text-center mb-10">
+            <div className="text-center mb-8">
               <span className="inline-block bg-indigo-50 text-indigo-600 text-xs font-bold px-3 py-1 rounded-full mb-4 tracking-wide uppercase">
-                Tout en un
+                Démonstration
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-4">
-                De l&apos;analyse à la candidature,<br className="hidden sm:block" /> en quelques clics.
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-6">
+                La différence JobBoost en un coup d&apos;œil
               </h2>
-              <p className="text-gray-500 text-base sm:text-lg max-w-2xl mx-auto leading-relaxed">
-                Collez votre CV et une offre d&apos;emploi. JobBoost calcule votre score ATS, identifie les mots-clés manquants, adapte votre CV, vous permet de l&apos;exporter en PDF ou Word, et vous prépare aux questions d&apos;entretien les plus probables pour le poste visé.
+              <div className="inline-flex rounded-xl bg-gray-100 p-1 gap-1 mb-5">
+                <button
+                  onClick={() => setOngletCV("avant")}
+                  className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${ongletCV === "avant" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                >
+                  CV générique
+                </button>
+                <button
+                  onClick={() => setOngletCV("apres")}
+                  className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${ongletCV === "apres" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
+                >
+                  CV optimisé par JobBoost
+                </button>
+              </div>
+              <p className="text-gray-500 text-base max-w-xl mx-auto">
+                {ongletCV === "avant"
+                  ? "Les descriptions vagues sont ignorées par les ATS et les recruteurs en moins de 3 secondes."
+                  : "Chaque ligne est optimisée pour les ATS et immédiatement lisible par un recruteur humain."}
               </p>
             </div>
 
-            <div className="rounded-2xl ring-1 ring-gray-200 shadow-xl shadow-indigo-50 overflow-hidden">
-              {/* Barre navigateur */}
-              <div className="bg-gray-100 px-4 py-3 flex items-center gap-2 border-b border-gray-200">
-                <div className="flex gap-1.5">
-                  <div className="w-3 h-3 rounded-full bg-red-400" />
-                  <div className="w-3 h-3 rounded-full bg-amber-400" />
-                  <div className="w-3 h-3 rounded-full bg-emerald-400" />
-                </div>
-                <div className="flex-1 mx-4 bg-white rounded-md px-3 py-1 text-xs text-gray-400 font-mono">
-                  app.jobboost.fr/dashboard
-                </div>
+            <div className="flex items-start gap-6 xl:gap-10">
+
+              {/* Annotations gauche */}
+              <div className="w-44 xl:w-52 shrink-0 hidden lg:flex flex-col text-right">
+                {ongletCV === "avant" ? (
+                  <>
+                    <div className="pt-[88px] pb-5">
+                      <p className="text-xs italic leading-snug text-red-500">✕ Titre vague, aucun mot-clé ATS. Le poste exact n&apos;apparaît pas.</p>
+                    </div>
+                    <div className="pb-5">
+                      <p className="text-xs italic leading-snug text-red-500">✕ &ldquo;Motivée&rdquo; est un buzzword. Aucune preuve chiffrée.</p>
+                    </div>
+                    <div className="pb-5">
+                      <p className="text-xs italic leading-snug text-red-500">✕ Compétences génériques non indexées par les ATS.</p>
+                    </div>
+                    <div className="pb-5">
+                      <p className="text-xs italic leading-snug text-red-500">✕ Tâche basique que tout candidat peut écrire. Aucun résultat.</p>
+                    </div>
+                    <div>
+                      <p className="text-xs italic leading-snug text-red-500">✕ Aucun outil cité (JIRA ? Trello ?). Impossible à évaluer.</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="pt-[88px] pb-5">
+                      <p className="text-xs italic leading-snug text-emerald-600">✓ Titre aligné mot pour mot avec l&apos;offre d&apos;emploi visée.</p>
+                    </div>
+                    <div className="pb-5">
+                      <p className="text-xs italic leading-snug text-emerald-600">✓ Résumé chiffré. La valeur ajoutée est visible en 3 secondes.</p>
+                    </div>
+                    <div className="pb-5">
+                      <p className="text-xs italic leading-snug text-emerald-600">✓ Compétences techniques recherchées par les ATS du secteur.</p>
+                    </div>
+                    <div className="pb-5">
+                      <p className="text-xs italic leading-snug text-emerald-600">✓ Budget + taux de livraison = preuve de résultat concret.</p>
+                    </div>
+                    <div>
+                      <p className="text-xs italic leading-snug text-emerald-600">✓ Outils nommés + méthode = scope de responsabilité immédiat.</p>
+                    </div>
+                  </>
+                )}
               </div>
 
-              {/* App shell */}
-              <div className="flex h-[460px]">
-                {/* Sidebar */}
-                <div className="w-48 bg-indigo-950 flex flex-col py-5 px-3 shrink-0">
-                  <div className="text-white font-extrabold text-sm mb-5 px-2">JobBoost</div>
-                  <button className="flex items-center justify-center gap-1.5 bg-indigo-500 hover:bg-indigo-400 text-white text-xs font-bold px-3 py-2 rounded-lg mb-4 mx-1">
-                    <span>+</span> Nouvelle analyse
-                  </button>
-                  <p className="text-emerald-400 text-[10px] px-2 mb-3 flex items-center gap-1">
-                    <span>✓</span> Analyses illimitées
-                  </p>
-                  <p className="text-indigo-400 text-[9px] font-semibold uppercase tracking-widest px-2 mb-2">Menu</p>
-                  {[
-                    { label: "Dashboard", active: true },
-                    { label: "Mes candidatures", active: false },
-                    { label: "Préparer mon entretien", active: false },
-                    { label: "Mon abonnement", active: false },
-                  ].map(({ label, active }) => (
-                    <div
-                      key={label}
-                      className={`text-xs px-3 py-2 rounded-lg mb-0.5 font-medium ${active ? "bg-white/15 text-white" : "text-indigo-300"}`}
-                    >
-                      {label}
-                    </div>
-                  ))}
-                  <div className="mt-auto px-2 space-y-1">
-                    <p className="text-indigo-400 text-[10px]">sophie.martin@gmail.com</p>
-                    <p className="text-indigo-400 text-[10px] cursor-pointer hover:text-white">Nous contacter</p>
-                    <p className="text-indigo-400 text-[10px] cursor-pointer hover:text-white">Déconnexion</p>
-                  </div>
+              {/* CV document */}
+              <div className={`flex-1 rounded-xl shadow-xl overflow-hidden transition-all duration-300 ${ongletCV === "avant" ? "ring-2 ring-red-100" : "ring-2 ring-emerald-100"}`}>
+                {/* Bandeau score */}
+                <div className={`px-6 py-3 flex items-center justify-between ${ongletCV === "avant" ? "bg-red-50 border-b border-red-100" : "bg-emerald-50 border-b border-emerald-100"}`}>
+                  <span className={`text-xs font-bold ${ongletCV === "avant" ? "text-red-600" : "text-emerald-700"}`}>
+                    {ongletCV === "avant" ? "Avant JobBoost" : "Après JobBoost"}
+                  </span>
+                  <span className={`text-sm font-extrabold px-3 py-1 rounded-full ${ongletCV === "avant" ? "bg-red-100 text-red-700" : "bg-emerald-100 text-emerald-700"}`}>
+                    Score ATS : {ongletCV === "avant" ? "34" : "91"} / 100
+                  </span>
                 </div>
 
-                {/* Contenu */}
-                <div className="flex-1 bg-white p-6 overflow-hidden">
-                  <h2 className="text-base font-bold text-gray-900 mb-0.5">Bonjour, Sophie 👋</h2>
-                  <p className="text-xs text-gray-400 mb-4">Voici un aperçu de vos analyses et CV adaptés.</p>
+                {/* Corps du CV */}
+                <div className="bg-white p-8 font-serif text-gray-900">
+                  {ongletCV === "avant" ? (
+                    /* ── CV AVANT (style générique centré) ── */
+                    <div className="font-sans text-[13px] text-gray-900 leading-snug">
 
-                  <div className="bg-white rounded-xl ring-1 ring-gray-200 overflow-hidden text-xs">
-                    <div className="grid px-4 py-2 bg-gray-50 text-gray-400 font-semibold uppercase text-[10px] tracking-wider" style={{ gridTemplateColumns: "2fr 1fr 1.4fr 1.4fr" }}>
-                      <span>Poste visé</span><span>Analyse</span><span>CV adapté</span><span>Lettre de motivation</span>
-                    </div>
-                    {[
-                      { poste: "Chef de projet digital", date: "20 mai 2026", avant: null, apres: 74, pdf: false },
-                      { poste: "Responsable marketing", date: "18 mai 2026", avant: 61, apres: 88, pdf: true },
-                      { poste: "Product Manager", date: "15 mai 2026", avant: 58, apres: 82, pdf: true },
-                      { poste: "Chargé-e de communication", date: "12 mai 2026", avant: 63, apres: 91, pdf: true },
-                    ].map((r, i) => (
-                      <div key={i} className="grid px-4 py-2.5 border-t border-gray-100 items-center gap-1" style={{ gridTemplateColumns: "2fr 1fr 1.4fr 1.4fr" }}>
-                        <div>
-                          <p className="font-semibold text-gray-800 text-[11px]">{r.poste}</p>
-                          <p className="text-gray-400 text-[10px]">{r.date}</p>
-                        </div>
-                        <div>
-                          {r.avant === null ? (
-                            <span className="inline-flex items-center gap-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold px-2 py-1 rounded-lg">{r.apres} / 100</span>
-                          ) : (
-                            <div className="flex items-center gap-1">
-                              <span className="text-gray-400 text-[10px] font-bold">{r.avant}</span>
-                              <span className="text-gray-300 text-[10px]">→</span>
-                              <span className="text-emerald-600 text-[10px] font-bold">{r.apres}</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-1">
-                          {r.pdf ? (
-                            <>
-                              <span className="bg-gray-900 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">PDF</span>
-                              <span className="bg-indigo-600 text-white text-[9px] font-bold px-1.5 py-0.5 rounded">Word</span>
-                              <span className="text-indigo-500 text-[9px] font-medium">Aperçu</span>
-                            </>
-                          ) : (
-                            <span className="text-indigo-500 text-[9px] font-medium">Adapter pour les ATS →</span>
-                          )}
-                        </div>
-                        <div>
-                          <span className="text-indigo-500 text-[9px] font-medium">Générer →</span>
+                      {/* En-tête centré avec avatar */}
+                      <div className="text-center mb-5 pb-4 border-b border-gray-300">
+                        <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-3 text-gray-400 text-xl font-bold">SM</div>
+                        <p className="text-[22px] font-bold uppercase tracking-wide">SOPHIE MARTIN</p>
+                        <span className="inline-block bg-red-100 text-red-400 text-xs font-semibold px-3 py-0.5 rounded-sm mt-1">Chef de projet</span>
+                        <p className="text-xs text-gray-500 mt-2">Paris, France · sophie.martin@gmail.com · linkedin.com/in/sophiemartin</p>
+                      </div>
+
+                      {/* Résumé */}
+                      <div className="mb-4">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-1 mb-2">Résumé professionnel</p>
+                        <p className="text-gray-700 leading-relaxed">
+                          <span className="text-red-400 font-semibold">Motivée</span> et dynamique, je suis une professionnelle <span className="text-red-400 font-semibold">passionnée</span> par les projets et le travail en équipe. <span className="text-red-400 font-semibold">Team player</span> reconnue pour ma polyvalence, je cherche à rejoindre une entreprise <span className="text-red-400 font-semibold">dynamique</span> pour relever de nouveaux défis et contribuer à son succès dans un environnement stimulant.
+                        </p>
+                      </div>
+
+                      {/* Compétences — pills */}
+                      <div className="mb-4">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-1 mb-2">Compétences clés</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {["Microsoft Office", "Travail en équipe", "Communication", "Leadership", "Polyvalence", "Sens de l'organisation"].map(c => (
+                            <span key={c} className="border border-gray-300 text-gray-600 text-xs px-2.5 py-0.5 rounded-full">{c}</span>
+                          ))}
                         </div>
                       </div>
-                    ))}
-                  </div>
+
+                      {/* Expérience */}
+                      <div className="mb-4">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-1 mb-3">Expérience professionnelle</p>
+
+                        <div className="mb-3">
+                          <div className="flex justify-between items-baseline">
+                            <p className="font-bold">Acme Solutions</p>
+                            <p className="text-xs text-gray-500 shrink-0">Jan 2021 – Présent</p>
+                          </div>
+                          <p className="italic text-gray-500 text-xs mb-1.5">Chef de projet</p>
+                          <ul className="space-y-1 text-gray-700">
+                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Responsable de la gestion de projets en lien avec les équipes.</span></li>
+                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span><span className="text-red-400 font-semibold">Aidé</span> à l&apos;amélioration des processus internes de l&apos;entreprise.</span></li>
+                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Travaillé avec les équipes pour livrer les projets dans les délais.</span></li>
+                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Participé aux réunions de suivi avec les parties prenantes.</span></li>
+                          </ul>
+                        </div>
+
+                        <div className="mb-3">
+                          <div className="flex justify-between items-baseline">
+                            <p className="font-bold">StartupXYZ</p>
+                            <p className="text-xs text-gray-500 shrink-0">Sep 2018 – Déc 2020</p>
+                          </div>
+                          <p className="italic text-gray-500 text-xs mb-1.5">Coordinatrice de projet</p>
+                          <ul className="space-y-1 text-gray-700">
+                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span><span className="text-red-400 font-semibold">Utilisé</span> des stratégies <span className="text-red-400 font-semibold">synergiques</span> pour aligner les équipes sur les objectifs trimestriels.</span></li>
+                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Créé des tableaux de bord et rapports pour les présentations de direction.</span></li>
+                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span><span className="text-red-400 font-semibold">Aidé</span> à l&apos;organisation des plannings et des livrables de l&apos;équipe.</span></li>
+                          </ul>
+                        </div>
+
+                        <div>
+                          <div className="flex justify-between items-baseline">
+                            <p className="font-bold">Conseil Régional Île-de-France</p>
+                            <p className="text-xs text-gray-500 shrink-0">Juin 2016 – Août 2018</p>
+                          </div>
+                          <p className="italic text-gray-500 text-xs mb-1.5">Assistante chef de projet</p>
+                          <ul className="space-y-1 text-gray-700">
+                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Suivi administratif de projets de développement numérique.</span></li>
+                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Rédaction de comptes-rendus et supports de présentation.</span></li>
+                          </ul>
+                        </div>
+                      </div>
+
+                      {/* Formation */}
+                      <div className="mb-4">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-1 mb-2">Formation</p>
+                        <div className="mb-1.5">
+                          <div className="flex justify-between items-baseline">
+                            <p className="font-bold">Université Paris-Dauphine</p>
+                            <p className="text-xs text-gray-500 shrink-0">2014 – 2016</p>
+                          </div>
+                          <p className="italic text-gray-500 text-xs">Master Management de projets</p>
+                        </div>
+                        <div>
+                          <div className="flex justify-between items-baseline">
+                            <p className="font-bold">Université Paris 1 Panthéon-Sorbonne</p>
+                            <p className="text-xs text-gray-500 shrink-0">2011 – 2014</p>
+                          </div>
+                          <p className="italic text-gray-500 text-xs">Licence Administration des entreprises</p>
+                        </div>
+                      </div>
+
+                      {/* Certifications */}
+                      <div className="mb-4">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-1 mb-2">Certifications &amp; Récompenses</p>
+                        <ul className="space-y-1 text-gray-700">
+                          <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Formation gestion de projet (en ligne)</span></li>
+                          <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Employée du mois — Acme Solutions (2022)</span></li>
+                        </ul>
+                      </div>
+
+                      {/* Langues */}
+                      <div className="mb-4">
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-1 mb-2">Langues</p>
+                        <p className="text-gray-700">Français (natif) · Anglais (intermédiaire)</p>
+                      </div>
+
+                      {/* Centres d'intérêt */}
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-1 mb-2">Centres d&apos;intérêt</p>
+                        <ul className="space-y-1 text-gray-700">
+                          <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Voyages</span></li>
+                          <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Photographie</span></li>
+                          <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Lecture</span></li>
+                        </ul>
+                      </div>
+                    </div>
+                  ) : (
+                    /* ── CV APRÈS (format JobBoost) ── */
+                    <div className="font-serif text-[13px] text-gray-900 leading-snug">
+                      {/* En-tête */}
+                      <div className="mb-4">
+                        <p className="text-[22px] font-bold font-sans">Sophie Martin</p>
+                        <p className="text-sm font-sans text-gray-700 mt-0.5">Chef de projet digital — Transformation &amp; Pilotage agile</p>
+                        <p className="text-xs font-sans text-gray-500 mt-1">sophie.martin@gmail.com · +33 6 12 34 56 78 · Paris, France · linkedin.com/in/sophiemartin</p>
+                      </div>
+
+                      {/* Profil */}
+                      <div className="mb-3">
+                        <p className="text-[10px] font-bold uppercase tracking-wider font-sans border-b border-gray-400 pb-0.5 mb-1.5">Profil</p>
+                        <p className="leading-relaxed text-gray-700">
+                          Chef de projet digital avec{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">6 ans</span>{" "}d&apos;expérience en{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">transformation numérique</span>{" "}et pilotage de projets complexes (budgets jusqu&apos;à{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">250 K€</span>). Certifiée{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">PMP</span>{" "}et{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">PSM I</span>. Taux de livraison dans les délais :{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">94 %</span>. Reconnue pour son leadership cross-fonctionnel et sa capacité à conduire le changement à grande échelle.
+                        </p>
+                      </div>
+
+                      {/* Expérience */}
+                      <div className="mb-3">
+                        <p className="text-[10px] font-bold uppercase tracking-wider font-sans border-b border-gray-400 pb-0.5 mb-2">Expérience professionnelle</p>
+
+                        <div className="mb-2.5">
+                          <div className="flex justify-between items-baseline">
+                            <p className="font-bold font-sans">Chef de projet digital</p>
+                            <p className="text-xs font-sans text-gray-500 shrink-0">Jan 2021 – Présent</p>
+                          </div>
+                          <p className="italic text-gray-600 mb-1">Acme Solutions</p>
+                          <ul className="space-y-0.5 text-gray-700">
+                            <li className="flex gap-1.5"><span className="shrink-0">•</span><span>Piloté{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">3 projets</span>{" "}de refonte digitale (budget{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">250 K€</span>{" "}chacun), livrés à{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">94 %</span>{" "}dans les délais.</span></li>
+                            <li className="flex gap-1.5"><span className="shrink-0">•</span><span>Animé des{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">sprints Agile</span>{" "}bi-hebdomadaires avec{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">8 équipes</span>{" "}cross-fonctionnelles via{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">JIRA</span>.</span></li>
+                            <li className="flex gap-1.5"><span className="shrink-0">•</span><span>Mis en place des{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">tableaux de bord KPI</span>{" "}réduisant les retards de{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">40 %</span>.</span></li>
+                            <li className="flex gap-1.5"><span className="shrink-0">•</span><span>Conduit le{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">change management</span>{" "}pour{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">120 collaborateurs</span>{" "}lors d&apos;une migration ERP.</span></li>
+                          </ul>
+                        </div>
+
+                        <div className="mb-2.5">
+                          <div className="flex justify-between items-baseline">
+                            <p className="font-bold font-sans">Coordinatrice de projet digital</p>
+                            <p className="text-xs font-sans text-gray-500 shrink-0">Sep 2018 – Déc 2020</p>
+                          </div>
+                          <p className="italic text-gray-600 mb-1">StartupXYZ</p>
+                          <ul className="space-y-0.5 text-gray-700">
+                            <li className="flex gap-1.5"><span className="shrink-0">•</span><span>Coordonné la{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">roadmap</span>{" "}produit sur{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">12 sprints</span>, réduisant les délais de{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">25 %</span>.</span></li>
+                            <li className="flex gap-1.5"><span className="shrink-0">•</span><span>Suivi des{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">KPIs</span>{" "}de performance — reporting hebdomadaire à{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">15 managers</span>.</span></li>
+                            <li className="flex gap-1.5"><span className="shrink-0">•</span><span>Négocié avec{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">4 prestataires</span>{" "}externes, économisant{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">18 K€</span>{" "}sur le budget annuel.</span></li>
+                          </ul>
+                        </div>
+
+                        <div>
+                          <div className="flex justify-between items-baseline">
+                            <p className="font-bold font-sans">Assistante chef de projet digital</p>
+                            <p className="text-xs font-sans text-gray-500 shrink-0">Juin 2016 – Août 2018</p>
+                          </div>
+                          <p className="italic text-gray-600 mb-1">Conseil Régional Île-de-France</p>
+                          <ul className="space-y-0.5 text-gray-700">
+                            <li className="flex gap-1.5"><span className="shrink-0">•</span><span>Contribué au déploiement d&apos;un portail numérique citoyen (<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">50 000 utilisateurs</span>{" "}à l&apos;ouverture).</span></li>
+                            <li className="flex gap-1.5"><span className="shrink-0">•</span><span>Rédigé les{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">cahiers des charges</span>{" "}et rapports de suivi pour{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">3 directions métier</span>.</span></li>
+                          </ul>
+                        </div>
+                      </div>
+
+                      {/* Formation */}
+                      <div className="mb-3">
+                        <p className="text-[10px] font-bold uppercase tracking-wider font-sans border-b border-gray-400 pb-0.5 mb-2">Formation</p>
+                        <div className="mb-1.5">
+                          <div className="flex justify-between items-baseline">
+                            <p className="font-bold font-sans">Master Management de projets digitaux</p>
+                            <p className="text-xs font-sans text-gray-500 shrink-0">2014 – 2016</p>
+                          </div>
+                          <p className="italic text-gray-600">Université Paris-Dauphine</p>
+                          <p className="text-gray-600 ml-3"><span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">Major de promotion</span></p>
+                        </div>
+                        <div>
+                          <div className="flex justify-between items-baseline">
+                            <p className="font-bold font-sans">Licence Administration des entreprises</p>
+                            <p className="text-xs font-sans text-gray-500 shrink-0">2011 – 2014</p>
+                          </div>
+                          <p className="italic text-gray-600">Université Paris 1 Panthéon-Sorbonne</p>
+                        </div>
+                      </div>
+
+                      {/* Compétences */}
+                      <div className="mb-3">
+                        <p className="text-[10px] font-bold uppercase tracking-wider font-sans border-b border-gray-400 pb-0.5 mb-1.5">Compétences</p>
+                        <p className="text-gray-700"><span className="font-bold font-sans">Techniques :</span>{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">Gestion de projet</span>, <span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">Agile / Scrum</span>, <span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">JIRA</span>, <span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">Roadmap</span>, <span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">KPI</span>, <span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">Tableau de bord</span>, <span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">Change management</span></p>
+                        <p className="text-gray-700 mt-0.5"><span className="font-bold font-sans">Langues :</span>{" "}Français (natif), <span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">Anglais professionnel (C1)</span>, Espagnol (B1)</p>
+                        <p className="text-gray-700 mt-0.5"><span className="font-bold font-sans">Autres :</span>{" "}Relation client, Communication orale et écrite, Travail en équipe multidisciplinaire, Rigueur</p>
+                      </div>
+
+                      {/* Certifications */}
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wider font-sans border-b border-gray-400 pb-0.5 mb-2">Certifications</p>
+                        <div className="flex justify-between items-baseline">
+                          <p className="font-bold font-sans"><span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-semibold">PMP</span> — Project Management Institute</p>
+                          <p className="text-xs font-sans text-gray-500 shrink-0">2023</p>
+                        </div>
+                        <div className="flex justify-between items-baseline mt-0.5">
+                          <p className="font-bold font-sans"><span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-semibold">PSM I</span> — Scrum.org</p>
+                          <p className="text-xs font-sans text-gray-500 shrink-0">2022</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
+
+              {/* Annotations droite */}
+              <div className="w-44 xl:w-52 shrink-0 hidden lg:flex flex-col text-left">
+                {ongletCV === "avant" ? (
+                  <>
+                    <div className="pt-[88px] pb-5">
+                      <p className="text-xs italic leading-snug text-red-500">✕ Résumé sans chiffre. Les recruteurs ignorent ce type de profil en 3 s.</p>
+                    </div>
+                    <div className="pb-5">
+                      <p className="text-xs italic leading-snug text-red-500">✕ &ldquo;Synergique&rdquo;, &ldquo;team player&rdquo; : mots vides non indexés par les ATS.</p>
+                    </div>
+                    <div className="pb-5">
+                      <p className="text-xs italic leading-snug text-red-500">✕ Aucun outil cité (JIRA ? Asana ?). Niveau de compétence non évaluable.</p>
+                    </div>
+                    <div className="pb-5">
+                      <p className="text-xs italic leading-snug text-red-500">✕ Tâche vague. Aucune méthodologie ni scope de responsabilité.</p>
+                    </div>
+                    <div>
+                      <p className="text-xs italic leading-snug text-red-500">✕ Aucun résultat chiffré. Impossible de mesurer la valeur ajoutée.</p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="pt-[88px] pb-5">
+                      <p className="text-xs italic leading-snug text-emerald-600">✓ Chiffres + certification = crédibilité immédiate pour les recruteurs.</p>
+                    </div>
+                    <div className="pb-5">
+                      <p className="text-xs italic leading-snug text-emerald-600">✓ Mots-clés sectoriels détectés et indexés par tous les ATS.</p>
+                    </div>
+                    <div className="pb-5">
+                      <p className="text-xs italic leading-snug text-emerald-600">✓ Outils nommés + impact = preuve de valeur immédiatement visible.</p>
+                    </div>
+                    <div className="pb-5">
+                      <p className="text-xs italic leading-snug text-emerald-600">✓ Méthode Agile + taille d&apos;équipe = scope de responsabilité clair.</p>
+                    </div>
+                    <div>
+                      <p className="text-xs italic leading-snug text-emerald-600">✓ KPIs + chiffre d&apos;impact = preuve de contribution mesurable.</p>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Comment ça marche */}
+        <section className="bg-white border-t border-gray-100 px-6 py-16">
+          <div className="max-w-5xl mx-auto">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 text-center mb-12">
+              Comment ça marche
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-indigo-100 border border-indigo-100 rounded-2xl overflow-hidden shadow-sm shadow-indigo-50">
+              {[
+                {
+                  icon: (
+                    <svg className="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M7.5 3.75H6A2.25 2.25 0 003.75 6v1.5M16.5 3.75H18A2.25 2.25 0 0120.25 6v1.5m0 9V18A2.25 2.25 0 0118 20.25h-1.5m-9 0H6A2.25 2.25 0 013.75 18v-1.5M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  ),
+                  titre: "Analyser",
+                  desc: "Voyez exactement comment votre CV correspond à l'offre. Score ATS, mots-clés manquants et lacunes. En 30 secondes.",
+                },
+                {
+                  icon: (
+                    <svg className="w-7 h-7 text-violet-600" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                    </svg>
+                  ),
+                  titre: "Adapter",
+                  desc: "L'IA réécrit automatiquement votre CV pour ce poste : mots-clés intégrés, formulations optimisées. En un clic.",
+                },
+                {
+                  icon: (
+                    <svg className="w-7 h-7 text-purple-600" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21 7.5l-9-5.25L3 7.5m18 0l-9 5.25m9-5.25v9l-9 5.25M3 7.5l9 5.25M3 7.5v9l9 5.25m0-9v9" />
+                    </svg>
+                  ),
+                  titre: "Exporter",
+                  desc: "Téléchargez en PDF ou Word, avec une mise en forme ATS-compatible. Prêt à envoyer.",
+                },
+              ].map(({ icon, titre, desc }) => (
+                <div key={titre} className="bg-white hover:bg-indigo-50/30 transition-colors duration-200 p-8 flex flex-col gap-5">
+                  <div className="w-11 h-11 rounded-xl bg-indigo-50 flex items-center justify-center">
+                    {icon}
+                  </div>
+                  <div>
+                    <p className="font-bold text-gray-900 text-base mb-2">{titre}</p>
+                    <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -403,60 +717,6 @@ export default function PagePrincipale() {
         </section>
 
       </main>
-
-        {/* Comment ça marche */}
-        <section className="bg-white border-t border-gray-100 px-6 py-16">
-          <div className="max-w-5xl mx-auto">
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 text-center mb-12">
-              Comment ça marche
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {[
-                {
-                  num: "1",
-                  icon: (
-                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                    </svg>
-                  ),
-                  titre: "Importez votre CV",
-                  desc: "PDF, DOCX ou copier-coller — en quelques secondes.",
-                },
-                {
-                  num: "2",
-                  icon: (
-                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
-                    </svg>
-                  ),
-                  titre: "Analysez la correspondance",
-                  desc: "Niveau qualitatif + mots-clés manquants vs l'offre.",
-                },
-                {
-                  num: "3",
-                  icon: (
-                    <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                    </svg>
-                  ),
-                  titre: "Adaptez et exportez",
-                  desc: "CV réécrit par IA, téléchargeable en PDF ou Word.",
-                },
-              ].map(({ num, icon, titre, desc }) => (
-                <div key={num} className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-7 flex flex-col items-start gap-4">
-                  <div className="flex items-center gap-3">
-                    <span className="w-8 h-8 rounded-full bg-indigo-600 text-white text-sm font-bold flex items-center justify-center shrink-0">{num}</span>
-                    {icon}
-                  </div>
-                  <div>
-                    <p className="font-bold text-gray-900 mb-1">{titre}</p>
-                    <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
 
         {/* Social proof */}
         <section className="bg-gradient-to-br from-indigo-50 to-violet-50 px-6 py-16 border-t border-indigo-100">
