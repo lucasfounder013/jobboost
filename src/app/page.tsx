@@ -75,7 +75,7 @@ export default function PagePrincipale() {
     // Connecté ou non : on sauvegarde et on redirige vers le dashboard (ou login)
     posthog?.capture("analyse_lancee", { connecte: !!session });
     localStorage.setItem("pendingAnalysis", JSON.stringify({ cv, offre, nomFichier }));
-    router.push(session ? "/dashboard" : "/login");
+    router.push(session ? "/dashboard" : "/register");
   }
 
   return (
