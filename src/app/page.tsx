@@ -30,7 +30,7 @@ export default function PagePrincipale() {
         if (entry.isIntersecting) {
           intervalRef.current = setInterval(() => {
             setOngletCV(prev => prev === "avant" ? "apres" : "avant");
-          }, 3500);
+          }, 10000);
         } else {
           if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
         }
