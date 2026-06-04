@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={`${inter.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-[#FAFAFA] text-gray-900 font-sans">
+      <body className="min-h-full flex flex-col bg-[#FAFAFA] text-gray-900 font-sans overflow-x-hidden">
         <Providers>
           <Suspense fallback={null}>
             <PostHogPageView />

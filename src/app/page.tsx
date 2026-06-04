@@ -83,7 +83,7 @@ export default function PagePrincipale() {
 
       {/* Header */}
       <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-xl border-b border-white/60 shadow-sm shadow-indigo-50">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between w-full">
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 group">
@@ -97,13 +97,13 @@ export default function PagePrincipale() {
           <nav className="flex items-center gap-1 text-sm">
             <Link
               href="/ressources"
-              className="px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150"
+              className="hidden sm:block px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150"
             >
               Ressources
             </Link>
             <Link
               href="/pricing"
-              className="px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150"
+              className="hidden sm:block px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150"
             >
               Tarifs
             </Link>
@@ -135,13 +135,13 @@ export default function PagePrincipale() {
               <div className="flex items-center gap-2 ml-2">
                 <Link
                   href="/login"
-                  className="px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 font-semibold transition-colors duration-150"
+                  className="px-3 py-2 rounded-lg text-gray-600 hover:text-gray-900 font-semibold transition-colors duration-150"
                 >
                   Connexion
                 </Link>
                 <Link
                   href="/register"
-                  className="bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white px-5 py-2 rounded-xl font-bold text-sm shadow-lg shadow-indigo-200/60 hover:shadow-indigo-300/60 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
+                  className="hidden sm:block bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white px-5 py-2 rounded-xl font-bold text-sm shadow-lg shadow-indigo-200/60 hover:shadow-indigo-300/60 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
                 >
                   S&apos;inscrire gratuitement
                 </Link>
