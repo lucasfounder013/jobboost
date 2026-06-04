@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useSession, signOut } from "@/lib/auth-client";
 import Footer from "@/components/Footer";
 
 const articles = [
@@ -89,7 +88,6 @@ const COULEURS_CATEGORIE: Record<string, string> = {
 };
 
 export default function RessourcesPage() {
-  const { data: session } = useSession();
   const [categorie, setCategorie] = useState("Toutes");
   const [recherche, setRecherche] = useState("");
 
@@ -102,66 +100,6 @@ export default function RessourcesPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FAFAFA]">
-      {/* Header — identique à la home */}
-      <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-xl border-b border-white/60 shadow-sm shadow-indigo-50">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 group">
-
-            <span className="text-lg font-extrabold tracking-tight text-gray-900 group-hover:text-indigo-600 transition-colors duration-200">
-              JobBoost
-            </span>
-          </Link>
-
-          <nav className="flex items-center gap-1 text-sm">
-            <Link
-              href="/ressources"
-              className="px-4 py-2 rounded-lg text-gray-900 font-semibold transition-all duration-150"
-            >
-              Ressources
-            </Link>
-            <Link
-              href="/pricing"
-              className="px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150"
-            >
-              Tarifs
-            </Link>
-
-            {session ? (
-              <>
-                <Link
-                  href="/dashboard"
-                  className="px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150 hidden sm:block"
-                >
-                  Dashboard
-                </Link>
-                <span className="text-gray-300 mx-1 hidden sm:block">·</span>
-                <span className="text-gray-400 text-sm font-medium hidden sm:block">{session.user.email}</span>
-                <button
-                  onClick={() => signOut()}
-                  className="ml-2 px-4 py-2 rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100/70 font-medium transition-all duration-150"
-                >
-                  Déconnexion
-                </button>
-              </>
-            ) : (
-              <div className="flex items-center gap-2 ml-2">
-                <Link
-                  href="/login"
-                  className="px-4 py-2 rounded-lg text-gray-600 hover:text-gray-900 font-semibold transition-colors duration-150"
-                >
-                  Connexion
-                </Link>
-                <Link
-                  href="/register"
-                  className="bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white px-5 py-2 rounded-xl font-bold text-sm shadow-lg shadow-indigo-200/60 hover:shadow-indigo-300/60 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
-                >
-                  S&apos;inscrire gratuitement
-                </Link>
-              </div>
-            )}
-          </nav>
-        </div>
-      </header>
 
       {/* Hero */}
       <section className="px-6 pt-20 pb-14 text-center">

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { signUp } from "@/lib/auth-client";
 
@@ -12,13 +12,15 @@ const TEMOIGNAGE = {
   initiales: "TM",
 };
 
-export default function PageInscription() {
+function FormulaireInscription() {
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
   const [motDePasse, setMotDePasse] = useState("");
   const [erreur, setErreur] = useState("");
   const [chargement, setChargement] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectApres = searchParams.get("redirect");
 
   async function soumettreFormulaire(e: React.FormEvent) {
     e.preventDefault();
@@ -51,7 +53,7 @@ export default function PageInscription() {
         );
       } else {
         const hasPending = Boolean(localStorage.getItem("pendingAnalysis"));
-        router.push(hasPending ? "/dashboard" : "/");
+        router.push(redirectApres ?? (hasPending ? "/dashboard" : "/"));
       }
     } catch {
       setErreur("Une erreur est survenue. Veuillez réessayer.");
@@ -173,5 +175,13 @@ export default function PageInscription() {
       </div>
 
     </div>
+  );
+}
+
+export default function PageInscription() {
+  return (
+    <Suspense fallback={null}>
+      <FormulaireInscription />
+    </Suspense>
   );
 }

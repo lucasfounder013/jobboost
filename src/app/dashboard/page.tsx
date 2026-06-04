@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useSession, signOut } from "@/lib/auth-client";
 import { usePostHog } from "posthog-js/react";
@@ -148,13 +148,17 @@ const DEPARTEMENTS = [
 
 // ─── Composant ────────────────────────────────────────────────────────────────
 
-export default function Dashboard() {
+function DashboardInner() {
   const { data: session, isPending } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const posthog = usePostHog();
 
-  // Vue active
-  const [vue, setVue] = useState<"historique" | "nouvelle-analyse" | "preparer-entretien" | "trouver-offres" | "trouver-rh">("historique");
+  // Vue active — initialisée depuis ?vue= si présent
+  const vuesValides = ["historique", "nouvelle-analyse", "preparer-entretien", "trouver-offres", "trouver-rh"] as const;
+  type Vue = typeof vuesValides[number];
+  const vueParam = searchParams.get("vue") as Vue | null;
+  const [vue, setVue] = useState<Vue>(vuesValides.includes(vueParam as Vue) ? (vueParam as Vue) : "historique");
 
   // ── Données historique
   const [analyses, setAnalyses] = useState<AnalyseSauvegardee[]>([]);
@@ -2935,5 +2939,13 @@ export default function Dashboard() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function Dashboard() {
+  return (
+    <Suspense fallback={null}>
+      <DashboardInner />
+    </Suspense>
   );
 }

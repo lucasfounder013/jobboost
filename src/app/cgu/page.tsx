@@ -9,13 +9,6 @@ export const metadata = {
 export default function CGU() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <header className="border-b border-gray-100 px-6 py-4">
-        <Link href="/" className="flex items-center gap-2 w-fit">
-          
-          <span className="font-bold text-gray-900">JobBoost</span>
-        </Link>
-      </header>
-
       <main className="flex-1 max-w-3xl mx-auto px-6 py-12 w-full">
         <h1 className="text-2xl font-extrabold text-gray-900 mb-8">Conditions Générales d&apos;Utilisation (CGU)</h1>
 
