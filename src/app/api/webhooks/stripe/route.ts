@@ -39,11 +39,16 @@ export async function POST(req: NextRequest) {
       const rhCredits = plan === "pro" ? 80 : 20;
 
       if (userId && subscriptionId) {
-        await pool.query(
-          'UPDATE "user" SET is_subscribed = true, stripe_subscription_id = $1, plan_type = $2, rh_credits = $3 WHERE id = $4',
-          [subscriptionId, plan, rhCredits, userId]
-        );
-        await phCapture(userId, "subscription_created", { plan, subscription_id: subscriptionId });
+        try {
+          await pool.query(
+            'UPDATE "user" SET is_subscribed = true, stripe_subscription_id = $1, plan_type = $2, rh_credits = $3 WHERE id = $4',
+            [subscriptionId, plan, rhCredits, userId]
+          );
+          await phCapture(userId, "subscription_created", { plan, subscription_id: subscriptionId });
+        } catch (err) {
+          console.error("[webhook] Erreur mise à jour utilisateur après paiement :", err);
+          return NextResponse.json({ error: "Erreur DB lors de l'activation." }, { status: 500 });
+        }
       }
       break;
     }

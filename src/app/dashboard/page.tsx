@@ -196,6 +196,7 @@ function DashboardInner() {
   const [suppressionEnCours, setSuppressionEnCours] = useState<string | null>(null);
   const [editionPoste, setEditionPoste] = useState<{ id: string; valeur: string } | null>(null);
   const [ongletAnalyse, setOngletAnalyse] = useState<"resultats" | "apres" | "lettre" | "offre" | "cv">("resultats");
+  const [sidebarOuverte, setSidebarOuverte] = useState(false);
   const [lmCreditsRestants, setLmCreditsRestants] = useState<number | null>(null);
   const [generationLmEnCours, setGenerationLmEnCours] = useState<string | null>(null);
   const [exportLmEnCours, setExportLmEnCours] = useState<"pdf" | "docx" | null>(null);
@@ -872,8 +873,16 @@ function DashboardInner() {
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
 
+      {/* Backdrop mobile */}
+      {sidebarOuverte && (
+        <div
+          className="fixed inset-0 bg-black/50 z-30 md:hidden"
+          onClick={() => setSidebarOuverte(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-64 bg-indigo-950 flex flex-col z-40 shrink-0">
+      <aside className={`fixed left-0 top-0 h-full w-64 bg-indigo-950 flex flex-col z-40 shrink-0 transition-transform duration-300 md:translate-x-0 ${sidebarOuverte ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="px-5 py-5 border-b border-indigo-900">
           <Link href="/" className="flex items-center gap-2 group">
             
@@ -883,7 +892,7 @@ function DashboardInner() {
 
         <div className="px-4 pt-5 flex flex-col gap-2">
           <button
-            onClick={() => { setVue("nouvelle-analyse"); setResultat(null); setCvAdapte(null); setErreur(""); setCv(""); setOffre(""); setNomFichier(""); setModeCV("upload"); setAnalyseId(null); }}
+            onClick={() => { setVue("nouvelle-analyse"); setResultat(null); setCvAdapte(null); setErreur(""); setCv(""); setOffre(""); setNomFichier(""); setModeCV("upload"); setAnalyseId(null); setSidebarOuverte(false); }}
             className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white font-bold text-sm py-2.5 px-4 rounded-xl transition-all shadow-lg shadow-indigo-900/40"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -935,7 +944,7 @@ function DashboardInner() {
           <p className="text-indigo-400 text-xs font-semibold uppercase tracking-widest px-2 mb-2">Menu</p>
 
           <button
-            onClick={() => setVue("historique")}
+            onClick={() => { setVue("historique"); setSidebarOuverte(false); }}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-semibold text-sm w-full text-left transition-colors ${vue === "historique" ? "bg-indigo-800 text-white" : "text-indigo-200 hover:bg-indigo-800/60 hover:text-white"}`}
           >
             <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -945,7 +954,7 @@ function DashboardInner() {
           </button>
 
           <button
-            onClick={() => setVue("historique")}
+            onClick={() => { setVue("historique"); setSidebarOuverte(false); }}
             className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-indigo-200 hover:bg-indigo-800/60 hover:text-white font-medium text-sm transition-colors text-left"
           >
             <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -955,7 +964,7 @@ function DashboardInner() {
           </button>
 
           <button
-            onClick={() => { setVue("preparer-entretien"); resetEntretien(); }}
+            onClick={() => { setVue("preparer-entretien"); resetEntretien(); setSidebarOuverte(false); }}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm w-full text-left transition-colors ${vue === "preparer-entretien" ? "bg-indigo-800 text-white" : "text-indigo-200 hover:bg-indigo-800/60 hover:text-white"}`}
           >
             <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -965,7 +974,7 @@ function DashboardInner() {
           </button>
 
           <button
-            onClick={() => { setVue("trouver-offres"); setOngletOffres("recherche"); chargerOffresSauvegardees(); }}
+            onClick={() => { setVue("trouver-offres"); setOngletOffres("recherche"); chargerOffresSauvegardees(); setSidebarOuverte(false); }}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm w-full text-left transition-colors ${vue === "trouver-offres" ? "bg-indigo-800 text-white" : "text-indigo-200 hover:bg-indigo-800/60 hover:text-white"}`}
           >
             <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -975,7 +984,7 @@ function DashboardInner() {
           </button>
 
           <button
-            onClick={() => { setVue("trouver-rh"); setResultatsRH([]); setErreurRH(""); }}
+            onClick={() => { setVue("trouver-rh"); setResultatsRH([]); setErreurRH(""); setSidebarOuverte(false); }}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl font-medium text-sm w-full text-left transition-colors ${vue === "trouver-rh" ? "bg-indigo-800 text-white" : "text-indigo-200 hover:bg-indigo-800/60 hover:text-white"}`}
           >
             <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1014,7 +1023,21 @@ function DashboardInner() {
       </aside>
 
       {/* Zone principale */}
-      <main className="ml-64 flex-1 overflow-y-auto">
+      <main className="md:ml-64 flex-1 overflow-y-auto">
+
+        {/* Barre de navigation mobile */}
+        <div className="md:hidden sticky top-0 z-20 bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3">
+          <button
+            onClick={() => setSidebarOuverte(true)}
+            className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+            aria-label="Ouvrir le menu"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <span className="font-bold text-gray-900 text-base">JobBoost</span>
+        </div>
 
         {/* ── Vue : Historique ─────────────────────────────────────────────── */}
         {vue === "historique" && (
