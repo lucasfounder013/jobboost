@@ -6,6 +6,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 9,
+    categorie: "CV & ATS",
+    titre: "Mots-clés CV Commercial : liste complète 2026 pour passer les ATS",
+    extrait:
+      "30+ mots-clés indispensables pour un CV Commercial : compétences, CRM, certifications. Avec exemples concrets pour passer les filtres ATS.",
+    slug: "/ressources/cv-ats/mots-cles-cv-commercial",
+    date: "5 juin 2026",
+  },
+  {
     id: 8,
     categorie: "CV & ATS",
     titre: "Mots-clés CV Chef de Projet : liste complète 2026 pour passer les ATS",
