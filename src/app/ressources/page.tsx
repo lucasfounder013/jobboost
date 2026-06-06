@@ -6,6 +6,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 10,
+    categorie: "CV & ATS",
+    titre: "Mots-clés CV Chargé RH : liste complète 2026 pour passer les ATS",
+    extrait:
+      "30+ mots-clés indispensables pour un CV Chargé RH : recrutement, formation, droit social, SIRH. Liste complète par catégorie + exemples concrets.",
+    slug: "/ressources/cv-ats/mots-cles-cv-charge-rh",
+    date: "6 juin 2026",
+  },
+  {
     id: 9,
     categorie: "CV & ATS",
     titre: "Mots-clés CV Commercial : liste complète 2026 pour passer les ATS",

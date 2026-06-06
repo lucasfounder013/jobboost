@@ -14,6 +14,7 @@ const TEMOIGNAGE = {
 };
 
 function FormulaireInscription() {
+  const [prenom, setPrenom] = useState("");
   const [nom, setNom] = useState("");
   const [email, setEmail] = useState("");
   const [motDePasse, setMotDePasse] = useState("");
@@ -37,10 +38,12 @@ function FormulaireInscription() {
 
     try {
       const { error } = await signUp.email({
-        name: nom,
+        name: `${prenom} ${nom}`.trim(),
         email,
         password: motDePasse,
-      });
+        firstName: prenom,
+        lastName: nom,
+      } as Parameters<typeof signUp.email>[0]);
 
       if (error) {
         const emailPris =
@@ -54,7 +57,7 @@ function FormulaireInscription() {
             : "Une erreur est survenue. Veuillez réessayer."
         );
       } else {
-        posthog?.identify(email, { email, name: nom });
+        posthog?.identify(email, { email, name: `${prenom} ${nom}`.trim() });
         posthog?.capture("user_registered", { redirect: redirectApres ?? "/dashboard" });
         router.push(redirectApres ?? "/dashboard");
       }
@@ -79,16 +82,29 @@ function FormulaireInscription() {
           <p className="text-sm text-gray-500 mb-8">1 adaptation de CV gratuite offerte.</p>
 
           <form onSubmit={soumettreFormulaire} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
-              <input
-                type="text"
-                value={nom}
-                onChange={(e) => setNom(e.target.value)}
-                required
-                autoComplete="given-name"
-                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
-              />
+            <div className="flex gap-3">
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
+                <input
+                  type="text"
+                  value={prenom}
+                  onChange={(e) => setPrenom(e.target.value)}
+                  required
+                  autoComplete="given-name"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                <input
+                  type="text"
+                  value={nom}
+                  onChange={(e) => setNom(e.target.value)}
+                  required
+                  autoComplete="family-name"
+                  className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+                />
+              </div>
             </div>
 
             <div>

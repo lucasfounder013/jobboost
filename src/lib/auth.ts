@@ -14,6 +14,16 @@ export const auth = betterAuth({
   },
   user: {
     additionalFields: {
+      firstName: {
+        type: "string",
+        fieldName: "first_name",
+        input: true,
+      },
+      lastName: {
+        type: "string",
+        fieldName: "last_name",
+        input: true,
+      },
       credits: {
         type: "number",
         defaultValue: 1,
