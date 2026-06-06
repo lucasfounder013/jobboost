@@ -56,7 +56,7 @@ async function rechercherEmailPourDomaine(
   prenom: string,
   nom: string,
   domaine: string
-): Promise<{ email: string; certitude: number } | null> {
+): Promise<{ email: string; certitude: number | null } | null> {
   try {
     const startData = await icypeasFetch("https://app.icypeas.com/api/email-search", {
       method: "POST",
@@ -75,7 +75,10 @@ async function rechercherEmailPourDomaine(
     const emailData = items[0]?.results?.emails?.[0];
     if (!emailData?.email) return null;
 
-    return { email: emailData.email, certitude: CERTAINTY_SCORE[emailData.certainty ?? ""] ?? 0 };
+    const certitudeRaw = emailData.certainty ?? "";
+    const certitude = CERTAINTY_SCORE[certitudeRaw];
+    console.log(`[Icypeas] certitude brute: "${certitudeRaw}" → score: ${certitude ?? "inconnu"} (domaine: ${domaine})`);
+    return { email: emailData.email, certitude: certitude ?? null };
   } catch {
     return null;
   }
@@ -113,16 +116,16 @@ function genererDomainesAlternatifs(domaine: string): string[] {
 
 // Attend tous les résultats et retourne celui avec le score de certitude le plus élevé
 async function meilleurEmailTrouve(
-  promises: Promise<{ email: string; certitude: number } | null>[]
-): Promise<{ email: string; certitude: number } | null> {
+  promises: Promise<{ email: string; certitude: number | null } | null>[]
+): Promise<{ email: string; certitude: number | null } | null> {
   const resultats = await Promise.allSettled(promises);
   const valides = resultats
-    .filter((r): r is PromiseFulfilledResult<{ email: string; certitude: number }> =>
+    .filter((r): r is PromiseFulfilledResult<{ email: string; certitude: number | null }> =>
       r.status === "fulfilled" && r.value !== null
     )
     .map(r => r.value);
   if (valides.length === 0) return null;
-  return valides.reduce((best, cur) => cur.certitude > best.certitude ? cur : best);
+  return valides.reduce((best, cur) => (cur.certitude ?? 0) > (best.certitude ?? 0) ? cur : best);
 }
 
 export async function POST(req: NextRequest) {
@@ -143,7 +146,6 @@ export async function POST(req: NextRequest) {
   if (mode === "email" && (!prenom || !nom || (!entreprise && !domaine))) {
     return NextResponse.json({ error: "Prénom, nom et domaine requis." }, { status: 400 });
   }
-
   let rhCreditsRestants: number | null = null;
 
   if (mode !== "domaine") {

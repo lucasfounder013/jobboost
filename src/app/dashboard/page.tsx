@@ -213,7 +213,7 @@ function DashboardInner() {
   const [chargementRH, setChargementRH] = useState(false);
   const [erreurRH, setErreurRH] = useState("");
   const [emailCopie, setEmailCopie] = useState<string | null>(null);
-  const [emailsReveles, setEmailsReveles] = useState<Record<number, { email: string; certitude: number }>>({});
+  const [emailsReveles, setEmailsReveles] = useState<Record<number, { email: string; certitude: number | null }>>({});
   const [emailChargement, setEmailChargement] = useState<Record<number, boolean>>({});
   const [emailsEchec, setEmailsEchec] = useState<Record<number, boolean>>({});
   type ContactSauvegarde = { id: string; prenom: string; nom: string; poste: string; linkedin: string; email: string; domaine: string };
@@ -227,7 +227,7 @@ function DashboardInner() {
   const [inputPrenomDirect, setInputPrenomDirect] = useState("");
   const [inputNomDirect, setInputNomDirect] = useState("");
   const [inputEntrepriseDirect, setInputEntrepriseDirect] = useState("");
-  const [resultatDirect, setResultatDirect] = useState<{ email: string; certitude: number } | null>(null);
+  const [resultatDirect, setResultatDirect] = useState<{ email: string; certitude: number | null } | null>(null);
   const [chargementDirect, setChargementDirect] = useState(false);
   const [erreurDirect, setErreurDirect] = useState("");
   const [contactDirectSauvegardeId, setContactDirectSauvegardeId] = useState<string | null>(null);
@@ -784,7 +784,7 @@ function DashboardInner() {
     });
   }
 
-  async function sauvegarderContact(contact: { prenom: string; nom: string; poste: string; linkedin?: string }, emailRevele?: { email: string; certitude: number }) {
+  async function sauvegarderContact(contact: { prenom: string; nom: string; poste: string; linkedin?: string }, emailRevele?: { email: string; certitude: number | null }) {
     const key = `${contact.prenom}|${contact.nom}|${domaineTrouveRH}`;
     const res = await fetch("/api/contacts-sauvegardes", {
       method: "POST",
@@ -2152,6 +2152,7 @@ function DashboardInner() {
             {/* Formulaire recherche par personne */}
             <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6 mb-6">
                 <p className="text-sm font-semibold text-gray-700 mb-4">Trouver l&apos;adresse email d&apos;une personne</p>
+
                 <div className="flex flex-col gap-3">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
@@ -2197,7 +2198,7 @@ function DashboardInner() {
                         });
                         const data = await res.json();
                         if (!res.ok) { setErreurDirect(data.error ?? "Aucun email trouvé."); return; }
-                        setResultatDirect({ email: data.email, certitude: data.certitude ?? 0 });
+                        setResultatDirect({ email: data.email, certitude: data.certitude ?? null });
                         if (data.rhCreditsRestants !== undefined && data.rhCreditsRestants !== null) setRhCreditsRestants(data.rhCreditsRestants);
                       } catch { setErreurDirect("Erreur réseau. Veuillez réessayer."); }
                       finally { setChargementDirect(false); }
@@ -2220,13 +2221,15 @@ function DashboardInner() {
                   <div className="mt-4 flex items-center gap-3 bg-emerald-50 rounded-xl px-4 py-3 ring-1 ring-emerald-100">
                     <svg className="w-4 h-4 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                     <span className="text-sm font-semibold text-gray-900 flex-1">{resultatDirect.email}</span>
-                    <span className={`text-xs font-semibold px-2 py-1 rounded-lg ${
-                      resultatDirect.certitude >= 90 ? "bg-emerald-100 text-emerald-700" :
-                      resultatDirect.certitude >= 70 ? "bg-amber-100 text-amber-700" :
-                      "bg-orange-100 text-orange-700"
-                    }`}>
-                      {resultatDirect.certitude}% certitude
-                    </span>
+                    {resultatDirect.certitude !== null && (
+                      <span className={`text-xs font-semibold px-2 py-1 rounded-lg ${
+                        resultatDirect.certitude >= 90 ? "bg-emerald-100 text-emerald-700" :
+                        resultatDirect.certitude >= 70 ? "bg-amber-100 text-amber-700" :
+                        "bg-orange-100 text-orange-700"
+                      }`}>
+                        {resultatDirect.certitude}% certitude
+                      </span>
+                    )}
                     <button
                       onClick={() => { navigator.clipboard.writeText(resultatDirect!.email); setEmailCopie(resultatDirect!.email); setTimeout(() => setEmailCopie(null), 2000); }}
                       className="flex items-center gap-1 text-xs font-semibold bg-white hover:bg-gray-50 text-gray-600 px-3 py-1.5 rounded-lg ring-1 ring-gray-200 transition-colors"
@@ -2305,11 +2308,13 @@ function DashboardInner() {
                           <p className="text-xs text-indigo-600 font-medium mt-1 flex items-center gap-1">
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                             {emailRevele.email}
-                            <span className={`ml-1 text-xs font-medium px-1.5 py-0.5 rounded ${
-                              emailRevele.certitude >= 90 ? "bg-emerald-50 text-emerald-700" :
-                              emailRevele.certitude >= 70 ? "bg-amber-50 text-amber-700" :
-                              "bg-orange-50 text-orange-700"
-                            }`}>{emailRevele.certitude}%</span>
+                            {emailRevele.certitude !== null && (
+                              <span className={`ml-1 text-xs font-medium px-1.5 py-0.5 rounded ${
+                                emailRevele.certitude >= 90 ? "bg-emerald-50 text-emerald-700" :
+                                emailRevele.certitude >= 70 ? "bg-amber-50 text-amber-700" :
+                                "bg-orange-50 text-orange-700"
+                              }`}>{emailRevele.certitude}%</span>
+                            )}
                           </p>
                         )}
                       </div>
@@ -2352,7 +2357,7 @@ function DashboardInner() {
                                 });
                                 const data = await res.json();
                                 if (!res.ok) { setEmailsEchec(prev => ({ ...prev, [i]: true })); return; }
-                                setEmailsReveles(prev => ({ ...prev, [i]: { email: data.email, certitude: data.certitude ?? 0 } }));
+                                setEmailsReveles(prev => ({ ...prev, [i]: { email: data.email, certitude: data.certitude ?? null } }));
                                 if (data.rhCreditsRestants !== undefined && data.rhCreditsRestants !== null) setRhCreditsRestants(data.rhCreditsRestants);
                               } catch { setEmailsEchec(prev => ({ ...prev, [i]: true })); }
                               finally { setEmailChargement(prev => ({ ...prev, [i]: false })); }
