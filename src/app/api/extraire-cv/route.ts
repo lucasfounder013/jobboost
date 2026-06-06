@@ -30,9 +30,21 @@ export async function POST(req: NextRequest) {
 
   if (fichier.type === "application/pdf") {
     const data = await pdfParse(buffer);
+    if (!data.text.trim()) {
+      return NextResponse.json(
+        { error: "Impossible d'extraire le texte de ce PDF. Il s'agit peut-être d'un PDF scanné ou créé depuis une image. Veuillez coller le texte de votre CV manuellement." },
+        { status: 422 }
+      );
+    }
     return NextResponse.json({ texte: data.text });
   }
 
   const { value } = await mammoth.extractRawText({ buffer });
+  if (!value.trim()) {
+    return NextResponse.json(
+      { error: "Impossible d'extraire le texte de ce fichier Word. Veuillez coller le texte de votre CV manuellement." },
+      { status: 422 }
+    );
+  }
   return NextResponse.json({ texte: value });
 }

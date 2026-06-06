@@ -62,6 +62,8 @@ export default function PagePrincipale() {
       const msg = e instanceof Error ? e.message : "Impossible d'extraire le texte du fichier.";
       posthog?.capture("cv_fichier_erreur", { erreur: msg });
       setErreur(msg);
+      setNomFichier("");
+      setCv("");
     } finally {
       setExtractionEnCours(false);
     }
