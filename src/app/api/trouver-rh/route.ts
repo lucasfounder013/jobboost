@@ -36,7 +36,7 @@ const CERTAINTY_SCORE: Record<string, number> = {
   very_unsure: 20,
 };
 
-async function pollEmailSearch(id: string): Promise<Record<string, unknown>> {
+async function pollEmailSearch(id: string): Promise<Record<string, unknown> | null> {
   for (let i = 0; i < 60; i++) {
     await new Promise(r => setTimeout(r, 2000));
     const data = await icypeasFetch("https://app.icypeas.com/api/bulk-single-searchs/read", {
@@ -47,11 +47,82 @@ async function pollEmailSearch(id: string): Promise<Record<string, unknown>> {
     const items = data.items as Array<{ status: string }> | undefined;
     if (!items || items.length === 0) continue;
     if (items[0].status === "DEBITED") return data;
-    if (items[0].status === "FAILED" || items[0].status === "NOT_FOUND") {
-      throw new Error("Aucun email trouvé pour ce contact.");
+    if (items[0].status === "FAILED" || items[0].status === "NOT_FOUND") return null;
+  }
+  return null;
+}
+
+async function rechercherEmailPourDomaine(
+  prenom: string,
+  nom: string,
+  domaine: string
+): Promise<{ email: string; certitude: number } | null> {
+  try {
+    const startData = await icypeasFetch("https://app.icypeas.com/api/email-search", {
+      method: "POST",
+      headers: ICYPEAS_HEADERS,
+      body: JSON.stringify({ firstname: prenom, lastname: nom, domainOrCompany: domaine }),
+    });
+    console.log(`[Icypeas] email-search start (${domaine}):`, JSON.stringify(startData));
+    const searchId = (startData.item as { _id?: string })?._id;
+    if (!searchId) return null;
+
+    const result = await pollEmailSearch(searchId);
+    if (!result) return null;
+
+    type IcypeasEmailItem = { status: string; results?: { emails?: { email: string; certainty?: string }[] } };
+    const items = (result.items as IcypeasEmailItem[]) ?? [];
+    const emailData = items[0]?.results?.emails?.[0];
+    if (!emailData?.email) return null;
+
+    return { email: emailData.email, certitude: CERTAINTY_SCORE[emailData.certainty ?? ""] ?? 0 };
+  } catch {
+    return null;
+  }
+}
+
+function genererDomainesAlternatifs(domaine: string): string[] {
+  const match = domaine.match(/^(.+)\.([^.]+)$/);
+  if (!match) return [];
+  const [, base, tld] = match;
+
+  // Génère des bases simplifiées en supprimant progressivement les parties après tiret
+  // Ex: "loreal-paris" → ["loreal-paris", "loreal"]
+  const bases = [base];
+  const parts = base.split("-");
+  for (let i = parts.length - 1; i >= 1; i--) {
+    bases.push(parts.slice(0, i).join("-"));
+  }
+
+  const tlds = ["com", "fr", "net"];
+  const seen = new Set([domaine]);
+  const alternatives: string[] = [];
+
+  for (const b of bases) {
+    for (const t of tlds) {
+      const candidate = `${b}.${t}`;
+      if (!seen.has(candidate)) {
+        alternatives.push(candidate);
+        seen.add(candidate);
+      }
     }
   }
-  throw new Error("La recherche a dépassé 2 minutes. Veuillez réessayer.");
+
+  return alternatives;
+}
+
+// Attend tous les résultats et retourne celui avec le score de certitude le plus élevé
+async function meilleurEmailTrouve(
+  promises: Promise<{ email: string; certitude: number } | null>[]
+): Promise<{ email: string; certitude: number } | null> {
+  const resultats = await Promise.allSettled(promises);
+  const valides = resultats
+    .filter((r): r is PromiseFulfilledResult<{ email: string; certitude: number }> =>
+      r.status === "fulfilled" && r.value !== null
+    )
+    .map(r => r.value);
+  if (valides.length === 0) return null;
+  return valides.reduce((best, cur) => cur.certitude > best.certitude ? cur : best);
 }
 
 export async function POST(req: NextRequest) {
@@ -111,24 +182,19 @@ export async function POST(req: NextRequest) {
     }
 
     if (mode === "personne" || mode === "email") {
-      const startData = await icypeasFetch("https://app.icypeas.com/api/email-search", {
-        method: "POST",
-        headers: ICYPEAS_HEADERS,
-        body: JSON.stringify({ firstname: prenom, lastname: nom, domainOrCompany: cible }),
-      });
-      console.log("[Icypeas] email-search start:", JSON.stringify(startData));
-      const searchId = (startData.item as { _id?: string })?._id;
-      if (!searchId) throw new Error("Impossible de démarrer la recherche d'email.");
+      // Lance le domaine original + les alternatives en parallèle ; retourne le premier résultat trouvé
+      const tousLesDomaines = [cible, ...genererDomainesAlternatifs(cible)];
+      console.log("[Icypeas] Domaines testés en parallèle :", tousLesDomaines);
 
-      const result = await pollEmailSearch(searchId);
-      type IcypeasEmailItem = { status: string; results?: { emails?: { email: string; certainty?: string }[] } };
-      const items = (result.items as IcypeasEmailItem[]) ?? [];
-      const emailData = items[0]?.results?.emails?.[0];
+      const emailTrouve = await meilleurEmailTrouve(
+        tousLesDomaines.map(d => rechercherEmailPourDomaine(prenom, nom, d))
+      );
 
-      if (!emailData?.email) throw new Error("Aucun email trouvé pour ce contact.");
+      if (!emailTrouve) {
+        throw new Error("Aucun email trouvé pour ce contact. Vérifiez que le site de l'entreprise est correct.");
+      }
 
-      const certitude = CERTAINTY_SCORE[emailData.certainty ?? ""] ?? 0;
-      return NextResponse.json({ email: emailData.email, certitude, rhCreditsRestants });
+      return NextResponse.json({ email: emailTrouve.email, certitude: emailTrouve.certitude, rhCreditsRestants });
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : "Erreur inconnue";

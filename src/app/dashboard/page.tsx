@@ -2220,9 +2220,13 @@ function DashboardInner() {
                   <div className="mt-4 flex items-center gap-3 bg-emerald-50 rounded-xl px-4 py-3 ring-1 ring-emerald-100">
                     <svg className="w-4 h-4 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                     <span className="text-sm font-semibold text-gray-900 flex-1">{resultatDirect.email}</span>
-                    {resultatDirect.certitude >= 70 && (
-                      <span className="text-xs font-semibold px-2 py-1 rounded-lg bg-emerald-100 text-emerald-700">{resultatDirect.certitude}%</span>
-                    )}
+                    <span className={`text-xs font-semibold px-2 py-1 rounded-lg ${
+                      resultatDirect.certitude >= 90 ? "bg-emerald-100 text-emerald-700" :
+                      resultatDirect.certitude >= 70 ? "bg-amber-100 text-amber-700" :
+                      "bg-orange-100 text-orange-700"
+                    }`}>
+                      {resultatDirect.certitude}% certitude
+                    </span>
                     <button
                       onClick={() => { navigator.clipboard.writeText(resultatDirect!.email); setEmailCopie(resultatDirect!.email); setTimeout(() => setEmailCopie(null), 2000); }}
                       className="flex items-center gap-1 text-xs font-semibold bg-white hover:bg-gray-50 text-gray-600 px-3 py-1.5 rounded-lg ring-1 ring-gray-200 transition-colors"
@@ -2301,9 +2305,11 @@ function DashboardInner() {
                           <p className="text-xs text-indigo-600 font-medium mt-1 flex items-center gap-1">
                             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                             {emailRevele.email}
-                            {emailRevele.certitude >= 70 && (
-                              <span className="ml-1 text-xs font-medium px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700">{emailRevele.certitude}%</span>
-                            )}
+                            <span className={`ml-1 text-xs font-medium px-1.5 py-0.5 rounded ${
+                              emailRevele.certitude >= 90 ? "bg-emerald-50 text-emerald-700" :
+                              emailRevele.certitude >= 70 ? "bg-amber-50 text-amber-700" :
+                              "bg-orange-50 text-orange-700"
+                            }`}>{emailRevele.certitude}%</span>
                           </p>
                         )}
                       </div>
