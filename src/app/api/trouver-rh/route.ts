@@ -180,6 +180,12 @@ export async function POST(req: NextRequest) {
         linkedin: p.linkedinUrl ?? "",
       }));
 
+      // Log de l'événement pour la personnalisation des emails
+      pool.query(
+        `INSERT INTO user_events (user_id, action, metadata) VALUES ($1, 'rh', $2)`,
+        [session.user.id, JSON.stringify({ entreprise: cible })]
+      ).catch(e => console.error("[trouver-rh] Erreur log event:", e.message));
+
       return NextResponse.json({ contacts, domaineTrouve: cible, rhCreditsRestants });
     }
 

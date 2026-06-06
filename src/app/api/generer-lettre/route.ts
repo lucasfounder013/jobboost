@@ -109,5 +109,13 @@ Réponds UNIQUEMENT avec un objet JSON valide, sans markdown ni backticks :
     [session.user.id, analyseId, nom_offre, JSON.stringify(lettre)]
   );
 
+  // Log de l'événement pour la personnalisation des emails
+  if (nom_offre) {
+    pool.query(
+      `INSERT INTO user_events (user_id, action, metadata) VALUES ($1, 'lettre', $2)`,
+      [session.user.id, JSON.stringify({ nomPoste: nom_offre })]
+    ).catch(e => console.error("[generer-lettre] Erreur log event:", e.message));
+  }
+
   return NextResponse.json({ lettre, lmCreditsRestants });
 }

@@ -107,5 +107,13 @@ Règles pour forme (section factuelle sur la qualité du CV) :
     return NextResponse.json({ error: "Impossible de parser la réponse de l'IA." }, { status: 500 });
   }
 
+  // Log de l'événement pour la personnalisation des emails
+  if (resultat.nomPoste) {
+    pool.query(
+      `INSERT INTO user_events (user_id, action, metadata) VALUES ($1, 'analyse', $2)`,
+      [session.user.id, JSON.stringify({ nomPoste: resultat.nomPoste, score: resultat.score })]
+    ).catch(e => console.error("[analyser] Erreur log event:", e.message));
+  }
+
   return NextResponse.json({ ...resultat, scansRestants });
 }
