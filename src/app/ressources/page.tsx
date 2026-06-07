@@ -6,6 +6,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 11,
+    categorie: "CV & ATS",
+    titre: "Mots-clés CV Comptable : liste complète 2026 pour passer les ATS",
+    extrait:
+      "30+ mots-clés indispensables pour un CV Comptable qui passe les filtres ATS en 2026. Liste complète par catégorie + exemples.",
+    slug: "/ressources/cv-ats/mots-cles-cv-comptable",
+    date: "7 juin 2026",
+  },
+  {
     id: 10,
     categorie: "CV & ATS",
     titre: "Mots-clés CV Chargé RH : liste complète 2026 pour passer les ATS",
