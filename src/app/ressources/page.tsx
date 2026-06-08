@@ -6,6 +6,24 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 13,
+    categorie: "Lettre de motivation",
+    titre: "Comment écrire une lettre de motivation en 2026 : méthode, exemples et erreurs",
+    extrait:
+      "La méthode en 4 étapes pour écrire une lettre de motivation efficace. Exemples concrets, erreurs à éviter et conseils pour décrocher un entretien.",
+    slug: "/ressources/lettre-de-motivation/comment-ecrire-une-lettre-de-motivation",
+    date: "8 juin 2026",
+  },
+  {
+    id: 12,
+    categorie: "CV & ATS",
+    titre: "Mots-clés CV Marketing Manager : liste complète 2026 pour passer les ATS",
+    extrait:
+      "30+ mots-clés indispensables pour un CV Marketing Manager qui passe les filtres ATS en 2026. Liste complète par catégorie + exemples.",
+    slug: "/ressources/cv-ats/mots-cles-cv-marketing-manager",
+    date: "8 juin 2026",
+  },
+  {
     id: 11,
     categorie: "CV & ATS",
     titre: "Mots-clés CV Comptable : liste complète 2026 pour passer les ATS",
