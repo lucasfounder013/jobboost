@@ -114,18 +114,30 @@ function genererDomainesAlternatifs(domaine: string): string[] {
   return alternatives;
 }
 
-// Attend tous les résultats et retourne celui avec le score de certitude le plus élevé
+// Retourne dès qu'un email avec bonne certitude est trouvé ; sinon attend tous et prend le meilleur
 async function meilleurEmailTrouve(
   promises: Promise<{ email: string; certitude: number | null } | null>[]
 ): Promise<{ email: string; certitude: number | null } | null> {
-  const resultats = await Promise.allSettled(promises);
-  const valides = resultats
-    .filter((r): r is PromiseFulfilledResult<{ email: string; certitude: number | null }> =>
-      r.status === "fulfilled" && r.value !== null
-    )
-    .map(r => r.value);
-  if (valides.length === 0) return null;
-  return valides.reduce((best, cur) => (cur.certitude ?? 0) > (best.certitude ?? 0) ? cur : best);
+  return new Promise((resolve) => {
+    let completed = 0;
+    const total = promises.length;
+    let meilleur: { email: string; certitude: number | null } | null = null;
+
+    for (const p of promises) {
+      p.then((result) => {
+        completed++;
+        if (result !== null && (result.certitude ?? 0) > (meilleur?.certitude ?? -1)) {
+          meilleur = result;
+          // Résoudre immédiatement dès qu'un email "sure" ou mieux est trouvé
+          if ((result.certitude ?? 0) >= 75) resolve(result);
+        }
+        if (completed === total) resolve(meilleur);
+      }).catch(() => {
+        completed++;
+        if (completed === total) resolve(meilleur);
+      });
+    }
+  });
 }
 
 export async function POST(req: NextRequest) {

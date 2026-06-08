@@ -52,7 +52,11 @@ export async function GET() {
 
   return NextResponse.json({
     analyses,
-    cvsAdaptes,
+    cvsAdaptes: cvsAdaptes.map((c) => ({
+      ...c,
+      cv_data: typeof c.cv_data === "string" ? JSON.parse(c.cv_data) : c.cv_data,
+      questions_reponses: typeof c.questions_reponses === "string" ? JSON.parse(c.questions_reponses) : c.questions_reponses,
+    })),
     entretiens,
     scans: utilisateur.scans,
     credits: utilisateur.credits,

@@ -349,6 +349,15 @@ function DashboardInner() {
 
   useEffect(() => {
     if (!session) return;
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") chargerHistorique();
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+  }, [session]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!session) return;
     chargerHistorique();
     fetch("/api/contacts-sauvegardes")
       .then(r => r.json())
@@ -360,6 +369,29 @@ function DashboardInner() {
         setSauvegardeIds(ids);
       });
   }, [session]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── Polling score_apres pour les analyses adaptées sans score encore calculé
+  useEffect(() => {
+    const aPolluer = analyses.filter((a) => a.cv_adapte_id && a.score_apres == null);
+    if (aPolluer.length === 0) return;
+    const interval = setInterval(() => {
+      fetch("/api/dashboard")
+        .then((r) => r.json())
+        .then((data) => {
+          const mises = (data.analyses ?? []) as AnalyseSauvegardee[];
+          const toutesResolues = aPolluer.every((a) => {
+            const maj = mises.find((m) => m.id === a.id);
+            return maj?.score_apres != null;
+          });
+          if (toutesResolues) {
+            setAnalyses(mises);
+            clearInterval(interval);
+          }
+        })
+        .catch(() => {});
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [analyses]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Récupère pendingAnalysis depuis la page d'accueil (après inscription)
   useEffect(() => {
@@ -453,6 +485,67 @@ function DashboardInner() {
       setErreur("Une erreur est survenue. Veuillez réessayer.");
     } finally {
       setChargement(false);
+    }
+  }
+
+  // ── Adaptation depuis l'historique (sans re-analyser)
+  async function adapterCVDepuisHistorique(analyse: AnalyseSauvegardee) {
+    if (!analyse.cv_texte || !analyse.offre_texte) {
+      setVue("nouvelle-analyse");
+      return;
+    }
+    const cvTexte = analyse.cv_texte;
+    const offreTexte = analyse.offre_texte;
+    const idAnalyse = analyse.id;
+
+    setCv(cvTexte);
+    setOffre(offreTexte);
+    setAnalyseId(idAnalyse);
+    setNomPosteEnregistre(analyse.nom_offre);
+    setResultat({ score: analyse.score ?? 0, resume: "", forme: [], motsClesManquants: analyse.mots_cles_manquants ?? [], motsClesPresents: analyse.mots_cles_presents ?? [] });
+    setErreurAdaptation("");
+    setCvAdapte(null);
+    setAdaptationEnCours(true);
+    setEtapeAdaptation("generation");
+    setVue("nouvelle-analyse");
+
+    try {
+      const reponse = await fetch("/api/adapter-cv", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cv: cvTexte, offre: offreTexte, motsClesManquants: analyse.mots_cles_manquants ?? [], reponses: [] }),
+      });
+      const data = await reponse.json();
+      if (reponse.status === 403) { setModaleUpgrade("credits"); setEtapeAdaptation("idle"); return; }
+      if (!reponse.ok) throw new Error(data.error);
+      setCreditsRestants(data.creditsRestants);
+      posthog?.capture("cv_adapte", { credits_restants: data.creditsRestants });
+      setEtapeAdaptation("idle");
+      await fetch("/api/sauvegarder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ analyseId: idAnalyse, nomOffre: analyse.nom_offre, cvAdapte: data.cvAdapte, questionsReponses: [] }),
+      });
+      // Calcul score après adaptation (en arrière-plan)
+      const cvTexteApres = cvStructureVersTexte(data.cvAdapte);
+      fetch("/api/analyser-interne", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cv: cvTexteApres, offre: offreTexte }),
+      }).then((r) => r.ok ? r.json() : null).then((ds) => {
+        if (!ds) return;
+        fetch(`/api/analyses/${idAnalyse}/score-apres`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ scoreApres: ds.score, motsClesApresManquants: ds.motsClesManquants, motsClesApresPresents: ds.motsClesPresents }),
+        }).catch(() => {});
+      }).catch(() => {});
+      router.push(`/cv-adapte/${idAnalyse}`);
+    } catch (e) {
+      setErreurAdaptation(e instanceof Error ? e.message : "Une erreur est survenue.");
+      setEtapeAdaptation("idle");
+    } finally {
+      setAdaptationEnCours(false);
     }
   }
 
@@ -1143,7 +1236,7 @@ function DashboardInner() {
                           </>
                         ) : (
                           <button
-                            onClick={() => setVue("nouvelle-analyse")}
+                            onClick={() => adapterCVDepuisHistorique(analyse)}
                             className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 hover:bg-indigo-50 px-3 py-1.5 rounded-lg transition-colors"
                           >
                             Adapter pour les ATS →
