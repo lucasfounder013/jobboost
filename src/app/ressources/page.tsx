@@ -6,6 +6,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 14,
+    categorie: "Candidature spontanée",
+    titre: "Comment trouver l'email d'un recruteur en 2026 : 8 méthodes efficaces",
+    extrait:
+      "Envoyer votre CV à contact@entreprise.fr, c'est l'envoyer à la corbeille. Voici 8 méthodes pour trouver directement l'email du recruteur ou du DRH.",
+    slug: "/ressources/candidature-spontanee/trouver-email-recruteur",
+    date: "9 juin 2026",
+  },
+  {
     id: 13,
     categorie: "Lettre de motivation",
     titre: "Comment écrire une lettre de motivation en 2026 : méthode, exemples et erreurs",
@@ -124,11 +133,12 @@ const articles = [
   },
 ];
 
-const CATEGORIES = ["Toutes", "CV & ATS", "Lettre de motivation", "Trouver des offres"];
+const CATEGORIES = ["Toutes", "CV & ATS", "Lettre de motivation", "Candidature spontanée", "Trouver des offres"];
 
 const COULEURS_CATEGORIE: Record<string, string> = {
   "CV & ATS": "bg-violet-50 text-violet-700",
   "Lettre de motivation": "bg-violet-50 text-violet-700",
+  "Candidature spontanée": "bg-violet-50 text-violet-700",
   "Trouver des offres": "bg-violet-50 text-violet-700",
 };
 
