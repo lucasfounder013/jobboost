@@ -6,6 +6,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 15,
+    categorie: "CV & ATS",
+    titre: "Mots-clés CV Ingénieur : liste complète 2026 pour passer les ATS",
+    extrait:
+      "Les 30+ mots-clés techniques, outils et certifications indispensables pour qu'un CV Ingénieur soit trouvé dans les ATS. Liste par catégorie avec exemples.",
+    slug: "/ressources/cv-ats/mots-cles-cv-ingenieur",
+    date: "9 juin 2026",
+  },
+  {
     id: 14,
     categorie: "Candidature spontanée",
     titre: "Comment trouver l'email d'un recruteur en 2026 : 8 méthodes efficaces",
