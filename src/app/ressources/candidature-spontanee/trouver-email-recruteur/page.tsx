@@ -1,11 +1,17 @@
 import Link from "next/link";
 import Footer from "@/components/Footer";
 import ShareButtons from "./ShareButtons";
+import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
   title: "Comment trouver l'email d'un recruteur en 2026 : 8 méthodes efficaces | JobBoost",
   description:
     "8 méthodes pour trouver l'adresse email d'un recruteur ou DRH pour votre candidature spontanée. Hunter.io, LinkedIn, patterns email, RGPD : guide complet.",
+  ...ogMeta(
+    "Comment trouver l'email d'un recruteur en 2026 : 8 méthodes efficaces | JobBoost",
+    "8 méthodes pour trouver l'adresse email d'un recruteur ou DRH pour votre candidature spontanée. Hunter.io, LinkedIn, patterns email, RGPD : guide complet.",
+    "/ressources/candidature-spontanee/trouver-email-recruteur"
+  ),
 };
 
 const TOC = [
@@ -393,7 +399,7 @@ export default function ArticleTrouverEmailRecruteur() {
           </article>
 
           {/* Sidebar TOC */}
-          <aside className="hidden lg:block sticky top-8 self-start">
+          <aside className="hidden lg:block sticky top-20 self-start">
 
             {/* Méta-ligne */}
             <div className="flex items-center gap-2 text-sm text-gray-500 mb-6">

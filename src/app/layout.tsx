@@ -13,8 +13,25 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://www.jobboost.fr"),
   title: "Analysez votre CV face à une offre d'emploi | JobBoost",
   description: "Collez votre CV et une offre d'emploi pour obtenir votre score de correspondance, les mots-clés manquants et un CV adapté en quelques secondes.",
+  alternates: {
+    canonical: "https://www.jobboost.fr",
+  },
+  openGraph: {
+    title: "Analysez votre CV face à une offre d'emploi | JobBoost",
+    description: "Collez votre CV et une offre d'emploi pour obtenir votre score de correspondance, les mots-clés manquants et un CV adapté en quelques secondes.",
+    url: "https://www.jobboost.fr",
+    siteName: "JobBoost",
+    locale: "fr_FR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Analysez votre CV face à une offre d'emploi | JobBoost",
+    description: "Collez votre CV et une offre d'emploi pour obtenir votre score de correspondance, les mots-clés manquants et un CV adapté en quelques secondes.",
+  },
   verification: {
     other: {
       "ahrefs-site-verification": "823a7c82006d70b462570506b8d4daa23b741b165360fe97b16e548e574a0fe9",

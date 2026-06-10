@@ -1,11 +1,17 @@
 import Link from "next/link";
 import Footer from "@/components/Footer";
 import ShareButtons from "../quest-ce-qu-un-ats/ShareButtons";
+import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
   title: "Les ATS les plus utilisés en France, et ce que ça change pour vous | JobBoost",
   description:
     "Workday, Taleo, SAP, Greenhouse, Welcome to the Jungle... Quels ATS les entreprises françaises utilisent vraiment, et est-ce que ça change quelque chose pour votre CV ?",
+  ...ogMeta(
+    "Les ATS les plus utilisés en France, et ce que ça change pour vous | JobBoost",
+    "Workday, Taleo, SAP, Greenhouse, Welcome to the Jungle... Quels ATS les entreprises françaises utilisent vraiment, et est-ce que ça change quelque chose pour votre CV ?",
+    "/ressources/cv-ats/ats-les-plus-utilises-en-france"
+  ),
 };
 
 const TOC = [
@@ -248,37 +254,30 @@ export default function ArticleATSLesPlusUtilises() {
           </article>
 
           {/* TOC sticky */}
-          <aside className="hidden lg:block">
-            <div className="sticky top-24">
+          <aside className="hidden lg:block sticky top-20 self-start">
 
-              {/* Table des matières */}
-              <div className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-6 mb-6">
-                <p className="text-base font-bold text-gray-900 mb-5">
-                  Table des matières
-                </p>
-                <nav className="space-y-1">
-                  {TOC.map((section) => (
-                    <a
-                      key={section.id}
-                      href={`#${section.id}`}
-                      className={`block text-sm text-gray-500 hover:text-violet-600 transition-colors py-1 leading-snug ${
-                        section.niveau === 3 ? "ml-4 text-xs text-gray-400 hover:text-violet-500" : ""
-                      }`}
-                    >
-                      {section.titre}
-                    </a>
-                  ))}
-                </nav>
-              </div>
+            {/* Table des matières */}
+            <div className="bg-gray-50 rounded-2xl p-5 ring-1 ring-gray-100 mb-6">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Sommaire</p>
+              <nav className="space-y-2">
+                {TOC.map((section) => (
+                  <a
+                    key={section.id}
+                    href={`#${section.id}`}
+                    className={`block text-sm leading-snug text-gray-600 hover:text-violet-600 transition-colors ${
+                      section.niveau === 3 ? "pl-3 text-xs" : "font-medium"
+                    }`}
+                  >
+                    {section.titre}
+                  </a>
+                ))}
+              </nav>
+            </div>
 
-              {/* Partager */}
-              <div className="bg-white rounded-2xl ring-1 ring-gray-100 shadow-sm p-6">
-                <p className="text-base font-bold text-gray-900 mb-4">
-                  Partager cet article
-                </p>
-                <ShareButtons />
-              </div>
-
+            {/* Partager */}
+            <div className="bg-gray-50 rounded-2xl p-5 ring-1 ring-gray-100">
+              <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4">Partager</p>
+              <ShareButtons />
             </div>
           </aside>
 

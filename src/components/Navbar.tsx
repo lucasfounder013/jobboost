@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useSession, signOut } from "@/lib/auth-client";
 
 const lienCentre = [
@@ -13,11 +14,13 @@ const lienCentre = [
 
 export default function Navbar() {
   const { data: session } = useSession();
+  const pathname = usePathname();
+  const isArticle = pathname.startsWith("/ressources/") && pathname !== "/ressources";
 
   if (session) return null;
 
   return (
-    <header className="sticky top-0 z-50 bg-white/70 backdrop-blur-xl border-b border-white/60 shadow-sm shadow-indigo-50">
+    <header className={`${isArticle ? "relative" : "sticky top-0"} z-50 bg-white/70 backdrop-blur-xl border-b border-white/60 shadow-sm shadow-indigo-50`}>
       <div className="overflow-x-auto scrollbar-hide sm:overflow-x-visible">
         <div className="min-w-max sm:min-w-0 max-w-6xl mx-auto px-4 sm:px-6 h-16 grid grid-cols-[auto_1fr_auto] items-center gap-2">
 
