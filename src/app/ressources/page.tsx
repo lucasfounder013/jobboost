@@ -6,6 +6,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 16,
+    categorie: "CV & ATS",
+    titre: "Mots-clés CV Développeur Web : liste complète 2026 pour passer les ATS",
+    extrait:
+      "Les 30+ mots-clés indispensables pour un CV Développeur Web qui passe les filtres ATS en 2026. Langages, frameworks, DevOps et soft skills par catégorie.",
+    slug: "/ressources/cv-ats/mots-cles-cv-developpeur-web",
+    date: "10 juin 2026",
+  },
+  {
     id: 15,
     categorie: "CV & ATS",
     titre: "Mots-clés CV Ingénieur : liste complète 2026 pour passer les ATS",
