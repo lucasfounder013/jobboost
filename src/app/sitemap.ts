@@ -126,6 +126,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    {
+      url: `${BASE_URL}/ressources/cv-ats/mots-cles-cv-assistant-rh`,
+      lastModified: new Date("2026-06-11"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     // Articles lettre de motivation
     {
       url: `${BASE_URL}/ressources/lettre-de-motivation/comment-ecrire-une-lettre-de-motivation`,

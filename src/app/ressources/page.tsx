@@ -6,6 +6,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 17,
+    categorie: "CV & ATS",
+    titre: "Mots-clés CV Assistant RH : liste complète 2026 pour passer les ATS",
+    extrait:
+      "Les 30+ mots-clés indispensables pour un CV Assistant RH. Liste organisée par catégorie (recrutement, SIRH, droit social) avec exemples d'intégration.",
+    slug: "/ressources/cv-ats/mots-cles-cv-assistant-rh",
+    date: "11 juin 2026",
+  },
+  {
     id: 16,
     categorie: "CV & ATS",
     titre: "Mots-clés CV Développeur Web : liste complète 2026 pour passer les ATS",
