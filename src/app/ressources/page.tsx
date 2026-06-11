@@ -6,6 +6,24 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 19,
+    categorie: "Lettre de motivation",
+    titre: "Reconversion professionnelle à 50 ans : comment adapter son CV et ses candidatures en 2026",
+    extrait:
+      "CV sans date de naissance, compétences transférables, lettre de motivation adaptée : tout ce qu'il faut savoir pour réussir sa reconversion à 50 ans.",
+    slug: "/ressources/lettre-de-motivation/reconversion-professionnelle-50-ans",
+    date: "11 juin 2026",
+  },
+  {
+    id: 18,
+    categorie: "Lettre de motivation",
+    titre: "Lettre de motivation reconversion professionnelle : guide complet + exemple 2026",
+    extrait:
+      "Comment rédiger une lettre de motivation convaincante pour une reconversion. Structure en 4 parties, exemple complet annoté et erreurs à éviter.",
+    slug: "/ressources/lettre-de-motivation/lettre-motivation-reconversion-professionnelle",
+    date: "11 juin 2026",
+  },
+  {
     id: 17,
     categorie: "CV & ATS",
     titre: "Mots-clés CV Assistant RH : liste complète 2026 pour passer les ATS",

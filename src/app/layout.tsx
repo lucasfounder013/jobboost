@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { Providers } from "./providers";
 import { PostHogPageView } from "./posthog-pageview";
 import Navbar from "@/components/Navbar";
+import { FeedbackButton } from "@/components/FeedbackButton";
 import "./globals.css";
 
 const inter = Inter({
@@ -53,6 +54,7 @@ export default function RootLayout({
           </Suspense>
           <Navbar />
           {children}
+          <FeedbackButton />
         </Providers>
       </body>
     </html>

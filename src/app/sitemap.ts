@@ -134,6 +134,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     // Articles lettre de motivation
     {
+      url: `${BASE_URL}/ressources/lettre-de-motivation/reconversion-professionnelle-50-ans`,
+      lastModified: new Date("2026-06-11"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/ressources/lettre-de-motivation/lettre-motivation-reconversion-professionnelle`,
+      lastModified: new Date("2026-06-11"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
       url: `${BASE_URL}/ressources/lettre-de-motivation/comment-ecrire-une-lettre-de-motivation`,
       lastModified: new Date("2026-06-05"),
       changeFrequency: "monthly",
