@@ -159,8 +159,8 @@ export default function PagePricing() {
               </Link>
             </div>
 
-            <PlanPayant plan="starter" label="Starter" prix="9,99€" features={FEATURES_STANDARD} />
-            <PlanPayant plan="pro" label="Pro" prix="14,99€" features={FEATURES_PREMIUM} recommande />
+            <PlanPayant plan="starter" label="Starter" prix="9,99€" features={FEATURES_STANDARD} recommande />
+            <PlanPayant plan="pro" label="Pro" prix="14,99€" features={FEATURES_PREMIUM} />
           </div>
 
           <p className="mt-8 text-xs text-gray-400">
