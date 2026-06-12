@@ -6,6 +6,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 20,
+    categorie: "CV & ATS",
+    titre: "Comment tester son CV ATS gratuitement",
+    extrait:
+      "Avant de postuler, vous pouvez savoir si votre CV sera bien lu par un ATS. Voici comment le tester gratuitement.",
+    slug: "/ressources/cv-ats/tester-son-cv-ats-gratuitement",
+    date: "12 juin 2026",
+  },
+  {
     id: 19,
     categorie: "Lettre de motivation",
     titre: "Reconversion professionnelle à 50 ans : comment adapter son CV et ses candidatures en 2026",
