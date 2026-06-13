@@ -160,6 +160,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Prénom, nom et domaine requis." }, { status: 400 });
   }
   let rhCreditsRestants: number | null = null;
+  let estGratuit = false;
 
   if (mode !== "domaine") {
     const { rowCount, rows } = await pool.query(
@@ -167,9 +168,15 @@ export async function POST(req: NextRequest) {
       [session.user.id]
     );
     if (rowCount === 0) {
-      return NextResponse.json({ error: "Vous n'avez plus de crédits email ce mois-ci." }, { status: 403 });
+      if (mode === "personne") {
+        // Utilisateur gratuit : recherche autorisée mais email flouté côté client
+        estGratuit = true;
+      } else {
+        return NextResponse.json({ error: "Vous n'avez plus de crédits email ce mois-ci." }, { status: 403 });
+      }
+    } else {
+      rhCreditsRestants = rows[0].rh_credits;
     }
-    rhCreditsRestants = rows[0].rh_credits;
   }
 
   try {
@@ -215,11 +222,11 @@ export async function POST(req: NextRequest) {
         throw new Error("Aucun email trouvé pour ce contact. Vérifiez que le site de l'entreprise est correct.");
       }
 
-      return NextResponse.json({ email: emailTrouve.email, certitude: emailTrouve.certitude, rhCreditsRestants });
+      return NextResponse.json({ email: emailTrouve.email, certitude: emailTrouve.certitude, rhCreditsRestants, estGratuit });
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : "Erreur inconnue";
-    if (mode !== "domaine") {
+    if (mode !== "domaine" && !estGratuit) {
       await pool.query('UPDATE "user" SET rh_credits = rh_credits + 1 WHERE id = $1', [session.user.id]);
     }
     return NextResponse.json({ error: message }, { status: 500 });
