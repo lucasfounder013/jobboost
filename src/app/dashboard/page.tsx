@@ -1508,7 +1508,7 @@ function DashboardInner() {
                       ) : (
                         <>
                           <button onClick={adapterCV} disabled={adaptationEnCours} className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                            Adapter mon CV au format ATS →
+                            Adapter mon CV à l'offre d'emploi
                           </button>
                           {erreurAdaptation && <p className="text-rose-500 text-xs font-medium text-center">{erreurAdaptation}</p>}
                           {creditsRestants !== null && creditsRestants > 0 ? (

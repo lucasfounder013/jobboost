@@ -189,7 +189,7 @@ export default function CvAdaptePage() {
         {/* Score ATS */}
         <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6">
           <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Score ATS</p>
-          <div className="flex items-center gap-8 flex-wrap">
+          <div className="flex items-center justify-center gap-8 flex-wrap">
             <div className="flex flex-col items-center gap-1">
               <p className="text-xs text-gray-400">Avant</p>
               <div className={`w-20 h-20 rounded-full flex flex-col items-center justify-center ring-4 bg-white ${ringScore(data.score)}`}>
@@ -215,38 +215,6 @@ export default function CvAdaptePage() {
             </div>
           </div>
         </div>
-
-        {/* Mots-clés */}
-        {(motsClesAjoutes.length > 0 || motsClesRetires.length > 0) && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            {motsClesAjoutes.length > 0 && (
-              <div className="bg-white rounded-2xl ring-1 ring-emerald-100 shadow-sm p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400" />
-                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Mots-clés ajoutés <span className="text-emerald-600 font-bold">({motsClesAjoutes.length})</span></p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {motsClesAjoutes.map((m) => (
-                    <span key={m} className="bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1 rounded-full text-xs font-semibold">{m}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-            {motsClesApresManquants && motsClesApresManquants.length > 0 && (
-              <div className="bg-white rounded-2xl ring-1 ring-amber-100 shadow-sm p-5">
-                <div className="flex items-center gap-2 mb-3">
-                  <div className="w-2 h-2 rounded-full bg-amber-400" />
-                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Encore manquants <span className="text-amber-600 font-bold">({motsClesApresManquants.length})</span></p>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {motsClesApresManquants.map((m) => (
-                    <span key={m} className="bg-amber-50 text-amber-700 border border-amber-100 px-3 py-1 rounded-full text-xs font-semibold">{m}</span>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
-        )}
 
         {/* CV Preview */}
         {data.cv_data ? (
@@ -280,6 +248,38 @@ export default function CvAdaptePage() {
         ) : (
           <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-8 text-center text-gray-400 text-sm">
             CV adapté non disponible.
+          </div>
+        )}
+
+        {/* Mots-clés */}
+        {(motsClesAjoutes.length > 0 || motsClesRetires.length > 0) && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {motsClesAjoutes.length > 0 && (
+              <div className="bg-white rounded-2xl ring-1 ring-emerald-100 shadow-sm p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Mots-clés ajoutés <span className="text-emerald-600 font-bold">({motsClesAjoutes.length})</span></p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {motsClesAjoutes.map((m) => (
+                    <span key={m} className="bg-emerald-50 text-emerald-700 border border-emerald-100 px-3 py-1 rounded-full text-xs font-semibold">{m}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+            {motsClesApresManquants && motsClesApresManquants.length > 0 && (
+              <div className="bg-white rounded-2xl ring-1 ring-amber-100 shadow-sm p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-2 h-2 rounded-full bg-amber-400" />
+                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Encore manquants <span className="text-amber-600 font-bold">({motsClesApresManquants.length})</span></p>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {motsClesApresManquants.map((m) => (
+                    <span key={m} className="bg-amber-50 text-amber-700 border border-amber-100 px-3 py-1 rounded-full text-xs font-semibold">{m}</span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
