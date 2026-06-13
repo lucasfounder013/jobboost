@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
   const estAbonne: boolean = rowsUser[0]?.is_subscribed ?? false;
 
   let creditsRestants: number | null = null;
+  let locked = false;
 
   if (!estAbonne) {
     // Décrémentation atomique : échoue si credits = 0
@@ -39,12 +40,12 @@ export async function POST(req: NextRequest) {
     );
 
     if (rowCount === 0) {
-      return NextResponse.json(
-        { error: "Vous n'avez plus de crédits disponibles. Passez à un abonnement pour des adaptations illimitées." },
-        { status: 403 }
-      );
+      // On génère quand même pour montrer un aperçu flou (conversion)
+      locked = true;
+      creditsRestants = 0;
+    } else {
+      creditsRestants = rows[0].credits;
     }
-    creditsRestants = rows[0].credits;
   }
 
   const motsClesListe =
@@ -77,7 +78,7 @@ Retourne UNIQUEMENT un objet JSON valide, sans markdown ni backticks, respectant
     "linkedin": "string?",
     "site": "string?"
   },
-  "resume": "string? (accroche professionnelle, 2-4 phrases)",
+  "resume": "string? (accroche professionnelle à la 1re personne du singulier, 2-3 phrases sobres et factuelles — jamais de 3e personne 'il/elle/son/sa', jamais de superlatifs exagérés comme 'excellent', 'reconnu pour', 'passionné' — exemple de ton : 'Étudiant ingénieur en chimie avec une expérience en gestion de projet et relation client. Je cherche à développer mes compétences commerciales dans un environnement dynamique.')",
   "experiences": [{
     "poste": "string",
     "entreprise": "string",
@@ -137,5 +138,5 @@ ${offre}`,
     [session.user.id, JSON.stringify({ nomPoste: cvAdapte?.titre ?? null })]
   ).catch(e => console.error("[adapter-cv] Erreur log event:", e.message));
 
-  return NextResponse.json({ cvAdapte, creditsRestants });
+  return NextResponse.json({ cvAdapte, creditsRestants, locked });
 }

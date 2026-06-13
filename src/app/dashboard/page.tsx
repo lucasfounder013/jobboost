@@ -181,6 +181,7 @@ function DashboardInner() {
   const [erreur, setErreur] = useState("");
   const [resultat, setResultat] = useState<ResultatAnalyse | null>(null);
   const [cvAdapte, setCvAdapte] = useState<CVStructure | null>(null);
+  const [cvLocked, setCvLocked] = useState(false);
   const [adaptationEnCours, setAdaptationEnCours] = useState(false);
   const [erreurAdaptation, setErreurAdaptation] = useState("");
   const [creditsRestants, setCreditsRestants] = useState<number | null>(null);
@@ -498,6 +499,17 @@ function DashboardInner() {
     const offreTexte = analyse.offre_texte;
     const idAnalyse = analyse.id;
 
+    // Redirection immédiate pour les utilisateurs sans crédit
+    if (creditsRestants === 0 && !estAbonne) {
+      sessionStorage.setItem("cvApercuParams", JSON.stringify({
+        cv: cvTexte, offre: offreTexte,
+        motsClesManquants: analyse.mots_cles_manquants ?? [],
+        scoreBefore: analyse.score ?? null,
+      }));
+      router.push("/cv-apercu");
+      return;
+    }
+
     setCv(cvTexte);
     setOffre(offreTexte);
     setAnalyseId(idAnalyse);
@@ -516,11 +528,34 @@ function DashboardInner() {
         body: JSON.stringify({ cv: cvTexte, offre: offreTexte, motsClesManquants: analyse.mots_cles_manquants ?? [], reponses: [] }),
       });
       const data = await reponse.json();
-      if (reponse.status === 403) { setModaleUpgrade("credits"); setEtapeAdaptation("idle"); return; }
       if (!reponse.ok) throw new Error(data.error);
+      const locked: boolean = data.locked ?? false;
       setCreditsRestants(data.creditsRestants);
-      posthog?.capture("cv_adapte", { credits_restants: data.creditsRestants });
+      posthog?.capture("cv_adapte", { credits_restants: data.creditsRestants, locked });
       setEtapeAdaptation("idle");
+      if (locked) {
+        // Calculer le score après adaptation pour l'aperçu
+        let scoreApres: number | null = null;
+        try {
+          const cvTexteApres = cvStructureVersTexte(data.cvAdapte);
+          const resScore = await fetch("/api/analyser-interne", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cv: cvTexteApres, offre: offreTexte }),
+          });
+          if (resScore.ok) {
+            const dataScore = await resScore.json();
+            scoreApres = dataScore.score ?? null;
+          }
+        } catch {}
+        sessionStorage.setItem("cvApercu", JSON.stringify({
+          cvAdapte: data.cvAdapte,
+          scoreBefore: analyse.score ?? null,
+          scoreAfter: scoreApres,
+        }));
+        router.push("/cv-apercu");
+        return;
+      }
       await fetch("/api/sauvegarder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -552,8 +587,21 @@ function DashboardInner() {
   // ── Adaptation CV
   async function adapterCV() {
     if (!resultat) return;
+
+    // Redirection immédiate vers la page d'aperçu pour les utilisateurs sans crédit
+    if (creditsRestants === 0 && !estAbonne) {
+      sessionStorage.setItem("cvApercuParams", JSON.stringify({
+        cv, offre,
+        motsClesManquants: resultat.motsClesManquants,
+        scoreBefore: resultat.score ?? null,
+      }));
+      router.push("/cv-apercu");
+      return;
+    }
+
     setErreurAdaptation("");
     setCvAdapte(null);
+    setCvLocked(false);
     setAdaptationEnCours(true);
     setEtapeAdaptation("generation");
     try {
@@ -563,18 +611,27 @@ function DashboardInner() {
         body: JSON.stringify({ cv, offre, motsClesManquants: resultat.motsClesManquants, reponses: [] }),
       });
       const data = await reponse.json();
-      if (reponse.status === 403) { setModaleUpgrade("credits"); setEtapeAdaptation("idle"); return; }
       if (!reponse.ok) throw new Error(data.error);
+      const locked: boolean = data.locked ?? false;
       setCreditsRestants(data.creditsRestants);
-      posthog?.capture("cv_adapte", { credits_restants: data.creditsRestants });
+      posthog?.capture("cv_adapte", { credits_restants: data.creditsRestants, locked });
       setEtapeAdaptation("idle");
+      if (locked) {
+        sessionStorage.setItem("cvApercuParams", JSON.stringify({
+          cv, offre,
+          motsClesManquants: resultat?.motsClesManquants ?? [],
+          scoreBefore: resultat?.score ?? null,
+        }));
+        router.push("/cv-apercu");
+        return;
+      }
       await sauvegarderCvAdapte(data.cvAdapte);
       calculerScoreApresAdaptation(data.cvAdapte).catch(() => {});
       if (analyseId) {
         router.push(`/cv-adapte/${analyseId}`);
-      } else {
-        setCvAdapte(data.cvAdapte);
+        return;
       }
+      setCvAdapte(data.cvAdapte);
     } catch (e) {
       setErreurAdaptation(e instanceof Error ? e.message : "Une erreur est survenue.");
       setEtapeAdaptation("idle");
@@ -1003,27 +1060,33 @@ function DashboardInner() {
               <div className="bg-indigo-900/50 rounded-xl px-3 py-2 flex flex-col gap-1">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-indigo-300">Analyses</span>
-                  <span className={`font-bold ${(scansRestants ?? 0) === 0 ? "text-rose-400" : "text-white"}`}>{scansRestants ?? 0}/3</span>
+                  <span className="font-bold text-white">{scansRestants ?? 0}/3</span>
                 </div>
                 <div className="w-full bg-indigo-800 rounded-full h-1.5">
                   <div
-                    className={`h-1.5 rounded-full transition-all ${(scansRestants ?? 0) === 0 ? "bg-rose-400" : "bg-indigo-400"}`}
+                    className="h-1.5 rounded-full transition-all bg-indigo-400"
                     style={{ width: `${Math.max(0, Math.min(100, ((scansRestants ?? 0) / 3) * 100))}%` }}
                   />
                 </div>
-                <div className="flex items-center justify-between text-xs mt-0.5">
-                  <span className="text-indigo-300">Adaptation CV</span>
-                  <span className={`font-bold ${(creditsRestants ?? 0) === 0 ? "text-rose-400" : "text-white"}`}>{(creditsRestants ?? 0) > 0 ? `${creditsRestants} crédit` : "0 crédit"}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs mt-0.5">
-                  <span className="text-indigo-300">Lettre de motivation</span>
-                  <span className={`font-bold ${(lmCreditsRestants ?? 0) === 0 ? "text-rose-400" : "text-white"}`}>{(lmCreditsRestants ?? 0) > 0 ? `${lmCreditsRestants} crédit` : "0 crédit"}</span>
-                </div>
-                <div className="flex items-center justify-between text-xs mt-0.5">
-                  <span className="text-indigo-300">Trouver un mail pro</span>
-                  <span className={`font-bold ${(rhCreditsRestants ?? 0) === 0 ? "text-rose-400" : "text-white"}`}>{(rhCreditsRestants ?? 0) > 0 ? `${rhCreditsRestants} email${(rhCreditsRestants ?? 0) > 1 ? "s" : ""}` : "0 email"}</span>
-                </div>
-                {((scansRestants ?? 0) <= 2 || (creditsRestants ?? 0) === 0 || (lmCreditsRestants ?? 0) === 0) && (
+                {(creditsRestants ?? 0) > 0 && (
+                  <div className="flex items-center justify-between text-xs mt-0.5">
+                    <span className="text-indigo-300">Adaptation CV</span>
+                    <span className="font-bold text-white">{creditsRestants} crédit</span>
+                  </div>
+                )}
+                {(lmCreditsRestants ?? 0) > 0 && (
+                  <div className="flex items-center justify-between text-xs mt-0.5">
+                    <span className="text-indigo-300">Lettre de motivation</span>
+                    <span className="font-bold text-white">{lmCreditsRestants} crédit</span>
+                  </div>
+                )}
+                {(rhCreditsRestants ?? 0) > 0 && (
+                  <div className="flex items-center justify-between text-xs mt-0.5">
+                    <span className="text-indigo-300">Trouver un mail pro</span>
+                    <span className="font-bold text-white">{rhCreditsRestants} email{(rhCreditsRestants ?? 0) > 1 ? "s" : ""}</span>
+                  </div>
+                )}
+                {(scansRestants ?? 0) <= 2 && (
                   <Link href="/pricing" className="mt-1 text-center text-xs font-semibold text-indigo-300 hover:text-white bg-indigo-800/60 hover:bg-indigo-700/60 rounded-lg py-1.5 transition-colors">
                     Passer à l&apos;abonnement →
                   </Link>
@@ -1437,12 +1500,7 @@ function DashboardInner() {
                       <p className="text-gray-700 text-sm leading-relaxed">{resultat.resume}</p>
                     </div>
                     <div className="pt-4 border-t border-gray-100 flex flex-col gap-2">
-                      {creditsRestants === 0 ? (
-                        <div className="flex flex-col gap-2">
-                          <Link href="/pricing" className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm text-center hover:opacity-90 transition-opacity shadow-md shadow-indigo-100">S&apos;abonner pour des adaptations illimitées →</Link>
-                          <p className="text-gray-400 text-xs text-center">Votre crédit gratuit a été utilisé</p>
-                        </div>
-                      ) : etapeAdaptation === "generation" ? (
+                      {etapeAdaptation === "generation" ? (
                         <button disabled className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm opacity-70 cursor-not-allowed flex items-center justify-center gap-2">
                           <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
                           Génération du CV en cours...
@@ -1450,7 +1508,7 @@ function DashboardInner() {
                       ) : (
                         <>
                           <button onClick={adapterCV} disabled={adaptationEnCours} className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                            Adapter mon CV pour les ATS →
+                            Adapter mon CV au format ATS →
                           </button>
                           {erreurAdaptation && <p className="text-rose-500 text-xs font-medium text-center">{erreurAdaptation}</p>}
                           {creditsRestants !== null && creditsRestants > 0 ? (
@@ -1532,19 +1590,44 @@ function DashboardInner() {
                         <div className="w-2 h-2 rounded-full bg-indigo-400" />
                         <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">CV adapté ATS</p>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => exporterCV(cvAdapte, "pdf", "analyse")} disabled={exportEnCoursAnalyse !== null} className="flex items-center gap-1.5 text-xs font-semibold bg-gray-900 text-white px-3 py-1.5 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                          {exportEnCoursAnalyse === "pdf" ? <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg> : <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>}
-                          PDF
-                        </button>
-                        <button onClick={() => exporterCV(cvAdapte, "docx", "analyse")} disabled={exportEnCoursAnalyse !== null} className="flex items-center gap-1.5 text-xs font-semibold bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                          {exportEnCoursAnalyse === "docx" ? <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg> : <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>}
-                          Word
-                        </button>
-                      </div>
+                      {cvLocked ? (
+                        <Link href="/pricing" className="flex items-center gap-1.5 text-xs font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity">
+                          <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                          Débloquer
+                        </Link>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => exporterCV(cvAdapte, "pdf", "analyse")} disabled={exportEnCoursAnalyse !== null} className="flex items-center gap-1.5 text-xs font-semibold bg-gray-900 text-white px-3 py-1.5 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            {exportEnCoursAnalyse === "pdf" ? <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg> : <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>}
+                            PDF
+                          </button>
+                          <button onClick={() => exporterCV(cvAdapte, "docx", "analyse")} disabled={exportEnCoursAnalyse !== null} className="flex items-center gap-1.5 text-xs font-semibold bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            {exportEnCoursAnalyse === "docx" ? <svg className="animate-spin w-3 h-3" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg> : <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>}
+                            Word
+                          </button>
+                        </div>
+                      )}
                     </div>
-                    <div className="p-4">
+                    <div className="p-4 relative">
                       <CVPreview cv={cvAdapte} />
+                      {cvLocked && (
+                        <>
+                          {/* Dégradé de fondu depuis le bas de l'en-tête */}
+                          <div className="absolute inset-x-0 top-[100px] h-20 bg-gradient-to-b from-transparent to-white/80 pointer-events-none" />
+                          {/* Zone floutée */}
+                          <div className="absolute inset-x-0 top-[120px] bottom-0 backdrop-blur-sm bg-white/50 pointer-events-none" />
+                          {/* CTA centré dans la zone floutée */}
+                          <div className="absolute inset-x-0 top-[120px] bottom-0 flex flex-col items-center justify-center gap-4 p-6 z-10">
+                            <div className="text-center">
+                              <p className="text-base font-semibold text-gray-800 mb-1">Votre CV adapté est prêt ✨</p>
+                              <p className="text-sm text-gray-500">Passez à l&apos;abonnement pour le télécharger en PDF ou Word</p>
+                            </div>
+                            <Link href="/pricing" className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white text-sm font-semibold shadow-lg hover:opacity-90 transition-opacity">
+                              Débloquer mon CV complet →
+                            </Link>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 )}

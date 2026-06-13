@@ -66,7 +66,7 @@ Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans backticks) av
 {
   "score": <entier entre 0 et 100 représentant le pourcentage de correspondance ATS>,
   "nomPoste": "<titre du poste extrait de l'offre d'emploi, ex: 'Développeur React Senior'>",
-  "resume": "<2-3 phrases d'analyse globale en français>",
+  "resume": "<2-3 phrases d'analyse globale en français, toujours à la 2e personne du pluriel (vous possédez, votre profil, vous manquez...) — ne jamais utiliser le prénom du candidat>",
   "forme": [
     { "verdict": "✅" | "❌", "constat": "<constat factuel court, jamais une question>" },
     ...
