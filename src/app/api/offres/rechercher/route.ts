@@ -1,10 +1,11 @@
+import { pool } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { auth } from "@/lib/auth";
-import { Pool } from "pg";
+
 import { OffreFT } from "@/types/offres";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+
 
 // Cache du token France Travail en mémoire (valide 1h)
 let tokenCache: { token: string; expiresAt: number } | null = null;

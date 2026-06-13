@@ -1,11 +1,12 @@
+import { pool } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { Pool } from "pg";
+
 import Anthropic from "@anthropic-ai/sdk";
 import { auth } from "@/lib/auth";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -27,24 +28,26 @@ export async function POST(req: NextRequest) {
 
   // Vérification et décompte des scans (source de vérité : DB)
   const { rows } = await pool.query(
-    'SELECT scans, is_subscribed FROM "user" WHERE id = $1',
+    'SELECT scans, is_subscribed, plan_type FROM "user" WHERE id = $1',
     [session.user.id]
   );
   const utilisateur = rows[0];
-  const estAbonne: boolean = utilisateur?.is_subscribed ?? false;
+  const planType: string | null = utilisateur?.plan_type ?? null;
+  const estPro = planType === "pro";
   let scansRestants: number | null = null;
 
-  if (!estAbonne) {
+  if (!estPro) {
     // Décrémenter atomiquement — échoue si scans = 0
     const { rowCount, rows: rowsMaj } = await pool.query(
       'UPDATE "user" SET scans = scans - 1 WHERE id = $1 AND scans > 0 RETURNING scans',
       [session.user.id]
     );
     if (rowCount === 0) {
-      return NextResponse.json(
-        { error: "Vous avez utilisé vos 3 analyses gratuites. Passez à un abonnement pour continuer." },
-        { status: 403 }
-      );
+      const estAbonne: boolean = utilisateur?.is_subscribed ?? false;
+      const msg = estAbonne
+        ? "Limite mensuelle de 50 analyses atteinte. Elle sera réinitialisée à votre prochain renouvellement."
+        : "Vous avez utilisé vos 3 analyses gratuites. Passez à un abonnement pour continuer.";
+      return NextResponse.json({ error: msg }, { status: 403 });
     }
     scansRestants = rowsMaj[0].scans;
   }

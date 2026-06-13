@@ -7,13 +7,15 @@ import { useRouter } from "next/navigation";
 
 const FEATURES_GRATUIT = [
   "3 analyses CV gratuites",
+  "3 lettres de motivation",
   "Préparation aux entretiens",
   "Recherche d'offres selon le CV",
 ];
 
 const FEATURES_STANDARD = [
-  "Analyses CV illimitées",
-  "Adaptations CV illimitées",
+  "50 analyses CV / mois",
+  "50 adaptations CV / mois",
+  "50 lettres de motivation / mois",
   "Export PDF & Word (.docx)",
   "Recherche d'offres selon le CV",
   "20 révélations d'email / mois",
@@ -22,6 +24,7 @@ const FEATURES_STANDARD = [
 const FEATURES_PREMIUM = [
   "Analyses CV illimitées",
   "Adaptations CV illimitées",
+  "Lettres de motivation illimitées",
   "Export PDF & Word (.docx)",
   "Préparation aux entretiens",
   "Recherche d'offres selon le CV",

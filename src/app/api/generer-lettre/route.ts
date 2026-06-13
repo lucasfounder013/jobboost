@@ -1,11 +1,12 @@
+import { pool } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { Pool } from "pg";
+
 import Anthropic from "@anthropic-ai/sdk";
 import { auth } from "@/lib/auth";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+
 
 export async function POST(req: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -31,22 +32,24 @@ export async function POST(req: NextRequest) {
 
   // Vérification crédits LM
   const { rows: rowsUser } = await pool.query(
-    'SELECT is_subscribed FROM "user" WHERE id = $1',
+    'SELECT is_subscribed, plan_type FROM "user" WHERE id = $1',
     [session.user.id]
   );
-  const estAbonne: boolean = rowsUser[0]?.is_subscribed ?? false;
+  const planType: string | null = rowsUser[0]?.plan_type ?? null;
+  const estPro = planType === "pro";
   let lmCreditsRestants: number | null = null;
 
-  if (!estAbonne) {
+  if (!estPro) {
     const { rowCount, rows } = await pool.query(
       'UPDATE "user" SET lm_credits = lm_credits - 1 WHERE id = $1 AND lm_credits > 0 RETURNING lm_credits',
       [session.user.id]
     );
     if (rowCount === 0) {
-      return NextResponse.json(
-        { error: "Vous n'avez plus de crédits pour générer une lettre de motivation. Passez à un abonnement." },
-        { status: 403 }
-      );
+      const estAbonne: boolean = rowsUser[0]?.is_subscribed ?? false;
+      const msg = estAbonne
+        ? "Limite mensuelle de 50 lettres de motivation atteinte. Elle sera réinitialisée à votre prochain renouvellement."
+        : "Vous n'avez plus de crédits pour générer une lettre de motivation. Passez à un abonnement.";
+      return NextResponse.json({ error: msg }, { status: 403 });
     }
     lmCreditsRestants = rows[0].lm_credits;
   }

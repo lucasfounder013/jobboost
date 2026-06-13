@@ -169,12 +169,46 @@ function construireDocx(cv: CVStructure): Document {
   });
 }
 
+// --- Nettoyage des balises de surlignage [MOD]...[/MOD] ---
+
+function strip(text: string): string {
+  return text.replace(/\[MOD\](.*?)\[\/MOD\]/g, "$1");
+}
+
+function stripMarkersFromCV(cv: CVStructure): CVStructure {
+  return {
+    ...cv,
+    titre: cv.titre ? strip(cv.titre) : cv.titre,
+    resume: cv.resume ? strip(cv.resume) : cv.resume,
+    experiences: cv.experiences?.map((e) => ({
+      ...e,
+      poste: strip(e.poste),
+      missions: e.missions.map(strip),
+    })),
+    formation: cv.formation?.map((f) => ({
+      ...f,
+      diplome: strip(f.diplome),
+      details: f.details ? strip(f.details) : f.details,
+    })),
+    competences: cv.competences
+      ? {
+          techniques: cv.competences.techniques?.map(strip),
+          langues: cv.competences.langues?.map(strip),
+          autres: cv.competences.autres?.map(strip),
+        }
+      : cv.competences,
+    projets: cv.projets?.map((p) => ({ ...p, description: strip(p.description) })),
+    certifications: cv.certifications?.map((c) => ({ ...c, nom: strip(c.nom) })),
+  };
+}
+
 // --- Route handler ---
 
 export async function POST(req: NextRequest) {
-  const { cv, format } = await req.json() as { cv: CVStructure; format: "pdf" | "docx" };
+  const { cv: cvBrut, format } = await req.json() as { cv: CVStructure; format: "pdf" | "docx" };
+  const cv = stripMarkersFromCV(cvBrut);
 
-  if (!cv || !format) {
+  if (!cvBrut || !format) {
     return NextResponse.json({ error: "Paramètres manquants." }, { status: 400 });
   }
 

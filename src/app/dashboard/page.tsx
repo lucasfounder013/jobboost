@@ -550,6 +550,7 @@ function DashboardInner() {
         } catch {}
         sessionStorage.setItem("cvApercu", JSON.stringify({
           cvAdapte: data.cvAdapte,
+          cvOriginal: data.cvOriginal ?? null,
           scoreBefore: analyse.score ?? null,
           scoreAfter: scoreApres,
         }));
@@ -559,7 +560,7 @@ function DashboardInner() {
       await fetch("/api/sauvegarder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ analyseId: idAnalyse, nomOffre: analyse.nom_offre, cvAdapte: data.cvAdapte, questionsReponses: [] }),
+        body: JSON.stringify({ analyseId: idAnalyse, nomOffre: analyse.nom_offre, cvAdapte: data.cvAdapte, cvOriginal: data.cvOriginal ?? undefined, questionsReponses: [] }),
       });
       // Calcul score après adaptation (en arrière-plan)
       const cvTexteApres = cvStructureVersTexte(data.cvAdapte);
@@ -625,7 +626,7 @@ function DashboardInner() {
         router.push("/cv-apercu");
         return;
       }
-      await sauvegarderCvAdapte(data.cvAdapte);
+      await sauvegarderCvAdapte(data.cvAdapte, data.cvOriginal ?? undefined);
       calculerScoreApresAdaptation(data.cvAdapte).catch(() => {});
       if (analyseId) {
         router.push(`/cv-adapte/${analyseId}`);
@@ -702,15 +703,15 @@ function DashboardInner() {
   }
 
   // ── Auto-save CV adapté
-  async function sauvegarderCvAdapte(cvData: CVStructure) {
+  async function sauvegarderCvAdapte(cvData: CVStructure, cvOriginalData?: CVStructure) {
     const nomOffre = nomPosteEnregistre || nomFichier || "Analyse sans titre";
     await fetch("/api/sauvegarder", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(
         analyseId
-          ? { analyseId, nomOffre, cvAdapte: cvData, questionsReponses: [] }
-          : { nomOffre, score: resultat?.score, resume: resultat?.resume ?? "", motsClesManquants: resultat?.motsClesManquants ?? [], motsClesPresents: resultat?.motsClesPresents ?? [], cvAdapte: cvData, questionsReponses: [] }
+          ? { analyseId, nomOffre, cvAdapte: cvData, cvOriginal: cvOriginalData, questionsReponses: [] }
+          : { nomOffre, score: resultat?.score, resume: resultat?.resume ?? "", motsClesManquants: resultat?.motsClesManquants ?? [], motsClesPresents: resultat?.motsClesPresents ?? [], cvAdapte: cvData, cvOriginal: cvOriginalData, questionsReponses: [] }
       ),
     });
   }
@@ -1245,7 +1246,7 @@ function DashboardInner() {
                   return (
                     <div
                       key={analyse.id}
-                      onClick={() => setAnalyseOuverte(analyse)}
+                      onClick={() => analyse.cv_adapte_id ? router.push(`/cv-adapte/${analyse.id}`) : setAnalyseOuverte(analyse)}
                       className={`grid grid-cols-[1fr_auto_auto] lg:grid-cols-[2fr_1fr_1fr_1fr_auto] items-center px-5 py-4 gap-4 transition-colors duration-150 cursor-pointer
                         ${index !== analyses.length - 1 ? "border-b border-gray-100" : ""}
                         ${enSuppression ? "opacity-40 pointer-events-none" : "hover:bg-indigo-50/40"}
@@ -2964,7 +2965,7 @@ function DashboardInner() {
                 {modaleUpgrade === "scans"
                   ? "Vous avez utilisé vos 3 analyses gratuites. Passez à un abonnement pour analyser autant de CV que vous le souhaitez."
                   : modaleUpgrade === "lm"
-                  ? "Votre crédit gratuit de lettre de motivation a été utilisé. Passez à un abonnement pour générer des lettres illimitées."
+                  ? "Vos 3 crédits gratuits de lettre de motivation ont été utilisés. Passez à un abonnement pour générer des lettres illimitées."
                   : "Votre crédit d'adaptation CV gratuit a été utilisé. Passez à un abonnement pour adapter votre CV en illimité."}
               </p>
             </div>

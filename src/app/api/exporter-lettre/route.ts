@@ -1,14 +1,15 @@
+import { pool } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { renderToBuffer } from "@react-pdf/renderer";
 import type { DocumentProps } from "@react-pdf/renderer";
 import { Document, Paragraph, TextRun, Packer, AlignmentType } from "docx";
-import { Pool } from "pg";
+
 import React from "react";
 import { auth } from "@/lib/auth";
 import { LettrePDFDocument } from "@/lib/lettre-pdf";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+
 
 type LettreData = {
   salutation: string;

@@ -1,7 +1,26 @@
 import { CVStructure } from "@/types/cv";
 import React from "react";
 
-export default function CVPreview({ cv }: { cv: CVStructure }) {
+function renderHighlighted(text: string, show: boolean): React.ReactNode {
+  if (!show || !text.includes("[MOD]")) return text;
+  const regex = /\[MOD\](.*?)\[\/MOD\]/g;
+  const parts: React.ReactNode[] = [];
+  let lastIndex = 0;
+  let match;
+  while ((match = regex.exec(text)) !== null) {
+    if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index));
+    parts.push(
+      <mark key={match.index} style={{ backgroundColor: "#bbf7d0", borderRadius: "2px", padding: "0 1px" }}>
+        {match[1]}
+      </mark>
+    );
+    lastIndex = regex.lastIndex;
+  }
+  if (lastIndex < text.length) parts.push(text.slice(lastIndex));
+  return <>{parts}</>;
+}
+
+export default function CVPreview({ cv, showHighlights = false, fluid = false }: { cv: CVStructure; showHighlights?: boolean; fluid?: boolean }) {
   const contactItems = [
     cv.contact.email,
     cv.contact.telephone,
@@ -12,12 +31,12 @@ export default function CVPreview({ cv }: { cv: CVStructure }) {
 
   return (
     <div
-      className="bg-white text-gray-900 p-10 max-w-3xl mx-auto text-sm leading-relaxed"
+      className={`bg-white text-gray-900 leading-relaxed ${fluid ? "w-full p-4 text-xs" : "p-10 max-w-3xl mx-auto text-sm"}`}
       style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
     >
       <div className="mb-5">
         <h1 className="text-3xl font-bold tracking-tight mb-1">{cv.nom}</h1>
-        {cv.titre && <p className="text-base text-gray-600 mb-2">{cv.titre}</p>}
+        {cv.titre && <p className="text-base text-gray-600 mb-2">{renderHighlighted(cv.titre, showHighlights)}</p>}
         {contactItems.length > 0 && (
           <p className="text-xs text-gray-500">{contactItems.join("  ·  ")}</p>
         )}
@@ -25,7 +44,7 @@ export default function CVPreview({ cv }: { cv: CVStructure }) {
 
       {cv.resume && (
         <Section titre="PROFIL">
-          <p className="text-gray-700">{cv.resume}</p>
+          <p className="text-gray-700">{renderHighlighted(cv.resume, showHighlights)}</p>
         </Section>
       )}
 
@@ -42,7 +61,7 @@ export default function CVPreview({ cv }: { cv: CVStructure }) {
               </p>
               {exp.missions.length > 0 && (
                 <ul className="list-disc list-inside space-y-0.5 text-gray-700">
-                  {exp.missions.map((m, j) => <li key={j}>{m}</li>)}
+                  {exp.missions.map((m, j) => <li key={j}>{renderHighlighted(m, showHighlights)}</li>)}
                 </ul>
               )}
             </div>
@@ -59,7 +78,7 @@ export default function CVPreview({ cv }: { cv: CVStructure }) {
                 <span className="text-xs text-gray-500 ml-4 shrink-0">{f.dates}</span>
               </div>
               <p className="text-gray-600 italic text-xs">{f.etablissement}</p>
-              {f.details && <p className="text-gray-700 text-xs mt-0.5">{f.details}</p>}
+              {f.details && <p className="text-gray-700 text-xs mt-0.5">{renderHighlighted(f.details, showHighlights)}</p>}
             </div>
           ))}
         </Section>
@@ -72,19 +91,19 @@ export default function CVPreview({ cv }: { cv: CVStructure }) {
           {cv.competences.techniques?.length ? (
             <div className="mb-1">
               <span className="font-semibold text-xs uppercase tracking-wide text-gray-500 mr-2">Techniques :</span>
-              <span className="text-gray-700">{cv.competences.techniques.join(", ")}</span>
+              <span className="text-gray-700">{renderHighlighted(cv.competences.techniques.join(", "), showHighlights)}</span>
             </div>
           ) : null}
           {cv.competences.langues?.length ? (
             <div className="mb-1">
               <span className="font-semibold text-xs uppercase tracking-wide text-gray-500 mr-2">Langues :</span>
-              <span className="text-gray-700">{cv.competences.langues.join(", ")}</span>
+              <span className="text-gray-700">{renderHighlighted(cv.competences.langues.join(", "), showHighlights)}</span>
             </div>
           ) : null}
           {cv.competences.autres?.length ? (
             <div className="mb-1">
               <span className="font-semibold text-xs uppercase tracking-wide text-gray-500 mr-2">Autres :</span>
-              <span className="text-gray-700">{cv.competences.autres.join(", ")}</span>
+              <span className="text-gray-700">{renderHighlighted(cv.competences.autres.join(", "), showHighlights)}</span>
             </div>
           ) : null}
         </Section>
@@ -98,7 +117,7 @@ export default function CVPreview({ cv }: { cv: CVStructure }) {
               {p.technologies && (
                 <span className="text-gray-500 text-xs ml-2">— {p.technologies}</span>
               )}
-              <p className="text-gray-700 mt-0.5">{p.description}</p>
+              <p className="text-gray-700 mt-0.5">{renderHighlighted(p.description, showHighlights)}</p>
             </div>
           ))}
         </Section>

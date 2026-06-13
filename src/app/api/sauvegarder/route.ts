@@ -1,10 +1,11 @@
+import { pool } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { Pool } from "pg";
+
 import { auth } from "@/lib/auth";
 import { CVStructure } from "@/types/cv";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+
 
 export async function POST(req: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -20,12 +21,13 @@ export async function POST(req: NextRequest) {
     motsClesManquants?: string[];
     motsClesPresents?: string[];
     cvAdapte?: CVStructure;
+    cvOriginal?: CVStructure;
     cvTexte?: string;
     offreTexte?: string;
     questionsReponses?: { question: string; reponse: string }[];
   };
 
-  const { analyseId, nomOffre, score, resume, motsClesManquants, motsClesPresents, cvAdapte, cvTexte, offreTexte, questionsReponses } = body;
+  const { analyseId, nomOffre, score, resume, motsClesManquants, motsClesPresents, cvAdapte, cvOriginal, cvTexte, offreTexte, questionsReponses } = body;
 
   if (!nomOffre) {
     return NextResponse.json({ error: "Paramètres manquants." }, { status: 400 });
@@ -37,9 +39,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "CV adapté manquant." }, { status: 400 });
     }
     await pool.query(
-      `INSERT INTO cv_adapte (user_id, analyse_id, nom_offre, cv_data, questions_reponses)
-       VALUES ($1, $2, $3, $4, $5)`,
-      [session.user.id, analyseId, nomOffre, JSON.stringify(cvAdapte), questionsReponses ? JSON.stringify(questionsReponses) : null]
+      `INSERT INTO cv_adapte (user_id, analyse_id, nom_offre, cv_data, cv_original, questions_reponses)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [session.user.id, analyseId, nomOffre, JSON.stringify(cvAdapte), cvOriginal ? JSON.stringify(cvOriginal) : null, questionsReponses ? JSON.stringify(questionsReponses) : null]
     );
     return NextResponse.json({ analyseId });
   }
@@ -55,9 +57,9 @@ export async function POST(req: NextRequest) {
 
   if (cvAdapte) {
     await pool.query(
-      `INSERT INTO cv_adapte (user_id, analyse_id, nom_offre, cv_data)
-       VALUES ($1, $2, $3, $4)`,
-      [session.user.id, nouvelAnalyseId, nomOffre, JSON.stringify(cvAdapte)]
+      `INSERT INTO cv_adapte (user_id, analyse_id, nom_offre, cv_data, cv_original)
+       VALUES ($1, $2, $3, $4, $5)`,
+      [session.user.id, nouvelAnalyseId, nomOffre, JSON.stringify(cvAdapte), cvOriginal ? JSON.stringify(cvOriginal) : null]
     );
   }
 

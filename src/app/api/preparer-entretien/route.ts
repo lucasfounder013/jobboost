@@ -1,11 +1,12 @@
+import { pool } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { Pool } from "pg";
+
 import Anthropic from "@anthropic-ai/sdk";
 import { auth } from "@/lib/auth";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+
 
 async function scraperUrl(url: string): Promise<string> {
   try {

@@ -1,11 +1,12 @@
+import { pool } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { Pool } from "pg";
+
 import Anthropic from "@anthropic-ai/sdk";
 import { auth } from "@/lib/auth";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+
 
 export async function POST(req: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -22,17 +23,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Texte trop long." }, { status: 400 });
   }
 
-  // Vérifier si l'utilisateur est abonné (bypass total des crédits)
   const { rows: rowsUser } = await pool.query(
-    'SELECT is_subscribed FROM "user" WHERE id = $1',
+    'SELECT is_subscribed, plan_type, credits FROM "user" WHERE id = $1',
     [session.user.id]
   );
-  const estAbonne: boolean = rowsUser[0]?.is_subscribed ?? false;
+  const planType: string | null = rowsUser[0]?.plan_type ?? null;
+  const estPro = planType === "pro";
 
   let creditsRestants: number | null = null;
   let locked = false;
 
-  if (!estAbonne) {
+  if (!estPro) {
     // Décrémentation atomique : échoue si credits = 0
     const { rowCount, rows } = await pool.query(
       'UPDATE "user" SET credits = credits - 1 WHERE id = $1 AND credits > 0 RETURNING credits',
@@ -40,7 +41,14 @@ export async function POST(req: NextRequest) {
     );
 
     if (rowCount === 0) {
-      // On génère quand même pour montrer un aperçu flou (conversion)
+      const estAbonne: boolean = rowsUser[0]?.is_subscribed ?? false;
+      if (estAbonne) {
+        return NextResponse.json(
+          { error: "Limite mensuelle de 50 adaptations atteinte. Elle sera réinitialisée à votre prochain renouvellement." },
+          { status: 403 }
+        );
+      }
+      // Gratuit : on génère quand même pour montrer un aperçu flou (conversion)
       locked = true;
       creditsRestants = 0;
     } else {
@@ -66,7 +74,23 @@ export async function POST(req: NextRequest) {
         role: "user",
         content: `Tu es un expert en rédaction de CV ATS-friendly. Réécris ce CV pour maximiser sa correspondance avec l'offre d'emploi, en intégrant naturellement les mots-clés manquants. Ne fabrique pas d'expériences ni de diplômes — reformule et mets en valeur ce qui existe déjà. Les concours, compétitions et hackathons vont dans "projets", pas dans "certifications". Les certifications sont uniquement des diplômes ou titres officiels (ex : TOEIC, certifications professionnelles).${motsClesListe}${reponsesListe}
 
-Retourne UNIQUEMENT un objet JSON valide, sans markdown ni backticks, respectant exactement ce schéma (n'inclure que les champs présents dans le CV original — ne pas inventer ni laisser de tableaux vides) :
+MARQUAGE DES MODIFICATIONS — règle stricte : entoure UNIQUEMENT les mots ou groupes de mots que tu AJOUTES ou CHANGES par rapport au texte original. Si une partie de la phrase existait déjà telle quelle dans le CV original, ne la marque PAS. Ne marque jamais toute une phrase si seule une partie a changé.
+Exemples corrects :
+- Original : "Gestion de projets en équipe" → Adapté : "Gestion de projets [MOD]RSE[/MOD] en équipe [MOD]multidisciplinaire[/MOD]"
+- Original : "Coordination d'événements" → Adapté : "Coordination d'événements [MOD]et d'initiatives de développement durable[/MOD]"
+- Bullet entièrement nouveau : "[MOD]Suivi des indicateurs ESG et reporting trimestriel auprès des parties prenantes.[/MOD]"
+Interdiction : ne PAS écrire "[MOD]Coordination d'événements et d'initiatives de développement durable[/MOD]" si "Coordination d'événements" venait du CV original.
+
+Retourne UNIQUEMENT un objet JSON valide, sans markdown ni backticks, avec exactement deux clés "original" et "adapte" :
+- "original" : le CV parsé tel quel depuis le texte original, sans aucune modification ni balise [MOD]
+- "adapte" : le CV optimisé pour l'offre, avec les balises [MOD]...[/MOD] autour des ajouts/modifications
+
+{
+  "original": { ...même schéma ci-dessous... },
+  "adapte": { ...même schéma ci-dessous avec balises [MOD]... }
+}
+
+Schéma de chaque objet CV (n'inclure que les champs présents — ne pas inventer ni laisser de tableaux vides) :
 
 {
   "nom": "string",
@@ -126,17 +150,21 @@ ${offre}`,
   // Nettoyer les backticks markdown éventuels avant le parse
   const texteNettoye = contenu.text.replace(/^```(?:json)?\n?/i, "").replace(/\n?```$/i, "").trim();
 
-  let cvAdapte;
+  let parsed;
   try {
-    cvAdapte = JSON.parse(texteNettoye);
+    parsed = JSON.parse(texteNettoye);
   } catch {
     return NextResponse.json({ error: "Format de réponse invalide. Veuillez réessayer." }, { status: 500 });
   }
+
+  // Support ancien format (CVStructure directe) et nouveau format { original, adapte }
+  const cvAdapte = parsed?.adapte ?? parsed;
+  const cvOriginal = parsed?.original ?? null;
 
   pool.query(
     `INSERT INTO user_events (user_id, action, metadata) VALUES ($1, 'adaptation_cv', $2)`,
     [session.user.id, JSON.stringify({ nomPoste: cvAdapte?.titre ?? null })]
   ).catch(e => console.error("[adapter-cv] Erreur log event:", e.message));
 
-  return NextResponse.json({ cvAdapte, creditsRestants, locked });
+  return NextResponse.json({ cvAdapte, cvOriginal, creditsRestants, locked });
 }

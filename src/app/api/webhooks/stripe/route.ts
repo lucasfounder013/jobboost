@@ -1,9 +1,10 @@
+import { pool } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { Pool } from "pg";
+
 import Stripe from "stripe";
 import { PostHog } from "posthog-node";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+
 
 function phCapture(distinctId: string, event: string, properties?: Record<string, unknown>) {
   const client = new PostHog(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
@@ -41,7 +42,11 @@ export async function POST(req: NextRequest) {
       if (userId && subscriptionId) {
         try {
           await pool.query(
-            'UPDATE "user" SET is_subscribed = true, stripe_subscription_id = $1, plan_type = $2, rh_credits = $3 WHERE id = $4',
+            `UPDATE "user" SET is_subscribed = true, stripe_subscription_id = $1, plan_type = $2, rh_credits = $3,
+              scans = CASE WHEN $2 = 'starter' THEN 50 ELSE scans END,
+              credits = CASE WHEN $2 = 'starter' THEN 50 ELSE credits END,
+              lm_credits = CASE WHEN $2 = 'starter' THEN 50 ELSE lm_credits END
+             WHERE id = $4`,
             [subscriptionId, plan, rhCredits, userId]
           );
           await phCapture(userId, "subscription_created", { plan, subscription_id: subscriptionId });
@@ -84,7 +89,11 @@ export async function POST(req: NextRequest) {
       const subId = (invoice as unknown as { subscription: string }).subscription;
       if (subId) {
         await pool.query(
-          `UPDATE "user" SET rh_credits = CASE WHEN plan_type = 'pro' THEN 80 ELSE 20 END
+          `UPDATE "user" SET
+            rh_credits = CASE WHEN plan_type = 'pro' THEN 80 ELSE 20 END,
+            scans = CASE WHEN plan_type = 'starter' THEN 50 ELSE scans END,
+            credits = CASE WHEN plan_type = 'starter' THEN 50 ELSE credits END,
+            lm_credits = CASE WHEN plan_type = 'starter' THEN 50 ELSE lm_credits END
            WHERE stripe_subscription_id = $1 AND is_subscribed = true`,
           [subId]
         );

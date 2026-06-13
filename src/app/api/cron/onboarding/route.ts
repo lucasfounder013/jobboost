@@ -1,9 +1,10 @@
+import { pool } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
-import { Pool } from "pg";
+
 import { resend } from "@/lib/resend";
 import { email1, email2, email3, email4, email5, triggerRH, triggerScans } from "@/lib/emails/templates";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+
 
 const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.jobboost.fr";
 

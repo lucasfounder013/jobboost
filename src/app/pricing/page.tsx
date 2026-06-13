@@ -9,13 +9,15 @@ import { usePostHog } from "posthog-js/react";
 
 const FEATURES_GRATUIT = [
   "3 analyses CV offertes",
+  "3 lettres de motivation",
   "Préparation aux entretiens",
   "Recherche d'offres selon le CV",
 ];
 
 const FEATURES_STANDARD = [
-  "Analyses CV illimitées",
-  "Adaptations CV illimitées",
+  "50 analyses CV / mois",
+  "50 adaptations CV / mois",
+  "50 lettres de motivation / mois",
   "Export PDF ATS",
   "Export Word (.docx)",
   "Recherche d'offres selon le CV",
@@ -25,6 +27,7 @@ const FEATURES_STANDARD = [
 const FEATURES_PREMIUM = [
   "Analyses CV illimitées",
   "Adaptations CV illimitées",
+  "Lettres de motivation illimitées",
   "Export PDF ATS",
   "Export Word (.docx)",
   "Préparation aux entretiens",

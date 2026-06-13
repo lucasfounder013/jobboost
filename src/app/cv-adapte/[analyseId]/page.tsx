@@ -15,6 +15,7 @@ type PageData = {
   mots_cles_apres_manquants: string[] | null;
   mots_cles_apres_presents: string[] | null;
   cv_data: CVStructure | null;
+  cv_original: CVStructure | null;
 };
 
 function couleurScore(score: number | null | undefined): string {
@@ -144,7 +145,7 @@ export default function CvAdaptePage() {
 
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -184,67 +185,97 @@ export default function CvAdaptePage() {
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col gap-6">
+      <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
 
-        {/* Score ATS */}
-        <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6">
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Score ATS</p>
-          <div className="flex items-center justify-center gap-8 flex-wrap">
-            <div className="flex flex-col items-center gap-1">
-              <p className="text-xs text-gray-400">Avant</p>
-              <div className={`w-20 h-20 rounded-full flex flex-col items-center justify-center ring-4 bg-white ${ringScore(data.score)}`}>
-                <span className="text-2xl font-black">{data.score ?? "—"}</span>
-                <span className="text-[10px] font-semibold text-gray-400">/ 100</span>
-              </div>
-            </div>
-            <svg className="w-6 h-6 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-            <div className="flex flex-col items-center gap-1">
-              <p className="text-xs text-gray-400">Après</p>
-              {scoreApres !== null ? (
-                <div className={`w-20 h-20 rounded-full flex flex-col items-center justify-center ring-4 bg-white ${ringScore(scoreApres)}`}>
-                  <span className="text-2xl font-black">{scoreApres}</span>
-                  <span className="text-[10px] font-semibold text-gray-400">/ 100</span>
-                </div>
-              ) : (
-                <div className="w-20 h-20 rounded-full ring-4 ring-gray-100 bg-white flex items-center justify-center">
-                  <svg className="animate-spin w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* CV Preview */}
+        {/* CV côte à côte (si cv_original disponible) ou colonne simple */}
         {data.cv_data ? (
-          <div className="bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm overflow-hidden">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-indigo-100 bg-indigo-50/40">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-indigo-400" />
-                <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">CV adapté pour les ATS</p>
+          data.cv_original ? (
+            <div className="grid grid-cols-2 gap-4 items-start">
+              {/* CV original */}
+              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden">
+                <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">CV original</p>
+                  <div className={`flex items-center gap-1 px-3 py-1 rounded-full ring-2 bg-white ${ringScore(data.score)}`}>
+                    <span className="text-base font-black">{data.score ?? "—"}</span>
+                    <span className="text-[10px] font-semibold opacity-50">/ 100</span>
+                  </div>
+                </div>
+                <div>
+                  <CVPreview cv={data.cv_original} fluid />
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => exporterCV("pdf")}
-                  disabled={exportEnCours !== null}
-                  className="flex items-center gap-1.5 text-xs font-semibold bg-gray-900 text-white px-3 py-1.5 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50"
-                >
-                  PDF
-                </button>
-                <button
-                  onClick={() => exporterCV("docx")}
-                  disabled={exportEnCours !== null}
-                  className="flex items-center gap-1.5 text-xs font-semibold bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50"
-                >
-                  Word
-                </button>
+
+              {/* CV adapté */}
+              <div className="bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm overflow-hidden">
+                <div className="px-5 py-3 border-b border-indigo-100 bg-indigo-50/40 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-indigo-400" />
+                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">CV adapté ATS</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    {scoreApres !== null ? (
+                      <div className={`flex items-center gap-1 px-3 py-1 rounded-full ring-2 bg-white ${ringScore(scoreApres)}`}>
+                        <span className="text-base font-black">{scoreApres}</span>
+                        <span className="text-[10px] font-semibold opacity-50">/ 100</span>
+                      </div>
+                    ) : (
+                      <svg className="animate-spin w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                    )}
+                    <button onClick={() => exporterCV("pdf")} disabled={exportEnCours !== null} className="text-xs font-semibold bg-gray-900 text-white px-2.5 py-1 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50">PDF</button>
+                    <button onClick={() => exporterCV("docx")} disabled={exportEnCours !== null} className="text-xs font-semibold bg-indigo-600 text-white px-2.5 py-1 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50">Word</button>
+                  </div>
+                </div>
+                <div>
+                  <CVPreview cv={data.cv_data} fluid showHighlights />
+                </div>
               </div>
             </div>
-            <div className="p-4">
-              <CVPreview cv={data.cv_data} />
-            </div>
-          </div>
+          ) : (
+            // Fallback colonne simple pour CVs sans original stocké
+            <>
+              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6">
+                <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Score ATS</p>
+                <div className="flex items-center justify-center gap-8 flex-wrap">
+                  <div className="flex flex-col items-center gap-1">
+                    <p className="text-xs text-gray-400">Avant</p>
+                    <div className={`w-20 h-20 rounded-full flex flex-col items-center justify-center ring-4 bg-white ${ringScore(data.score)}`}>
+                      <span className="text-2xl font-black">{data.score ?? "—"}</span>
+                      <span className="text-[10px] font-semibold text-gray-400">/ 100</span>
+                    </div>
+                  </div>
+                  <svg className="w-6 h-6 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                  </svg>
+                  <div className="flex flex-col items-center gap-1">
+                    <p className="text-xs text-gray-400">Après</p>
+                    {scoreApres !== null ? (
+                      <div className={`w-20 h-20 rounded-full flex flex-col items-center justify-center ring-4 bg-white ${ringScore(scoreApres)}`}>
+                        <span className="text-2xl font-black">{scoreApres}</span>
+                        <span className="text-[10px] font-semibold text-gray-400">/ 100</span>
+                      </div>
+                    ) : (
+                      <div className="w-20 h-20 rounded-full ring-4 ring-gray-100 bg-white flex items-center justify-center">
+                        <svg className="animate-spin w-5 h-5 text-indigo-400" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm overflow-hidden">
+                <div className="flex items-center justify-between px-6 py-4 border-b border-indigo-100 bg-indigo-50/40">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-indigo-400" />
+                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">CV adapté pour les ATS</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => exporterCV("pdf")} disabled={exportEnCours !== null} className="flex items-center gap-1.5 text-xs font-semibold bg-gray-900 text-white px-3 py-1.5 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50">PDF</button>
+                    <button onClick={() => exporterCV("docx")} disabled={exportEnCours !== null} className="flex items-center gap-1.5 text-xs font-semibold bg-indigo-600 text-white px-3 py-1.5 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50">Word</button>
+                  </div>
+                </div>
+                <div className="p-4"><CVPreview cv={data.cv_data} showHighlights /></div>
+              </div>
+            </>
+          )
         ) : (
           <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-8 text-center text-gray-400 text-sm">
             CV adapté non disponible.

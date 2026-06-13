@@ -1,9 +1,10 @@
+import { pool } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { Pool } from "pg";
+
 import { auth } from "@/lib/auth";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+
 
 const ICYPEAS_API_KEY = process.env.ICYPEAS_API_KEY!;
 const ICYPEAS_HEADERS = { Authorization: ICYPEAS_API_KEY, "Content-Type": "application/json" };

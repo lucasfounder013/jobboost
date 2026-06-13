@@ -1,9 +1,10 @@
+import { pool } from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { Pool } from "pg";
+
 import { auth } from "@/lib/auth";
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
+
 
 const MIME_TYPES: Record<string, string> = {
   pdf: "application/pdf",

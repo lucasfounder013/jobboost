@@ -1,12 +1,9 @@
 import { betterAuth } from "better-auth";
-import { Pool } from "pg";
 import { nextCookies } from "better-auth/next-js";
+import { pool } from "@/lib/db";
 
 export const auth = betterAuth({
-  database: new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: { rejectUnauthorized: false },
-  }),
+  database: pool,
   trustedOrigins: ["https://www.jobboost.fr", "https://jobboost.fr"],
   emailAndPassword: {
     enabled: true,
@@ -49,7 +46,7 @@ export const auth = betterAuth({
       },
       lmCredits: {
         type: "number",
-        defaultValue: 1,
+        defaultValue: 3,
         fieldName: "lm_credits",
       },
       rhCredits: {

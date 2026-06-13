@@ -8,6 +8,7 @@ import { CVStructure } from "@/types/cv";
 
 type AperuData = {
   cvAdapte: CVStructure;
+  cvOriginal: CVStructure | null;
   scoreBefore: number | null;
   scoreAfter: number | null;
 };
@@ -113,6 +114,7 @@ export default function CvApercuPage() {
 
           const aperuData: AperuData = {
             cvAdapte: result.cvAdapte,
+            cvOriginal: result.cvOriginal ?? null,
             scoreBefore: params.scoreBefore,
             scoreAfter: scoreApres,
           };
@@ -189,7 +191,7 @@ export default function CvApercuPage() {
 
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link
               href="/dashboard"
@@ -215,78 +217,100 @@ export default function CvApercuPage() {
         </div>
       </header>
 
-      <div className="max-w-5xl mx-auto px-6 py-8 flex flex-col gap-6">
+      <div className="max-w-7xl mx-auto px-6 py-8 flex flex-col gap-6">
 
-        {/* Score ATS */}
-        <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6">
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Score ATS</p>
-          <div className="flex items-center gap-6 flex-wrap">
-            <div className="flex flex-col items-center gap-1">
-              <p className="text-xs text-gray-400">Avant</p>
-              <div className={`w-20 h-20 rounded-full flex flex-col items-center justify-center ring-4 bg-white ${ringScore(data.scoreBefore)}`}>
-                <span className="text-2xl font-black">{data.scoreBefore ?? "—"}</span>
-                <span className="text-[10px] font-semibold text-gray-400">/ 100</span>
-              </div>
-            </div>
-            <svg className="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-            <div className="flex flex-col items-center gap-1">
-              <p className="text-xs text-gray-400">Après adaptation</p>
-              <div className={`w-20 h-20 rounded-full flex flex-col items-center justify-center ring-4 bg-white ${ringScore(data.scoreAfter)}`}>
-                <span className="text-2xl font-black">{data.scoreAfter ?? "—"}</span>
-                <span className="text-[10px] font-semibold text-gray-400">/ 100</span>
-              </div>
-            </div>
-            {gainScore !== null && gainScore > 0 && (
-              <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 ring-1 ring-emerald-200 rounded-xl">
-                <span className="text-emerald-600 font-black text-xl">+{gainScore}</span>
-                <span className="text-emerald-700 text-sm font-semibold">points gagnés</span>
-              </div>
-            )}
-          </div>
-          <p className="text-xs text-gray-400 mt-4">
-            Débloquez votre CV pour télécharger la version complète optimisée pour les ATS.
-          </p>
-        </div>
+        {/* CV côte à côte */}
+        <div className={data.cvOriginal ? "grid grid-cols-2 gap-4 items-start" : "flex flex-col gap-6"}>
 
-        {/* CV avec blur */}
-        <div className="bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-indigo-100 bg-indigo-50/40">
-            <div className="flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-indigo-400" />
-              <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">CV adapté ATS</p>
-            </div>
-            <Link
-              href="/pricing"
-              className="flex items-center gap-1.5 text-xs font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity"
-            >
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              Débloquer
-            </Link>
-          </div>
-          <div className="p-4 relative">
-            <CVPreview cv={data.cvAdapte} />
-            {/* Gradient de fondu au tiers */}
-            <div className="absolute inset-x-0 top-[28%] h-28 bg-gradient-to-b from-transparent to-white/80 pointer-events-none" />
-            {/* Zone floutée */}
-            <div className="absolute inset-x-0 top-[33%] bottom-0 backdrop-blur-sm bg-white/50 pointer-events-none" />
-            {/* CTA centré dans la zone floutée */}
-            <div className="absolute inset-x-0 top-[33%] bottom-0 flex flex-col items-center justify-center gap-4 p-6 z-10">
-              <div className="text-center">
-                <p className="text-lg font-semibold text-gray-800 mb-1">Votre CV adapté est prêt ✨</p>
-                <p className="text-sm text-gray-500">Téléchargez-le en PDF ou Word pour maximiser vos chances</p>
+          {/* CV original */}
+          {data.cvOriginal && (
+            <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm overflow-hidden">
+              <div className="px-5 py-3 border-b border-gray-100 flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">CV original</p>
+                <div className={`flex items-center gap-1 px-3 py-1 rounded-full ring-2 bg-white ${ringScore(data.scoreBefore)}`}>
+                  <span className="text-base font-black">{data.scoreBefore ?? "—"}</span>
+                  <span className="text-[10px] font-semibold opacity-50">/ 100</span>
+                </div>
               </div>
-              <Link
-                href="/pricing"
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold shadow-lg hover:opacity-90 transition-opacity"
-              >
-                Débloquer mon CV complet →
-              </Link>
+              <div>
+                <CVPreview cv={data.cvOriginal} fluid />
+              </div>
+            </div>
+          )}
+
+          {/* CV adapté avec blur */}
+          <div className="bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-3 border-b border-indigo-100 bg-indigo-50/40">
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-indigo-400" />
+                <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">CV adapté ATS</p>
+              </div>
+              <div className="flex items-center gap-3">
+                {data.scoreAfter !== null && (
+                  <div className={`flex items-center gap-1 px-3 py-1 rounded-full ring-2 bg-white ${ringScore(data.scoreAfter)}`}>
+                    <span className="text-base font-black">{data.scoreAfter}</span>
+                    <span className="text-[10px] font-semibold opacity-50">/ 100</span>
+                  </div>
+                )}
+                {gainScore !== null && gainScore > 0 && (
+                  <span className="text-xs font-bold text-emerald-600 bg-emerald-50 ring-1 ring-emerald-200 px-2 py-0.5 rounded-full">+{gainScore} pts</span>
+                )}
+                <Link href="/pricing" className="flex items-center gap-1 text-xs font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-2.5 py-1 rounded-lg hover:opacity-90 transition-opacity">
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  Débloquer
+                </Link>
+              </div>
+            </div>
+            <div className="relative overflow-hidden">
+              <CVPreview cv={data.cvAdapte} fluid={!!data.cvOriginal} showHighlights />
+              <div className="absolute inset-x-0 top-[28%] h-28 bg-gradient-to-b from-transparent to-white/80 pointer-events-none" />
+              <div className="absolute inset-x-0 top-[33%] bottom-0 backdrop-blur-sm bg-white/50 pointer-events-none" />
+              <div className="absolute inset-x-0 top-[33%] bottom-0 flex flex-col items-center justify-center gap-4 p-6 z-10">
+                <div className="text-center">
+                  <p className="text-lg font-semibold text-gray-800 mb-1">Votre CV adapté est prêt ✨</p>
+                  <p className="text-sm text-gray-500">Téléchargez-le en PDF ou Word pour maximiser vos chances</p>
+                </div>
+                <Link href="/pricing" className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-semibold shadow-lg hover:opacity-90 transition-opacity">
+                  Débloquer mon CV complet →
+                </Link>
+              </div>
             </div>
           </div>
+
+          {/* Score isolé (fallback sans cvOriginal) */}
+          {!data.cvOriginal && (
+            <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6">
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Score ATS</p>
+              <div className="flex items-center gap-6 flex-wrap">
+                <div className="flex flex-col items-center gap-1">
+                  <p className="text-xs text-gray-400">Avant</p>
+                  <div className={`w-20 h-20 rounded-full flex flex-col items-center justify-center ring-4 bg-white ${ringScore(data.scoreBefore)}`}>
+                    <span className="text-2xl font-black">{data.scoreBefore ?? "—"}</span>
+                    <span className="text-[10px] font-semibold text-gray-400">/ 100</span>
+                  </div>
+                </div>
+                <svg className="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+                <div className="flex flex-col items-center gap-1">
+                  <p className="text-xs text-gray-400">Après adaptation</p>
+                  <div className={`w-20 h-20 rounded-full flex flex-col items-center justify-center ring-4 bg-white ${ringScore(data.scoreAfter)}`}>
+                    <span className="text-2xl font-black">{data.scoreAfter ?? "—"}</span>
+                    <span className="text-[10px] font-semibold text-gray-400">/ 100</span>
+                  </div>
+                </div>
+                {gainScore !== null && gainScore > 0 && (
+                  <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 ring-1 ring-emerald-200 rounded-xl">
+                    <span className="text-emerald-600 font-black text-xl">+{gainScore}</span>
+                    <span className="text-emerald-700 text-sm font-semibold">points gagnés</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
         </div>
 
       </div>
