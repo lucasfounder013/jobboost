@@ -79,7 +79,7 @@ function FormulaireInscription() {
           </Link>
 
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Créer un compte</h1>
-          <p className="text-sm text-gray-500 mb-8">1 adaptation de CV gratuite offerte.</p>
+          <p className="text-sm text-gray-500 mb-8">3 analyses CV gratuites offertes.</p>
 
           <form onSubmit={soumettreFormulaire} className="space-y-4">
             <div className="flex gap-3">

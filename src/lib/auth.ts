@@ -26,12 +26,12 @@ export const auth = betterAuth({
       },
       credits: {
         type: "number",
-        defaultValue: 1,
+        defaultValue: 0,
         fieldName: "credits",
       },
       scans: {
         type: "number",
-        defaultValue: 5,
+        defaultValue: 3,
         fieldName: "scans",
       },
       isSubscribed: {
@@ -54,7 +54,7 @@ export const auth = betterAuth({
       },
       rhCredits: {
         type: "number",
-        defaultValue: 1,
+        defaultValue: 0,
         fieldName: "rh_credits",
       },
       planType: {

@@ -8,11 +8,9 @@ import { useSession } from "@/lib/auth-client";
 import { usePostHog } from "posthog-js/react";
 
 const FEATURES_GRATUIT = [
-  "5 analyses CV offertes",
-  "1 adaptation CV offerte",
-  "Export PDF ATS",
-  "Export Word (.docx)",
-  "1 révélation d'email (candidature spontanée)",
+  "3 analyses CV offertes",
+  "Préparation aux entretiens",
+  "Recherche d'offres selon le CV",
 ];
 
 const FEATURES_STANDARD = [
@@ -20,7 +18,7 @@ const FEATURES_STANDARD = [
   "Adaptations CV illimitées",
   "Export PDF ATS",
   "Export Word (.docx)",
-  "Recherche d'offres selon votre CV",
+  "Recherche d'offres selon le CV",
   "20 révélations d'email / mois",
 ];
 
@@ -30,7 +28,7 @@ const FEATURES_PREMIUM = [
   "Export PDF ATS",
   "Export Word (.docx)",
   "Préparation aux entretiens",
-  "Recherche d'offres selon votre CV",
+  "Recherche d'offres selon le CV",
   "80 révélations d'email / mois",
 ];
 
@@ -173,7 +171,7 @@ export default function PagePricing() {
           <div className="flex flex-col gap-4">
             {[
               { q: "Puis-je annuler à tout moment ?", r: "Oui, vous pouvez annuler votre abonnement à tout moment depuis votre espace Stripe. L'accès reste actif jusqu'à la fin de la période en cours." },
-              { q: "Les 5 analyses gratuites sont-elles renouvelées ?", r: "Non, les analyses gratuites sont données une seule fois à l'inscription. Un abonnement donne accès à des analyses illimitées." },
+              { q: "Les 3 analyses gratuites sont-elles renouvelées ?", r: "Non, les analyses gratuites sont données une seule fois à l'inscription. Un abonnement donne accès à des analyses illimitées." },
               { q: "Mes données sont-elles sécurisées ?", r: "Oui. Le contenu de votre CV n'est jamais stocké en base de données — il transite uniquement en mémoire pendant l'analyse." },
               { q: "Quelle est la différence entre Starter et Pro ?", r: "Le plan Pro inclut la préparation aux entretiens (pitch, questions probables, questions à poser) et 80 révélations d'email par mois au lieu de 20." },
             ].map(({ q, r }) => (

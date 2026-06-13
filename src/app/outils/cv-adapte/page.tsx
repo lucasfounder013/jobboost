@@ -210,7 +210,7 @@ export default function PageCVAdapte() {
         <section className="px-6 py-20">
           <div className="max-w-2xl mx-auto text-center bg-gradient-to-r from-indigo-500 to-violet-500 rounded-2xl px-10 py-14 shadow-xl shadow-indigo-200/50">
             <h2 className="text-3xl font-extrabold text-white mb-4">Commencer gratuitement</h2>
-            <p className="text-indigo-100 mb-8 text-base">5 analyses offertes. Aucune carte bancaire requise.</p>
+            <p className="text-indigo-100 mb-8 text-base">3 analyses offertes. Aucune carte bancaire requise.</p>
             <Link
               href="/register"
               className="inline-block bg-white text-indigo-600 font-bold px-8 py-3 rounded-xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"

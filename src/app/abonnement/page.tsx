@@ -6,17 +6,16 @@ import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 
 const FEATURES_GRATUIT = [
-  "5 analyses CV gratuites",
-  "1 adaptation CV gratuite",
-  "Export PDF & Word (.docx)",
-  "1 révélation d'email (candidature spontanée)",
+  "3 analyses CV gratuites",
+  "Préparation aux entretiens",
+  "Recherche d'offres selon le CV",
 ];
 
 const FEATURES_STANDARD = [
   "Analyses CV illimitées",
   "Adaptations CV illimitées",
   "Export PDF & Word (.docx)",
-  "Recherche d'offres selon votre CV",
+  "Recherche d'offres selon le CV",
   "20 révélations d'email / mois",
 ];
 
@@ -25,7 +24,7 @@ const FEATURES_PREMIUM = [
   "Adaptations CV illimitées",
   "Export PDF & Word (.docx)",
   "Préparation aux entretiens",
-  "Recherche d'offres selon votre CV",
+  "Recherche d'offres selon le CV",
   "80 révélations d'email / mois",
 ];
 

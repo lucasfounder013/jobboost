@@ -32,7 +32,7 @@ export default function CGV() {
             Les prix sont indiqués en euros TTC. Le service propose :
           </p>
           <ul className="mt-2 text-sm text-gray-600 leading-relaxed list-disc list-inside space-y-1">
-            <li>Une version gratuite : 5 analyses et 1 adaptation de CV</li>
+            <li>Une version gratuite : 3 analyses CV (sans adaptation de CV)</li>
             <li>Abonnement Starter : <strong>9,99 € / mois</strong></li>
             <li>Abonnement Pro : <strong>14,99 € / mois</strong></li>
           </ul>

@@ -1003,12 +1003,12 @@ function DashboardInner() {
               <div className="bg-indigo-900/50 rounded-xl px-3 py-2 flex flex-col gap-1">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-indigo-300">Analyses</span>
-                  <span className={`font-bold ${(scansRestants ?? 0) === 0 ? "text-rose-400" : "text-white"}`}>{scansRestants ?? 0}/5</span>
+                  <span className={`font-bold ${(scansRestants ?? 0) === 0 ? "text-rose-400" : "text-white"}`}>{scansRestants ?? 0}/3</span>
                 </div>
                 <div className="w-full bg-indigo-800 rounded-full h-1.5">
                   <div
                     className={`h-1.5 rounded-full transition-all ${(scansRestants ?? 0) === 0 ? "bg-rose-400" : "bg-indigo-400"}`}
-                    style={{ width: `${Math.max(0, Math.min(100, ((scansRestants ?? 0) / 5) * 100))}%` }}
+                    style={{ width: `${Math.max(0, Math.min(100, ((scansRestants ?? 0) / 3) * 100))}%` }}
                   />
                 </div>
                 <div className="flex items-center justify-between text-xs mt-0.5">
@@ -1020,7 +1020,7 @@ function DashboardInner() {
                   <span className={`font-bold ${(lmCreditsRestants ?? 0) === 0 ? "text-rose-400" : "text-white"}`}>{(lmCreditsRestants ?? 0) > 0 ? `${lmCreditsRestants} crédit` : "0 crédit"}</span>
                 </div>
                 <div className="flex items-center justify-between text-xs mt-0.5">
-                  <span className="text-indigo-300">Candidature spontanée</span>
+                  <span className="text-indigo-300">Trouver un mail pro</span>
                   <span className={`font-bold ${(rhCreditsRestants ?? 0) === 0 ? "text-rose-400" : "text-white"}`}>{(rhCreditsRestants ?? 0) > 0 ? `${rhCreditsRestants} email${(rhCreditsRestants ?? 0) > 1 ? "s" : ""}` : "0 email"}</span>
                 </div>
                 {((scansRestants ?? 0) <= 2 || (creditsRestants ?? 0) === 0 || (lmCreditsRestants ?? 0) === 0) && (
@@ -1083,7 +1083,7 @@ function DashboardInner() {
             <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
-            Candidature spontanée
+            Trouver un mail pro
           </button>
 
           <Link
@@ -1781,28 +1781,7 @@ function DashboardInner() {
               <p className="text-gray-400 text-sm mt-1">Recherchez des offres cadres et analysez votre CV en un clic.</p>
             </div>
 
-            {!estAbonne ? (
-              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-10 flex flex-col items-center text-center gap-5">
-                <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center">
-                  <svg className="w-7 h-7 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-gray-900">Fonctionnalité réservée aux abonnés</p>
-                  <p className="text-gray-500 text-sm mt-2 max-w-sm">
-                    Cherchez des offres cadres directement depuis JobBoost et lancez une analyse CV en un clic.
-                  </p>
-                </div>
-                <Link
-                  href="/pricing"
-                  className="bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-indigo-200/60 transition-all"
-                >
-                  Voir les abonnements →
-                </Link>
-              </div>
-            ) : (
-              <>
+            <>
                 {/* Toggle mode de recherche */}
                 <div className="flex gap-2 mb-4">
                   <button
@@ -2094,7 +2073,6 @@ function DashboardInner() {
                   </>
                 )}
               </>
-            )}
           </div>
         )}
 
@@ -2103,7 +2081,7 @@ function DashboardInner() {
           <div className="max-w-3xl mx-auto px-8 py-10">
             <div className="mb-8 flex items-start justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Candidature spontanée</h1>
+                <h1 className="text-2xl font-bold text-gray-900">Trouver un mail pro</h1>
                 {rhCreditsRestants !== null && (
                   <p className={`text-sm mt-1 font-medium ${rhCreditsRestants === 0 ? "text-rose-500" : "text-indigo-600"}`}>
                     {rhCreditsRestants === 0
@@ -2901,7 +2879,7 @@ function DashboardInner() {
               </h2>
               <p className="text-gray-500 text-sm leading-relaxed">
                 {modaleUpgrade === "scans"
-                  ? "Vous avez utilisé vos 5 analyses gratuites. Passez à un abonnement pour analyser autant de CV que vous le souhaitez."
+                  ? "Vous avez utilisé vos 3 analyses gratuites. Passez à un abonnement pour analyser autant de CV que vous le souhaitez."
                   : modaleUpgrade === "lm"
                   ? "Votre crédit gratuit de lettre de motivation a été utilisé. Passez à un abonnement pour générer des lettres illimitées."
                   : "Votre crédit d'adaptation CV gratuit a été utilisé. Passez à un abonnement pour adapter votre CV en illimité."}

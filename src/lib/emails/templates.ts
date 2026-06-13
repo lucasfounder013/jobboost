@@ -202,10 +202,10 @@ export function triggerScans({ nom, unsubscribeUrl, poste }: EmailProps): EmailT
   const prenom = nom.split(" ")[0];
   const subject = poste
     ? `Vos analyses gratuites sont épuisées, continuez sur ${poste}`
-    : "Vos 5 analyses gratuites ont été utilisées";
+    : "Vos 3 analyses gratuites ont été utilisées";
   const ouverture = poste
-    ? `<p style="margin:0 0 16px;">Vous avez utilisé vos 5 analyses gratuites, notamment pour des postes de <strong>${poste}</strong>.</p>`
-    : `<p style="margin:0 0 16px;">Vous avez utilisé vos 5 analyses gratuites.</p>`;
+    ? `<p style="margin:0 0 16px;">Vous avez utilisé vos 3 analyses gratuites, notamment pour des postes de <strong>${poste}</strong>.</p>`
+    : `<p style="margin:0 0 16px;">Vous avez utilisé vos 3 analyses gratuites.</p>`;
   const contenu = `
     <p style="margin:0 0 16px;">Bonjour ${prenom},</p>
     ${ouverture}

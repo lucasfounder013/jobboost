@@ -108,11 +108,6 @@ export async function POST(req: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
 
-  const { rows } = await pool.query('SELECT is_subscribed FROM "user" WHERE id = $1', [session.user.id]);
-  if (!rows[0]?.is_subscribed) {
-    return NextResponse.json({ error: "Fonctionnalité réservée aux abonnés" }, { status: 403 });
-  }
-
   const { motsCles, localisation, termesAlternatifs } = await req.json();
   if (!motsCles?.trim()) {
     return NextResponse.json({ error: "Le métier visé est requis" }, { status: 400 });

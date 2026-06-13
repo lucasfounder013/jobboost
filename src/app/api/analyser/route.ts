@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     );
     if (rowCount === 0) {
       return NextResponse.json(
-        { error: "Vous avez utilisé vos 5 analyses gratuites. Passez à un abonnement pour continuer." },
+        { error: "Vous avez utilisé vos 3 analyses gratuites. Passez à un abonnement pour continuer." },
         { status: 403 }
       );
     }

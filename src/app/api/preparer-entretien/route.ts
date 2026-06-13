@@ -38,16 +38,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "CV et offre d'emploi requis." }, { status: 400 });
   }
 
-  // Réservé au plan Premium uniquement
-  const { rows: rowsUser } = await pool.query(
-    'SELECT plan_type FROM "user" WHERE id = $1',
-    [session.user.id]
-  );
-  const planType: string | null = rowsUser[0]?.plan_type ?? null;
-  if (planType !== "pro") {
-    return NextResponse.json({ error: "Fonctionnalité réservée au plan Pro." }, { status: 403 });
-  }
-
   // Scraping URL entreprise (silencieux si échec)
   let contexteEntreprise = "";
   if (urlEntreprise?.trim()) {
