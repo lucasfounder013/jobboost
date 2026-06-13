@@ -8,6 +8,7 @@ const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
 export async function POST(req: NextRequest) {
+  try {
   // Authentification obligatoire
   const session = await auth.api.getSession({ headers: await headers() });
   if (!session) {
@@ -116,4 +117,9 @@ Règles pour forme (section factuelle sur la qualité du CV) :
   }
 
   return NextResponse.json({ ...resultat, scansRestants });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[analyser] Erreur non gérée:", msg);
+    return NextResponse.json({ error: `Erreur serveur : ${msg}` }, { status: 500 });
+  }
 }

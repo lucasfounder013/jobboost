@@ -476,14 +476,14 @@ function DashboardInner() {
       });
       const data = await reponse.json();
       if (reponse.status === 403) { setModaleUpgrade("scans"); return; }
-      if (!reponse.ok) throw new Error("Erreur lors de l'analyse.");
+      if (!reponse.ok) throw new Error(data?.error || "Erreur lors de l'analyse.");
       setResultat(data);
       setScansRestants(data.scansRestants ?? null);
       if (data.scansRestants === null) setEstAbonne(true);
       posthog?.capture("analyse_completee", { score: data.score, nb_mots_manquants: data.motsClesManquants?.length ?? 0 });
       sauvegarderAnalyse(data).catch(() => {});
-    } catch {
-      setErreur("Une erreur est survenue. Veuillez réessayer.");
+    } catch (e) {
+      setErreur(e instanceof Error ? e.message : "Une erreur est survenue. Veuillez réessayer.");
     } finally {
       setChargement(false);
     }
