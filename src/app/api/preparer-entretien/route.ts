@@ -116,6 +116,11 @@ Pour questionsProbables : génère 5 à 7 questions. Pour questionsAPoseur : gé
     ]
   );
 
+  pool.query(
+    `INSERT INTO user_events (user_id, action, metadata) VALUES ($1, 'entretien', $2)`,
+    [session.user.id, JSON.stringify({ nomPoste: resultat.nomPoste ?? null })]
+  ).catch(e => console.error("[preparer-entretien] Erreur log event:", e.message));
+
   return NextResponse.json({
     entretienId: rows[0].id,
     nomPoste: resultat.nomPoste,

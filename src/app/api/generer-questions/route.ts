@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { headers } from "next/headers";
+import { Pool } from "pg";
 import Anthropic from "@anthropic-ai/sdk";
 import { auth } from "@/lib/auth";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const pool = new Pool({ connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } });
 
 export async function POST(req: NextRequest) {
   const session = await auth.api.getSession({ headers: await headers() });
@@ -54,6 +56,11 @@ Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans backticks) :
   try {
     const texte = contenu.text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
     const data = JSON.parse(texte);
+    pool.query(
+      `INSERT INTO user_events (user_id, action, metadata) VALUES ($1, 'questions_cv', $2)`,
+      [session.user.id, JSON.stringify({ nb_questions: data.questions?.length ?? 0 })]
+    ).catch(e => console.error("[generer-questions] Erreur log event:", e.message));
+
     return NextResponse.json({ questions: data.questions ?? [] });
   } catch {
     return NextResponse.json({ error: "Impossible de parser la réponse." }, { status: 500 });

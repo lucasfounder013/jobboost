@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useSession } from "@/lib/auth-client";
@@ -18,28 +18,6 @@ export default function PagePrincipale() {
   const [nomFichier, setNomFichier] = useState("");
   const [extractionEnCours, setExtractionEnCours] = useState(false);
   const [dragActif, setDragActif] = useState(false);
-  const [ongletCV, setOngletCV] = useState<"avant" | "apres">("avant");
-  const refSectionDemo = useRef<HTMLElement>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  useEffect(() => {
-    const el = refSectionDemo.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          intervalRef.current = setInterval(() => {
-            setOngletCV(prev => prev === "avant" ? "apres" : "avant");
-          }, 15000);
-        } else {
-          if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
-        }
-      },
-      { threshold: 0.25 }
-    );
-    observer.observe(el);
-    return () => { observer.disconnect(); if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, []);
 
   async function traiterFichier(fichier: File) {
     const ext = fichier.name.split(".").pop()?.toLowerCase();
@@ -114,268 +92,218 @@ export default function PagePrincipale() {
         </section>
 
         {/* Démo avant / après CV */}
-        <section ref={refSectionDemo} className="bg-white border-t border-gray-100 px-6 pt-16 pb-16">
+        <section className="bg-white border-t border-gray-100 px-6 pt-16 pb-16">
           <div className="max-w-6xl mx-auto">
 
-            <div className="text-center mb-8">
+            <div className="text-center mb-10">
               <span className="inline-block bg-indigo-50 text-indigo-600 text-xs font-bold px-3 py-1 rounded-full mb-4 tracking-wide uppercase">
                 Démonstration
               </span>
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-6">
+              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-4">
                 La différence JobBoost en un coup d&apos;œil
               </h2>
-              <div className="inline-flex rounded-xl bg-gray-100 p-1 gap-1 mb-5">
-                <button
-                  onClick={() => setOngletCV("avant")}
-                  className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${ongletCV === "avant" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-                >
-                  CV générique
-                </button>
-                <button
-                  onClick={() => setOngletCV("apres")}
-                  className={`px-6 py-2 rounded-lg text-sm font-semibold transition-all duration-200 ${ongletCV === "apres" ? "bg-white text-gray-900 shadow-sm" : "text-gray-500 hover:text-gray-700"}`}
-                >
-                  CV optimisé par JobBoost
-                </button>
-              </div>
               <p className="text-gray-500 text-base max-w-xl mx-auto">
-                {ongletCV === "avant"
-                  ? "Les descriptions vagues sont ignorées par les ATS et les recruteurs en moins de 3 secondes."
-                  : "Chaque ligne est optimisée pour les ATS et immédiatement lisible par un recruteur humain."}
+                Voyez par vous-même ce que JobBoost transforme sur votre CV.
               </p>
             </div>
 
-            <div className="flex items-stretch gap-6 xl:gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-              {/* Annotations gauche */}
-              <div className="w-48 xl:w-56 shrink-0 hidden lg:block relative">
-                {ongletCV === "avant" ? (
-                  <>
-                    {/* → badge "Chef de projet" */}
-                    <div className="absolute top-[185px] right-0 w-full text-right">
-                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ Titre vague, aucun mot-clé ATS. Le poste exact n&apos;apparaît pas.</p>
-                      </span>
+              {/* ── Carte AVANT ── */}
+              <div className="rounded-xl shadow-xl overflow-hidden ring-2 ring-red-100">
+                <div className="px-5 py-3 flex items-center justify-between bg-red-50 border-b border-red-100">
+                  <span className="text-xs font-bold text-red-600">Avant JobBoost</span>
+                  <span className="text-sm font-extrabold px-3 py-1 rounded-full bg-red-100 text-red-700">Score ATS : 34 / 100</span>
+                </div>
+                <div className="relative overflow-hidden max-h-[680px] flex font-sans text-[11px] text-gray-900 leading-snug">
+
+                  {/* Sidebar gauche */}
+                  <div className="w-[33%] shrink-0 bg-[#f0ece7] p-3 flex flex-col gap-3">
+                    {/* Photo */}
+                    <div className="w-full aspect-[3/4] overflow-hidden rounded-sm">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&h=533&q=85&crop=faces"
+                        alt="Sophie Martin"
+                        className="w-full h-full object-cover object-top"
+                      />
                     </div>
-                    {/* → texte résumé "Motivée", "passionnée"... */}
-                    <div className="absolute top-[295px] right-0 w-full text-right">
-                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ &ldquo;Motivée&rdquo; est un buzzword. Aucune preuve chiffrée.</p>
-                      </span>
+
+                    {/* Coordonnées */}
+                    <div>
+                      <p className="text-[8px] font-bold uppercase tracking-widest text-[#7c5c4a] border-b border-[#c4a898] pb-0.5 mb-1.5">Coordonnées</p>
+                      <div className="space-y-1 text-[10px] text-gray-700">
+                        <p>06 12 34 56 78</p>
+                        <p>sophie.martin@gmail.com</p>
+                        <p>Paris, France</p>
+                      </div>
                     </div>
-                    {/* → section Compétences clés */}
-                    <div className="absolute top-[400px] right-0 w-full text-right">
-                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ Compétences génériques non indexées par les ATS.</p>
-                      </span>
+
+                    {/* Langues */}
+                    <div>
+                      <p className="text-[8px] font-bold uppercase tracking-widest text-[#7c5c4a] border-b border-[#c4a898] pb-0.5 mb-1.5">Langues</p>
+                      <div className="space-y-1.5">
+                        <div>
+                          <p className="text-[10px] text-gray-800 mb-0.5">Français</p>
+                          <div className="h-1 bg-[#d8cfc8] rounded-full"><div className="h-full bg-[#7c5c4a] rounded-full w-full" /></div>
+                        </div>
+                        <div>
+                          <p className="text-[10px] text-gray-800 mb-0.5">Anglais</p>
+                          <div className="h-1 bg-[#d8cfc8] rounded-full"><div className="h-full bg-[#7c5c4a] rounded-full w-1/2" /></div>
+                        </div>
+                      </div>
                     </div>
-                    {/* → premier bullet Acme */}
-                    <div className="absolute top-[492px] right-0 w-full text-right">
-                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ Tâche basique que tout candidat peut écrire. Aucun résultat.</p>
-                      </span>
+
+                    {/* Compétences */}
+                    <div>
+                      <p className="text-[8px] font-bold uppercase tracking-widest text-[#7c5c4a] border-b border-[#c4a898] pb-0.5 mb-1.5">Compétences</p>
+                      <ul className="space-y-0.5 text-[10px] text-gray-700">
+                        <li>Gestion du temps</li>
+                        <li>Microsoft Office</li>
+                        <li>Communication</li>
+                        <li>Leadership</li>
+                        <li>Travail en équipe</li>
+                        <li>Organisation</li>
+                      </ul>
                     </div>
-                    {/* → dernier bullet Acme */}
-                    <div className="absolute top-[580px] right-0 w-full text-right">
-                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ Aucun outil cité (JIRA ? Trello ?). Impossible à évaluer.</p>
-                      </span>
+
+                    {/* Centres d'intérêt */}
+                    <div>
+                      <p className="text-[8px] font-bold uppercase tracking-widest text-[#7c5c4a] border-b border-[#c4a898] pb-0.5 mb-1.5">Centres d&apos;intérêt</p>
+                      <ul className="space-y-0.5 text-[10px] text-gray-700">
+                        <li>Voyages</li>
+                        <li>Photographie</li>
+                        <li>Lecture</li>
+                        <li>Randonnée</li>
+                      </ul>
                     </div>
-                  </>
-                ) : (
-                  <>
-                    {/* → titre "Chef de projet digital — Transformation..." */}
-                    <div className="absolute top-[95px] right-0 w-full text-right">
-                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Titre aligné mot pour mot avec l&apos;offre d&apos;emploi visée.</p>
-                      </span>
+                  </div>
+
+                  {/* Contenu principal */}
+                  <div className="flex-1 bg-white p-4">
+                    {/* En-tête */}
+                    <div className="mb-4">
+                      <p className="text-[24px] font-black uppercase text-[#7c5c4a] leading-none tracking-tight">SOPHIE<br/>MARTIN</p>
+                      <p className="text-[10px] tracking-[0.12em] uppercase text-gray-500 mt-1.5">Chef de projet</p>
                     </div>
-                    {/* → profil chiffré "6 ans, 250K€, 94%" */}
-                    <div className="absolute top-[188px] right-0 w-full text-right">
-                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Résumé chiffré. La valeur ajoutée est visible en 3 secondes.</p>
-                      </span>
+
+                    {/* Formation */}
+                    <div className="mb-3">
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-[#7c5c4a] border-b border-[#7c5c4a] pb-0.5 mb-2 text-right">Formation</p>
+                      <div className="space-y-1.5">
+                        <div className="flex gap-2 items-start">
+                          <div className="w-2 h-2 rounded-full bg-[#7c5c4a] shrink-0 mt-[3px]" />
+                          <div className="flex-1">
+                            <div className="flex justify-between items-baseline gap-1">
+                              <p className="font-bold text-[11px]">Master Management de projets</p>
+                              <p className="text-[9px] text-gray-500 shrink-0">2014 – 2016</p>
+                            </div>
+                            <p className="text-[10px] text-gray-500">Université Paris-Dauphine</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 items-start">
+                          <div className="w-2 h-2 rounded-full bg-[#7c5c4a] shrink-0 mt-[3px]" />
+                          <div className="flex-1">
+                            <div className="flex justify-between items-baseline gap-1">
+                              <p className="font-bold text-[11px]">Licence Administration des entreprises</p>
+                              <p className="text-[9px] text-gray-500 shrink-0">2011 – 2014</p>
+                            </div>
+                            <p className="text-[10px] text-gray-500">Université Paris 1 Panthéon-Sorbonne</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    {/* → bullet Acme "3 projets, budget 250K€, 94% dans les délais" */}
-                    <div className="absolute top-[295px] right-0 w-full text-right">
-                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Budget + taux de livraison = preuve de résultat concret.</p>
-                      </span>
+
+                    {/* Expérience */}
+                    <div>
+                      <p className="text-[9px] font-bold uppercase tracking-widest text-[#7c5c4a] border-b border-[#7c5c4a] pb-0.5 mb-2 text-right">Expérience professionnelle</p>
+                      <div className="space-y-2.5">
+
+                        <div className="flex gap-2 items-start">
+                          <div className="w-2 h-2 rounded-full bg-[#7c5c4a] shrink-0 mt-[3px]" />
+                          <div className="flex-1">
+                            <div className="flex justify-between items-baseline gap-1">
+                              <p className="font-bold">Chef de projet</p>
+                              <p className="text-[9px] text-gray-500 shrink-0">Jan 2021 – Présent</p>
+                            </div>
+                            <p className="text-[10px] italic text-gray-500 mb-0.5">Acme Solutions</p>
+                            <ul className="space-y-0.5 text-[10px] text-gray-700">
+                              <li className="flex gap-1"><span className="shrink-0">•</span><span>Responsable de la gestion de projets en lien avec les équipes.</span></li>
+                              <li className="flex gap-1"><span className="shrink-0">•</span><span><span className="text-red-400 font-semibold">Aidé</span> à l&apos;amélioration des processus internes de l&apos;entreprise.</span></li>
+                              <li className="flex gap-1"><span className="shrink-0">•</span><span>Travaillé avec les équipes pour livrer les projets dans les délais.</span></li>
+                              <li className="flex gap-1"><span className="shrink-0">•</span><span>Participé aux réunions de suivi avec les parties prenantes.</span></li>
+                            </ul>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2 items-start">
+                          <div className="w-2 h-2 rounded-full bg-[#7c5c4a] shrink-0 mt-[3px]" />
+                          <div className="flex-1">
+                            <div className="flex justify-between items-baseline gap-1">
+                              <p className="font-bold">Coordinatrice de projet</p>
+                              <p className="text-[9px] text-gray-500 shrink-0">Sep 2018 – Déc 2020</p>
+                            </div>
+                            <p className="text-[10px] italic text-gray-500 mb-0.5">StartupXYZ</p>
+                            <ul className="space-y-0.5 text-[10px] text-gray-700">
+                              <li className="flex gap-1"><span className="shrink-0">•</span><span><span className="text-red-400 font-semibold">Utilisé</span> des stratégies <span className="text-red-400 font-semibold">synergiques</span> pour aligner les équipes sur les objectifs.</span></li>
+                              <li className="flex gap-1"><span className="shrink-0">•</span><span>Créé des tableaux de bord et rapports pour la direction.</span></li>
+                              <li className="flex gap-1"><span className="shrink-0">•</span><span><span className="text-red-400 font-semibold">Aidé</span> à l&apos;organisation des plannings et livrables de l&apos;équipe.</span></li>
+                            </ul>
+                          </div>
+                        </div>
+
+                        <div className="flex gap-2 items-start">
+                          <div className="w-2 h-2 rounded-full bg-[#7c5c4a] shrink-0 mt-[3px]" />
+                          <div className="flex-1">
+                            <div className="flex justify-between items-baseline gap-1">
+                              <p className="font-bold">Assistante chef de projet</p>
+                              <p className="text-[9px] text-gray-500 shrink-0">Juin 2016 – Août 2018</p>
+                            </div>
+                            <p className="text-[10px] italic text-gray-500 mb-0.5">Conseil Régional Île-de-France</p>
+                            <ul className="space-y-0.5 text-[10px] text-gray-700">
+                              <li className="flex gap-1"><span className="shrink-0">•</span><span>Suivi administratif de projets de développement numérique.</span></li>
+                              <li className="flex gap-1"><span className="shrink-0">•</span><span>Rédaction de comptes-rendus et supports de présentation.</span></li>
+                            </ul>
+                          </div>
+                        </div>
+
+                      </div>
                     </div>
-                    {/* → bullet Acme "sprints Agile, 8 équipes, JIRA" + bullet KPI */}
-                    <div className="absolute top-[400px] right-0 w-full text-right">
-                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Outils nommés + méthode = scope de responsabilité immédiat.</p>
-                      </span>
-                    </div>
-                    {/* → section Compétences (Agile/Scrum, JIRA, KPI...) */}
-                    <div className="absolute top-[495px] right-0 w-full text-right">
-                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Compétences techniques recherchées par les ATS du secteur.</p>
-                      </span>
-                    </div>
-                  </>
-                )}
+                  </div>
+                  <div className="absolute bottom-0 inset-x-0 h-20 bg-gradient-to-t from-white/80 to-transparent pointer-events-none" />
+                </div>
               </div>
 
-              {/* CV document */}
-              <div className={`flex-1 rounded-xl shadow-xl overflow-hidden transition-all duration-300 ${ongletCV === "avant" ? "ring-2 ring-red-100" : "ring-2 ring-emerald-100"}`}>
-                {/* Bandeau score */}
-                <div className={`px-6 py-3 flex items-center justify-between ${ongletCV === "avant" ? "bg-red-50 border-b border-red-100" : "bg-emerald-50 border-b border-emerald-100"}`}>
-                  <span className={`text-xs font-bold ${ongletCV === "avant" ? "text-red-600" : "text-emerald-700"}`}>
-                    {ongletCV === "avant" ? "Avant JobBoost" : "Après JobBoost"}
-                  </span>
-                  <span className={`text-sm font-extrabold px-3 py-1 rounded-full ${ongletCV === "avant" ? "bg-red-100 text-red-700" : "bg-emerald-100 text-emerald-700"}`}>
-                    Score ATS : {ongletCV === "avant" ? "34" : "91"} / 100
-                  </span>
+              {/* ── Carte APRÈS ── */}
+              <div className="rounded-xl shadow-xl overflow-hidden ring-2 ring-emerald-100">
+                <div className="px-5 py-3 flex items-center justify-between bg-emerald-50 border-b border-emerald-100">
+                  <span className="text-xs font-bold text-emerald-700">Après JobBoost</span>
+                  <span className="text-sm font-extrabold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700">Score ATS : 91 / 100</span>
                 </div>
+                <div className="relative">
+                  <div className="bg-white p-5 overflow-hidden max-h-[680px]">
+                    <div className="font-serif text-[11px] text-gray-900 leading-snug">
 
-                {/* Corps du CV */}
-                <div className="bg-white p-8 font-serif text-gray-900">
-                  {ongletCV === "avant" ? (
-                    /* ── CV AVANT (style générique centré) ── */
-                    <div className="font-sans text-[13px] text-gray-900 leading-snug">
-
-                      {/* En-tête centré avec avatar */}
-                      <div className="text-center mb-5 pb-4 border-b border-gray-300">
-                        <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center mx-auto mb-3 text-gray-400 text-xl font-bold">SM</div>
-                        <p className="text-[22px] font-bold uppercase tracking-wide">SOPHIE MARTIN</p>
-                        <span className="inline-block bg-red-100 text-red-400 text-xs font-semibold px-3 py-0.5 rounded-sm mt-1">Chef de projet</span>
-                        <p className="text-xs text-gray-500 mt-2">Paris, France · sophie.martin@gmail.com · linkedin.com/in/sophiemartin</p>
-                      </div>
-
-                      {/* Résumé */}
-                      <div className="mb-4">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-1 mb-2">Résumé professionnel</p>
-                        <p className="text-gray-700 leading-relaxed">
-                          <span className="text-red-400 font-semibold">Motivée</span> et dynamique, je suis une professionnelle <span className="text-red-400 font-semibold">passionnée</span> par les projets et le travail en équipe. <span className="text-red-400 font-semibold">Team player</span> reconnue pour ma polyvalence, je cherche à rejoindre une entreprise <span className="text-red-400 font-semibold">dynamique</span> pour relever de nouveaux défis et contribuer à son succès dans un environnement stimulant.
-                        </p>
-                      </div>
-
-                      {/* Compétences — pills */}
-                      <div className="mb-4">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-1 mb-2">Compétences clés</p>
-                        <div className="flex flex-wrap gap-1.5">
-                          {["Microsoft Office", "Travail en équipe", "Communication", "Leadership", "Polyvalence", "Sens de l'organisation"].map(c => (
-                            <span key={c} className="border border-gray-300 text-gray-600 text-xs px-2.5 py-0.5 rounded-full">{c}</span>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Expérience */}
-                      <div className="mb-4">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-1 mb-3">Expérience professionnelle</p>
-
-                        <div className="mb-3">
-                          <div className="flex justify-between items-baseline">
-                            <p className="font-bold">Acme Solutions</p>
-                            <p className="text-xs text-gray-500 shrink-0">Jan 2021 – Présent</p>
-                          </div>
-                          <p className="italic text-gray-500 text-xs mb-1.5">Chef de projet</p>
-                          <ul className="space-y-1 text-gray-700">
-                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Responsable de la gestion de projets en lien avec les équipes.</span></li>
-                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span><span className="text-red-400 font-semibold">Aidé</span> à l&apos;amélioration des processus internes de l&apos;entreprise.</span></li>
-                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Travaillé avec les équipes pour livrer les projets dans les délais.</span></li>
-                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Participé aux réunions de suivi avec les parties prenantes.</span></li>
-                          </ul>
-                        </div>
-
-                        <div className="mb-3">
-                          <div className="flex justify-between items-baseline">
-                            <p className="font-bold">StartupXYZ</p>
-                            <p className="text-xs text-gray-500 shrink-0">Sep 2018 – Déc 2020</p>
-                          </div>
-                          <p className="italic text-gray-500 text-xs mb-1.5">Coordinatrice de projet</p>
-                          <ul className="space-y-1 text-gray-700">
-                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span><span className="text-red-400 font-semibold">Utilisé</span> des stratégies <span className="text-red-400 font-semibold">synergiques</span> pour aligner les équipes sur les objectifs trimestriels.</span></li>
-                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Créé des tableaux de bord et rapports pour les présentations de direction.</span></li>
-                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span><span className="text-red-400 font-semibold">Aidé</span> à l&apos;organisation des plannings et des livrables de l&apos;équipe.</span></li>
-                          </ul>
-                        </div>
-
-                        <div>
-                          <div className="flex justify-between items-baseline">
-                            <p className="font-bold">Conseil Régional Île-de-France</p>
-                            <p className="text-xs text-gray-500 shrink-0">Juin 2016 – Août 2018</p>
-                          </div>
-                          <p className="italic text-gray-500 text-xs mb-1.5">Assistante chef de projet</p>
-                          <ul className="space-y-1 text-gray-700">
-                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Suivi administratif de projets de développement numérique.</span></li>
-                            <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Rédaction de comptes-rendus et supports de présentation.</span></li>
-                          </ul>
-                        </div>
-                      </div>
-
-                      {/* Formation */}
-                      <div className="mb-4">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-1 mb-2">Formation</p>
-                        <div className="mb-1.5">
-                          <div className="flex justify-between items-baseline">
-                            <p className="font-bold">Université Paris-Dauphine</p>
-                            <p className="text-xs text-gray-500 shrink-0">2014 – 2016</p>
-                          </div>
-                          <p className="italic text-gray-500 text-xs">Master Management de projets</p>
-                        </div>
-                        <div>
-                          <div className="flex justify-between items-baseline">
-                            <p className="font-bold">Université Paris 1 Panthéon-Sorbonne</p>
-                            <p className="text-xs text-gray-500 shrink-0">2011 – 2014</p>
-                          </div>
-                          <p className="italic text-gray-500 text-xs">Licence Administration des entreprises</p>
-                        </div>
-                      </div>
-
-                      {/* Certifications */}
-                      <div className="mb-4">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-1 mb-2">Certifications &amp; Récompenses</p>
-                        <ul className="space-y-1 text-gray-700">
-                          <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Formation gestion de projet (en ligne)</span></li>
-                          <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Employée du mois — Acme Solutions (2022)</span></li>
-                        </ul>
-                      </div>
-
-                      {/* Langues */}
-                      <div className="mb-4">
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-1 mb-2">Langues</p>
-                        <p className="text-gray-700">Français (natif) · Anglais (intermédiaire)</p>
-                      </div>
-
-                      {/* Centres d'intérêt */}
-                      <div>
-                        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-500 border-b border-gray-200 pb-1 mb-2">Centres d&apos;intérêt</p>
-                        <ul className="space-y-1 text-gray-700">
-                          <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Voyages</span></li>
-                          <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Photographie</span></li>
-                          <li className="flex gap-2 items-start"><span className="shrink-0 mt-[6px] w-1 h-1 rounded-full bg-gray-400 inline-block" /><span>Lecture</span></li>
-                        </ul>
-                      </div>
-                    </div>
-                  ) : (
-                    /* ── CV APRÈS (format JobBoost) ── */
-                    <div className="font-serif text-[13px] text-gray-900 leading-snug">
-                      {/* En-tête */}
-                      <div className="mb-4">
-                        <p className="text-[22px] font-bold font-sans">Sophie Martin</p>
-                        <p className="text-sm font-sans text-gray-700 mt-0.5">Chef de projet digital — Transformation &amp; Pilotage agile</p>
-                        <p className="text-xs font-sans text-gray-500 mt-1">sophie.martin@gmail.com · +33 6 12 34 56 78 · Paris, France · linkedin.com/in/sophiemartin</p>
-                      </div>
-
-                      {/* Profil */}
                       <div className="mb-3">
-                        <p className="text-[10px] font-bold uppercase tracking-wider font-sans border-b border-gray-400 pb-0.5 mb-1.5">Profil</p>
+                        <p className="text-[18px] font-bold font-sans">Sophie Martin</p>
+                        <p className="text-[11px] font-sans text-gray-700 mt-0.5">Chef de projet digital — Transformation &amp; Pilotage agile</p>
+                        <p className="text-[10px] font-sans text-gray-500 mt-1">sophie.martin@gmail.com · +33 6 12 34 56 78 · Paris, France · linkedin.com/in/sophiemartin</p>
+                      </div>
+
+                      <div className="mb-2.5">
+                        <p className="text-[9px] font-bold uppercase tracking-wider font-sans border-b border-gray-400 pb-0.5 mb-1.5">Profil</p>
                         <p className="leading-relaxed text-gray-700">
                           Chef de projet digital avec{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">6 ans</span>{" "}d&apos;expérience en{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">transformation numérique</span>{" "}et pilotage de projets complexes (budgets jusqu&apos;à{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">250 K€</span>). Certifiée{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">PMP</span>{" "}et{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">PSM I</span>. Taux de livraison dans les délais :{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">94 %</span>. Reconnue pour son leadership cross-fonctionnel et sa capacité à conduire le changement à grande échelle.
                         </p>
                       </div>
 
-                      {/* Expérience */}
-                      <div className="mb-3">
-                        <p className="text-[10px] font-bold uppercase tracking-wider font-sans border-b border-gray-400 pb-0.5 mb-2">Expérience professionnelle</p>
+                      <div className="mb-2.5">
+                        <p className="text-[9px] font-bold uppercase tracking-wider font-sans border-b border-gray-400 pb-0.5 mb-1.5">Expérience professionnelle</p>
 
-                        <div className="mb-2.5">
+                        <div className="mb-2">
                           <div className="flex justify-between items-baseline">
                             <p className="font-bold font-sans">Chef de projet digital</p>
-                            <p className="text-xs font-sans text-gray-500 shrink-0">Jan 2021 – Présent</p>
+                            <p className="text-[10px] font-sans text-gray-500 shrink-0">Jan 2021 – Présent</p>
                           </div>
                           <p className="italic text-gray-600 mb-1">Acme Solutions</p>
                           <ul className="space-y-0.5 text-gray-700">
@@ -386,10 +314,10 @@ export default function PagePrincipale() {
                           </ul>
                         </div>
 
-                        <div className="mb-2.5">
+                        <div className="mb-2">
                           <div className="flex justify-between items-baseline">
                             <p className="font-bold font-sans">Coordinatrice de projet digital</p>
-                            <p className="text-xs font-sans text-gray-500 shrink-0">Sep 2018 – Déc 2020</p>
+                            <p className="text-[10px] font-sans text-gray-500 shrink-0">Sep 2018 – Déc 2020</p>
                           </div>
                           <p className="italic text-gray-600 mb-1">StartupXYZ</p>
                           <ul className="space-y-0.5 text-gray-700">
@@ -402,7 +330,7 @@ export default function PagePrincipale() {
                         <div>
                           <div className="flex justify-between items-baseline">
                             <p className="font-bold font-sans">Assistante chef de projet digital</p>
-                            <p className="text-xs font-sans text-gray-500 shrink-0">Juin 2016 – Août 2018</p>
+                            <p className="text-[10px] font-sans text-gray-500 shrink-0">Juin 2016 – Août 2018</p>
                           </div>
                           <p className="italic text-gray-600 mb-1">Conseil Régional Île-de-France</p>
                           <ul className="space-y-0.5 text-gray-700">
@@ -412,13 +340,12 @@ export default function PagePrincipale() {
                         </div>
                       </div>
 
-                      {/* Formation */}
-                      <div className="mb-3">
-                        <p className="text-[10px] font-bold uppercase tracking-wider font-sans border-b border-gray-400 pb-0.5 mb-2">Formation</p>
-                        <div className="mb-1.5">
+                      <div className="mb-2.5">
+                        <p className="text-[9px] font-bold uppercase tracking-wider font-sans border-b border-gray-400 pb-0.5 mb-1.5">Formation</p>
+                        <div className="mb-1">
                           <div className="flex justify-between items-baseline">
                             <p className="font-bold font-sans">Master Management de projets digitaux</p>
-                            <p className="text-xs font-sans text-gray-500 shrink-0">2014 – 2016</p>
+                            <p className="text-[10px] font-sans text-gray-500 shrink-0">2014 – 2016</p>
                           </div>
                           <p className="italic text-gray-600">Université Paris-Dauphine</p>
                           <p className="text-gray-600 ml-3"><span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">Major de promotion</span></p>
@@ -426,107 +353,36 @@ export default function PagePrincipale() {
                         <div>
                           <div className="flex justify-between items-baseline">
                             <p className="font-bold font-sans">Licence Administration des entreprises</p>
-                            <p className="text-xs font-sans text-gray-500 shrink-0">2011 – 2014</p>
+                            <p className="text-[10px] font-sans text-gray-500 shrink-0">2011 – 2014</p>
                           </div>
                           <p className="italic text-gray-600">Université Paris 1 Panthéon-Sorbonne</p>
                         </div>
                       </div>
 
-                      {/* Compétences */}
-                      <div className="mb-3">
-                        <p className="text-[10px] font-bold uppercase tracking-wider font-sans border-b border-gray-400 pb-0.5 mb-1.5">Compétences</p>
+                      <div className="mb-2.5">
+                        <p className="text-[9px] font-bold uppercase tracking-wider font-sans border-b border-gray-400 pb-0.5 mb-1.5">Compétences</p>
                         <p className="text-gray-700"><span className="font-bold font-sans">Techniques :</span>{" "}<span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">Gestion de projet</span>, <span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">Agile / Scrum</span>, <span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">JIRA</span>, <span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">Roadmap</span>, <span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">KPI</span>, <span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">Tableau de bord</span>, <span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">Change management</span></p>
                         <p className="text-gray-700 mt-0.5"><span className="font-bold font-sans">Langues :</span>{" "}Français (natif), <span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-sans font-semibold">Anglais professionnel (C1)</span>, Espagnol (B1)</p>
                         <p className="text-gray-700 mt-0.5"><span className="font-bold font-sans">Autres :</span>{" "}Relation client, Communication orale et écrite, Travail en équipe multidisciplinaire, Rigueur</p>
                       </div>
 
-                      {/* Certifications */}
                       <div>
-                        <p className="text-[10px] font-bold uppercase tracking-wider font-sans border-b border-gray-400 pb-0.5 mb-2">Certifications</p>
+                        <p className="text-[9px] font-bold uppercase tracking-wider font-sans border-b border-gray-400 pb-0.5 mb-1.5">Certifications</p>
                         <div className="flex justify-between items-baseline">
                           <p className="font-bold font-sans"><span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-semibold">PMP</span> — Project Management Institute</p>
-                          <p className="text-xs font-sans text-gray-500 shrink-0">2023</p>
+                          <p className="text-[10px] font-sans text-gray-500 shrink-0">2023</p>
                         </div>
                         <div className="flex justify-between items-baseline mt-0.5">
                           <p className="font-bold font-sans"><span className="bg-emerald-100 text-emerald-800 px-0.5 rounded font-semibold">PSM I</span> — Scrum.org</p>
-                          <p className="text-xs font-sans text-gray-500 shrink-0">2022</p>
+                          <p className="text-[10px] font-sans text-gray-500 shrink-0">2022</p>
                         </div>
                       </div>
                     </div>
-                  )}
+                  </div>
+                  <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none" />
                 </div>
               </div>
 
-              {/* Annotations droite */}
-              <div className="w-48 xl:w-56 shrink-0 hidden lg:block relative">
-                {ongletCV === "avant" ? (
-                  <>
-                    {/* → corps du résumé professionnel */}
-                    <div className="absolute top-[290px] left-0 w-full">
-                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ Résumé sans chiffre. Les recruteurs ignorent ce type de profil en 3 s.</p>
-                      </span>
-                    </div>
-                    {/* → section Compétences clés (pills génériques) */}
-                    <div className="absolute top-[390px] left-0 w-full">
-                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ Aucun outil cité (JIRA ? Asana ?). Niveau de compétence non évaluable.</p>
-                      </span>
-                    </div>
-                    {/* → bullets Acme (tâches vagues) */}
-                    <div className="absolute top-[480px] left-0 w-full">
-                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ Tâche vague. Aucune méthodologie ni scope de responsabilité.</p>
-                      </span>
-                    </div>
-                    {/* → bullet StartupXYZ "synergiques" */}
-                    <div className="absolute top-[560px] left-0 w-full">
-                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ &ldquo;Synergique&rdquo;, &ldquo;team player&rdquo; : mots vides non indexés par les ATS.</p>
-                      </span>
-                    </div>
-                    {/* → bullets StartupXYZ / Conseil Régional (aucun chiffre) */}
-                    <div className="absolute top-[640px] left-0 w-full">
-                      <span className="inline-block bg-red-50 border border-red-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-red-600">✕ Aucun résultat chiffré. Impossible de mesurer la valeur ajoutée.</p>
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    {/* → profil "6 ans, 250K€, 94%, PMP, PSM I" */}
-                    <div className="absolute top-[185px] left-0 w-full">
-                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Chiffres + certification = crédibilité immédiate pour les recruteurs.</p>
-                      </span>
-                    </div>
-                    {/* → bullet Acme "sprints Agile, 8 équipes, JIRA" */}
-                    <div className="absolute top-[295px] left-0 w-full">
-                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Outils nommés + impact = preuve de valeur immédiatement visible.</p>
-                      </span>
-                    </div>
-                    {/* → bullet Acme "tableaux de bord KPI, -40%" */}
-                    <div className="absolute top-[390px] left-0 w-full">
-                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ KPIs + chiffre d&apos;impact = preuve de contribution mesurable.</p>
-                      </span>
-                    </div>
-                    {/* → bullet StartupXYZ "roadmap, 12 sprints, -25%" */}
-                    <div className="absolute top-[480px] left-0 w-full">
-                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Méthode Agile + taille d&apos;équipe = scope de responsabilité clair.</p>
-                      </span>
-                    </div>
-                    {/* → section Compétences (Agile/Scrum, JIRA, KPI...) */}
-                    <div className="absolute top-[565px] left-0 w-full">
-                      <span className="inline-block bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">
-                        <p className="text-[11px] font-semibold leading-snug text-emerald-700">✓ Mots-clés sectoriels détectés et indexés par tous les ATS.</p>
-                      </span>
-                    </div>
-                  </>
-                )}
-              </div>
             </div>
           </div>
         </section>

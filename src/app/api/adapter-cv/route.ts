@@ -132,5 +132,10 @@ ${offre}`,
     return NextResponse.json({ error: "Format de réponse invalide. Veuillez réessayer." }, { status: 500 });
   }
 
+  pool.query(
+    `INSERT INTO user_events (user_id, action, metadata) VALUES ($1, 'adaptation_cv', $2)`,
+    [session.user.id, JSON.stringify({ nomPoste: cvAdapte?.titre ?? null })]
+  ).catch(e => console.error("[adapter-cv] Erreur log event:", e.message));
+
   return NextResponse.json({ cvAdapte, creditsRestants });
 }
