@@ -12,6 +12,8 @@ import { OffreFT, OffreSauvegardee } from "@/types/offres";
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type FormeItem = { verdict: "✅" | "❌"; constat: string };
+type QuestionCV = { question: string; placeholder?: string };
+type ReponseCV = { question: string; reponse: string };
 
 type ResultatAnalyse = {
   score: number;
@@ -192,7 +194,10 @@ function DashboardInner() {
   const [analyseId, setAnalyseId] = useState<string | null>(null);
   const [nomPosteEnregistre, setNomPosteEnregistre] = useState("");
   const [autoAnalyse, setAutoAnalyse] = useState(false);
-  const [etapeAdaptation, setEtapeAdaptation] = useState<"idle" | "generation">("idle");
+  const [etapeAdaptation, setEtapeAdaptation] = useState<"idle" | "chargement-questions" | "questions" | "generation">("idle");
+  const [questionsCV, setQuestionsCV] = useState<QuestionCV[]>([]);
+  const [reponsesCV, setReponsesCV] = useState<ReponseCV[]>([]);
+  const [modaleQuestionsOuverte, setModaleQuestionsOuverte] = useState(false);
   const [modaleUpgrade, setModaleUpgrade] = useState<"scans" | "credits" | "lm" | null>(null);
   const [suppressionEnCours, setSuppressionEnCours] = useState<string | null>(null);
   const [editionPoste, setEditionPoste] = useState<{ id: string; valeur: string } | null>(null);
@@ -499,117 +504,84 @@ function DashboardInner() {
     const offreTexte = analyse.offre_texte;
     const idAnalyse = analyse.id;
 
-    // Redirection immédiate pour les utilisateurs sans crédit
-    if (creditsRestants === 0 && !estAbonne) {
-      sessionStorage.setItem("cvApercuParams", JSON.stringify({
-        cv: cvTexte, offre: offreTexte,
-        motsClesManquants: analyse.mots_cles_manquants ?? [],
-        scoreBefore: analyse.score ?? null,
-      }));
-      router.push("/cv-apercu");
-      return;
-    }
-
     setCv(cvTexte);
     setOffre(offreTexte);
     setAnalyseId(idAnalyse);
     setNomPosteEnregistre(analyse.nom_offre);
     setResultat({ score: analyse.score ?? 0, resume: "", forme: [], motsClesManquants: analyse.mots_cles_manquants ?? [], motsClesPresents: analyse.mots_cles_presents ?? [] });
     setErreurAdaptation("");
-    setCvAdapte(null);
-    setAdaptationEnCours(true);
-    setEtapeAdaptation("generation");
     setVue("nouvelle-analyse");
+    setEtapeAdaptation("chargement-questions");
 
     try {
-      const reponse = await fetch("/api/adapter-cv", {
+      const resQ = await fetch("/api/generer-questions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv: cvTexte, offre: offreTexte, motsClesManquants: analyse.mots_cles_manquants ?? [], reponses: [] }),
+        body: JSON.stringify({ cv: cvTexte, offre: offreTexte, motsClesManquants: analyse.mots_cles_manquants ?? [] }),
       });
-      const data = await reponse.json();
-      if (!reponse.ok) throw new Error(data.error);
-      const locked: boolean = data.locked ?? false;
-      setCreditsRestants(data.creditsRestants);
-      posthog?.capture("cv_adapte", { credits_restants: data.creditsRestants, locked });
-      setEtapeAdaptation("idle");
-      if (locked) {
-        // Calculer le score après adaptation pour l'aperçu
-        let scoreApres: number | null = null;
-        try {
-          const cvTexteApres = cvStructureVersTexte(data.cvAdapte);
-          const resScore = await fetch("/api/analyser-interne", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ cv: cvTexteApres, offre: offreTexte }),
-          });
-          if (resScore.ok) {
-            const dataScore = await resScore.json();
-            scoreApres = dataScore.score ?? null;
-          }
-        } catch {}
-        sessionStorage.setItem("cvApercu", JSON.stringify({
-          cvAdapte: data.cvAdapte,
-          cvOriginal: data.cvOriginal ?? null,
-          scoreBefore: analyse.score ?? null,
-          scoreAfter: scoreApres,
-        }));
-        router.push("/cv-apercu");
-        return;
+      if (resQ.ok) {
+        const dataQ = await resQ.json();
+        const qs: QuestionCV[] = dataQ.questions ?? [];
+        if (qs.length > 0) {
+          setQuestionsCV(qs);
+          setReponsesCV(qs.map(q => ({ question: q.question, reponse: "" })));
+          setEtapeAdaptation("questions");
+          setModaleQuestionsOuverte(true);
+          return;
+        }
       }
-      await fetch("/api/sauvegarder", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ analyseId: idAnalyse, nomOffre: analyse.nom_offre, cvAdapte: data.cvAdapte, cvOriginal: data.cvOriginal ?? undefined, questionsReponses: [] }),
-      });
-      // Calcul score après adaptation (en arrière-plan)
-      const cvTexteApres = cvStructureVersTexte(data.cvAdapte);
-      fetch("/api/analyser-interne", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv: cvTexteApres, offre: offreTexte }),
-      }).then((r) => r.ok ? r.json() : null).then((ds) => {
-        if (!ds) return;
-        fetch(`/api/analyses/${idAnalyse}/score-apres`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ scoreApres: ds.score, motsClesApresManquants: ds.motsClesManquants, motsClesApresPresents: ds.motsClesPresents }),
-        }).catch(() => {});
-      }).catch(() => {});
-      router.push(`/cv-adapte/${idAnalyse}`);
-    } catch (e) {
-      setErreurAdaptation(e instanceof Error ? e.message : "Une erreur est survenue.");
-      setEtapeAdaptation("idle");
-    } finally {
-      setAdaptationEnCours(false);
-    }
+    } catch {}
+    // Si la génération de questions échoue, on adapte directement sans réponses
+    await soumettreReponsesEtAdapter([]);
   }
 
-  // ── Adaptation CV
-  async function adapterCV() {
+  // ── Lance la génération des questions avant adaptation
+  async function lancerQuestionsAdaptation() {
     if (!resultat) return;
 
-    // Redirection immédiate vers la page d'aperçu pour les utilisateurs sans crédit
-    if (creditsRestants === 0 && !estAbonne) {
-      sessionStorage.setItem("cvApercuParams", JSON.stringify({
-        cv, offre,
-        motsClesManquants: resultat.motsClesManquants,
-        scoreBefore: resultat.score ?? null,
-      }));
-      router.push("/cv-apercu");
-      return;
-    }
-
     setErreurAdaptation("");
+    setEtapeAdaptation("chargement-questions");
+
+    try {
+      const resQ = await fetch("/api/generer-questions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ cv, offre, motsClesManquants: resultat.motsClesManquants }),
+      });
+      if (resQ.ok) {
+        const dataQ = await resQ.json();
+        const qs: QuestionCV[] = dataQ.questions ?? [];
+        if (qs.length > 0) {
+          setQuestionsCV(qs);
+          setReponsesCV(qs.map(q => ({ question: q.question, reponse: "" })));
+          setEtapeAdaptation("questions");
+          setModaleQuestionsOuverte(true);
+          return;
+        }
+      }
+    } catch {}
+    // Si la génération échoue, on adapte directement sans réponses
+    await soumettreReponsesEtAdapter([]);
+  }
+
+  // ── Helper mise à jour d'une réponse
+  function updateReponse(index: number, value: string) {
+    setReponsesCV(prev => prev.map((r, i) => i === index ? { ...r, reponse: value } : r));
+  }
+
+  // ── Adaptation CV (appelée après la modale questions)
+  async function soumettreReponsesEtAdapter(reponses: ReponseCV[]) {
+    setModaleQuestionsOuverte(false);
     setCvAdapte(null);
     setCvLocked(false);
     setAdaptationEnCours(true);
     setEtapeAdaptation("generation");
+    const reponsesNonVides = reponses.filter(r => r.reponse.trim());
     try {
       const reponse = await fetch("/api/adapter-cv", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv, offre, motsClesManquants: resultat.motsClesManquants, reponses: [] }),
+        body: JSON.stringify({ cv, offre, motsClesManquants: resultat?.motsClesManquants ?? [], reponses: reponsesNonVides }),
       });
       const data = await reponse.json();
       if (!reponse.ok) throw new Error(data.error);
@@ -626,7 +598,7 @@ function DashboardInner() {
         router.push("/cv-apercu");
         return;
       }
-      await sauvegarderCvAdapte(data.cvAdapte, data.cvOriginal ?? undefined);
+      await sauvegarderCvAdapte(data.cvAdapte, data.cvOriginal ?? undefined, reponsesNonVides);
       calculerScoreApresAdaptation(data.cvAdapte).catch(() => {});
       if (analyseId) {
         router.push(`/cv-adapte/${analyseId}`);
@@ -703,15 +675,15 @@ function DashboardInner() {
   }
 
   // ── Auto-save CV adapté
-  async function sauvegarderCvAdapte(cvData: CVStructure, cvOriginalData?: CVStructure) {
+  async function sauvegarderCvAdapte(cvData: CVStructure, cvOriginalData?: CVStructure, reponses: ReponseCV[] = []) {
     const nomOffre = nomPosteEnregistre || nomFichier || "Analyse sans titre";
     await fetch("/api/sauvegarder", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(
         analyseId
-          ? { analyseId, nomOffre, cvAdapte: cvData, cvOriginal: cvOriginalData, questionsReponses: [] }
-          : { nomOffre, score: resultat?.score, resume: resultat?.resume ?? "", motsClesManquants: resultat?.motsClesManquants ?? [], motsClesPresents: resultat?.motsClesPresents ?? [], cvAdapte: cvData, cvOriginal: cvOriginalData, questionsReponses: [] }
+          ? { analyseId, nomOffre, cvAdapte: cvData, cvOriginal: cvOriginalData, questionsReponses: reponses }
+          : { nomOffre, score: resultat?.score, resume: resultat?.resume ?? "", motsClesManquants: resultat?.motsClesManquants ?? [], motsClesPresents: resultat?.motsClesPresents ?? [], cvAdapte: cvData, cvOriginal: cvOriginalData, questionsReponses: reponses }
       ),
     });
   }
@@ -1501,15 +1473,20 @@ function DashboardInner() {
                       <p className="text-gray-700 text-sm leading-relaxed">{resultat.resume}</p>
                     </div>
                     <div className="pt-4 border-t border-gray-100 flex flex-col gap-2">
-                      {etapeAdaptation === "generation" ? (
+                      {etapeAdaptation === "chargement-questions" ? (
+                        <button disabled className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm opacity-70 cursor-not-allowed flex items-center justify-center gap-2">
+                          <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
+                          Préparation des questions...
+                        </button>
+                      ) : etapeAdaptation === "generation" ? (
                         <button disabled className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm opacity-70 cursor-not-allowed flex items-center justify-center gap-2">
                           <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
                           Génération du CV en cours...
                         </button>
                       ) : (
                         <>
-                          <button onClick={adapterCV} disabled={adaptationEnCours} className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
-                            Adapter mon CV à l'offre d'emploi
+                          <button onClick={lancerQuestionsAdaptation} disabled={adaptationEnCours} className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100 disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+                            Adapter mon CV à l&apos;offre d&apos;emploi
                           </button>
                           {erreurAdaptation && <p className="text-rose-500 text-xs font-medium text-center">{erreurAdaptation}</p>}
                           {creditsRestants !== null && creditsRestants > 0 ? (
@@ -2972,6 +2949,76 @@ function DashboardInner() {
                 </div>
               )}
 
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modale questionnaire avant adaptation */}
+      {modaleQuestionsOuverte && questionsCV.length > 0 && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => { setModaleQuestionsOuverte(false); setEtapeAdaptation("idle"); }}
+          />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg flex flex-col max-h-[90vh]">
+            {/* Header */}
+            <div className="p-6 border-b border-gray-100 flex items-start justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-bold text-gray-900">Quelques précisions sur votre parcours</h2>
+                <p className="text-sm text-gray-500 mt-1">Ces chiffres rendront votre CV plus convaincant. Répondez aux questions qui s&apos;appliquent, laissez vide sinon.</p>
+              </div>
+              <button
+                onClick={() => { setModaleQuestionsOuverte(false); setEtapeAdaptation("idle"); }}
+                className="shrink-0 text-gray-400 hover:text-gray-600 transition-colors mt-0.5"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Questions */}
+            <div className="overflow-y-auto p-6 flex flex-col gap-5">
+              {questionsCV.map((q, i) => (
+                <div key={i}>
+                  <label className="block text-sm font-semibold text-gray-800 mb-1.5">
+                    {i + 1}. {q.question}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={q.placeholder ?? "Votre réponse..."}
+                    value={reponsesCV[i]?.reponse ?? ""}
+                    onChange={e => updateReponse(i, e.target.value)}
+                    onKeyDown={e => {
+                      if (e.key === "Enter") {
+                        if (i < questionsCV.length - 1) {
+                          (e.currentTarget.closest(".flex.flex-col")?.querySelectorAll("input")[i + 1] as HTMLElement | null)?.focus();
+                        } else {
+                          soumettreReponsesEtAdapter(reponsesCV);
+                        }
+                      }
+                    }}
+                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-shadow"
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Footer */}
+            <div className="p-6 border-t border-gray-100 flex flex-col gap-3">
+              <button
+                onClick={() => soumettreReponsesEtAdapter(reponsesCV)}
+                className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100"
+              >
+                Améliorer mon CV
+              </button>
+              <button
+                onClick={() => soumettreReponsesEtAdapter([])}
+                className="text-sm text-gray-400 hover:text-gray-600 text-center transition-colors py-1"
+              >
+                Passer cette étape
+              </button>
             </div>
           </div>
         </div>

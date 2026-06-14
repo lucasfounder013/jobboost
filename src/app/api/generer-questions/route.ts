@@ -20,11 +20,11 @@ export async function POST(req: NextRequest) {
 
   const message = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
-    max_tokens: 512,
+    max_tokens: 1024,
     messages: [
       {
         role: "user",
-        content: `Tu es un expert en optimisation de CV. Un candidat veut adapter son CV pour une offre d'emploi.
+        content: `Tu es un expert en optimisation de CV ATS. Un candidat veut adapter son CV pour une offre d'emploi.
 
 CV :
 ${cv}
@@ -32,19 +32,20 @@ ${cv}
 OFFRE D'EMPLOI :
 ${offre}
 
-Mots-clés manquants dans le CV : ${(motsClesManquants as string[] ?? []).join(", ")}
+Mots-clés importants à intégrer : ${(motsClesManquants as string[] ?? []).join(", ")}
 
-Génère 3 à 5 questions courtes, ancrées dans le CV et l'offre, qui permettront d'ajouter des chiffres concrets au CV adapté.
+Génère exactement 5 à 7 questions courtes, personnalisées, ancrées dans le CV ET l'offre, qui permettront d'ajouter des données chiffrées concrètes pour renforcer le CV.
 
 Règles STRICTES :
 - Chaque question doit chercher un chiffre, une durée, un volume, un pourcentage ou un résultat mesurable — jamais une appréciation subjective
-- Chaque question doit faire référence à un élément précis du CV (un poste, un projet, une expérience nommée)
+- Chaque question doit faire référence à un élément précis du CV (un poste nommé, un projet nommé, une mission nommée) OU à une exigence chiffrée de l'offre
 - Questions courtes, directes, une seule phrase
-- Exemples CORRECTS : "Combien de personnes avez-vous managées chez [entreprise] ?", "Quel était le chiffre d'affaires géré sur [projet] ?", "En combien de temps avez-vous livré [projet mentionné] ?", "Quelle était la taille de l'équipe sur [mission] ?"
+- Ajoute un "placeholder" : un exemple de réponse courte (ex: "15 personnes", "35 %", "6 mois") pour guider l'utilisateur
+- Exemples CORRECTS : "Combien de personnes avez-vous managées chez [entreprise] ?", "De quel pourcentage avez-vous réduit les délais sur [projet] ?"
 - Exemples INTERDITS : questions sur les motivations, les valeurs, les points forts, les apprentissages — tout ce qui est subjectif
 
 Réponds UNIQUEMENT avec un objet JSON valide (sans markdown, sans backticks) :
-{ "questions": ["question 1", "question 2", ...] }`,
+{ "questions": [{ "question": "...", "placeholder": "ex: ..." }, ...] }`,
       },
     ],
   });
