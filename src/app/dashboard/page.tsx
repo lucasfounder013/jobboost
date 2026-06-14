@@ -2343,49 +2343,54 @@ function DashboardInner() {
                   </div>
                 )}
                 {resultatDirect && !estAbonne && (
-                  <div className="mt-4 flex items-center gap-3 bg-emerald-50 rounded-xl px-4 py-3 ring-1 ring-emerald-100">
-                    <svg className="w-4 h-4 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                    <Link href="/pricing" className="flex items-center gap-1 flex-1 group min-w-0">
+                  <div className="mt-4 flex flex-col gap-2 bg-emerald-50 rounded-xl px-4 py-3 ring-1 ring-emerald-100">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <svg className="w-4 h-4 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                       {(() => {
                         const atIdx = resultatDirect.email.indexOf('@');
                         const local = atIdx >= 0 ? resultatDirect.email.slice(0, atIdx) : resultatDirect.email;
                         const domaine = atIdx >= 0 ? resultatDirect.email.slice(atIdx) : "";
                         const padded = local.padEnd(Math.max(local.length + 4, 10), "●");
                         return (
-                          <span className="text-sm font-semibold text-gray-900 select-none pointer-events-none flex items-center min-w-0">
+                          <span className="text-sm font-semibold text-gray-900 select-none pointer-events-none flex items-center min-w-0 truncate">
                             <span className="blur-[5px]">{padded}</span>
                             <span>{domaine}</span>
                           </span>
                         );
                       })()}
-                      <span className="text-xs font-bold text-indigo-600 bg-white border border-indigo-200 px-2.5 py-1 rounded-lg shadow-sm group-hover:bg-indigo-50 transition-colors whitespace-nowrap shrink-0 ml-2">
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {resultatDirect.certitude !== null && (
+                        <span className={`text-xs font-semibold px-2 py-1 rounded-lg shrink-0 ${
+                          resultatDirect.certitude >= 90 ? "bg-emerald-100 text-emerald-700" :
+                          resultatDirect.certitude >= 70 ? "bg-amber-100 text-amber-700" :
+                          "bg-orange-100 text-orange-700"
+                        }`}>
+                          {resultatDirect.certitude}% certitude
+                        </span>
+                      )}
+                      <Link href="/pricing" className="flex items-center gap-1 text-xs font-bold text-indigo-600 bg-white border border-indigo-200 px-3 py-1.5 rounded-lg shadow-sm hover:bg-indigo-50 transition-colors whitespace-nowrap">
                         Débloquer
-                      </span>
-                    </Link>
-                    {resultatDirect.certitude !== null && (
-                      <span className={`text-xs font-semibold px-2 py-1 rounded-lg shrink-0 ${
-                        resultatDirect.certitude >= 90 ? "bg-emerald-100 text-emerald-700" :
-                        resultatDirect.certitude >= 70 ? "bg-amber-100 text-amber-700" :
-                        "bg-orange-100 text-orange-700"
-                      }`}>
-                        {resultatDirect.certitude}% certitude
-                      </span>
-                    )}
-                    <button
-                      disabled
-                      className="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg ring-1 bg-white text-indigo-600 ring-indigo-200 opacity-40 cursor-not-allowed"
-                    >
-                      <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 4a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 20V4z"/></svg>
-                      Sauvegarder
-                    </button>
+                      </Link>
+                      <button
+                        disabled
+                        className="flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg ring-1 bg-white text-indigo-600 ring-indigo-200 opacity-40 cursor-not-allowed whitespace-nowrap"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 4a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 20V4z"/></svg>
+                        Sauvegarder
+                      </button>
+                    </div>
                   </div>
                 )}
                 {resultatDirect && estAbonne && (
-                  <div className="mt-4 flex items-center gap-3 bg-emerald-50 rounded-xl px-4 py-3 ring-1 ring-emerald-100">
-                    <svg className="w-4 h-4 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                    <span className="text-sm font-semibold text-gray-900 flex-1">{resultatDirect.email}</span>
+                  <div className="mt-4 flex flex-col gap-2 bg-emerald-50 rounded-xl px-4 py-3 ring-1 ring-emerald-100">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <svg className="w-4 h-4 shrink-0 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                      <span className="text-sm font-semibold text-gray-900 truncate min-w-0 flex-1">{resultatDirect.email}</span>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
                     {resultatDirect.certitude !== null && (
-                      <span className={`text-xs font-semibold px-2 py-1 rounded-lg ${
+                      <span className={`text-xs font-semibold px-2 py-1 rounded-lg shrink-0 ${
                         resultatDirect.certitude >= 90 ? "bg-emerald-100 text-emerald-700" :
                         resultatDirect.certitude >= 70 ? "bg-amber-100 text-amber-700" :
                         "bg-orange-100 text-orange-700"
@@ -2429,6 +2434,7 @@ function DashboardInner() {
                         <><svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 4a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 20V4z"/></svg>Sauvegarder</>
                       )}
                     </button>
+                    </div>
                   </div>
                 )}
               </div>
