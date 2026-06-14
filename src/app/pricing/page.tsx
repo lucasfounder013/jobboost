@@ -15,24 +15,24 @@ const FEATURES_GRATUIT = [
 ];
 
 const FEATURES_STANDARD = [
+  "15 analyses CV / mois",
+  "10 adaptations CV / mois",
+  "10 lettres de motivation / mois",
+  "Export PDF ATS",
+  "Export Word (.docx)",
+  "Recherche d'offres selon le CV",
+  "2 révélations d'email / mois",
+];
+
+const FEATURES_PREMIUM = [
   "50 analyses CV / mois",
   "50 adaptations CV / mois",
   "50 lettres de motivation / mois",
   "Export PDF ATS",
   "Export Word (.docx)",
-  "Recherche d'offres selon le CV",
-  "20 révélations d'email / mois",
-];
-
-const FEATURES_PREMIUM = [
-  "Analyses CV illimitées",
-  "Adaptations CV illimitées",
-  "Lettres de motivation illimitées",
-  "Export PDF ATS",
-  "Export Word (.docx)",
   "Préparation aux entretiens",
   "Recherche d'offres selon le CV",
-  "80 révélations d'email / mois",
+  "10 révélations d'email / mois",
 ];
 
 function Check({ dim = false }: { dim?: boolean }) {
@@ -131,7 +131,7 @@ export default function PagePricing() {
             Passez à la vitesse supérieure
           </h1>
           <p className="text-gray-500 text-lg max-w-md mx-auto mb-12">
-            Commencez gratuitement, passez à l&apos;illimité quand vous voulez.
+            Commencez gratuitement, passez à un plan payant quand vous voulez.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -160,8 +160,8 @@ export default function PagePricing() {
               </Link>
             </div>
 
-            <PlanPayant plan="starter" label="Starter" prix="9,99€" features={FEATURES_STANDARD} recommande />
-            <PlanPayant plan="pro" label="Pro" prix="14,99€" features={FEATURES_PREMIUM} />
+            <PlanPayant plan="starter" label="Starter" prix="4,99€" features={FEATURES_STANDARD} recommande />
+            <PlanPayant plan="pro" label="Pro" prix="9,99€" features={FEATURES_PREMIUM} />
           </div>
 
           <p className="mt-8 text-xs text-gray-400">
@@ -176,7 +176,7 @@ export default function PagePricing() {
               { q: "Puis-je annuler à tout moment ?", r: "Oui, vous pouvez annuler votre abonnement à tout moment depuis votre espace Stripe. L'accès reste actif jusqu'à la fin de la période en cours." },
               { q: "Les 3 analyses gratuites sont-elles renouvelées ?", r: "Non, les analyses gratuites sont données une seule fois à l'inscription. Un abonnement donne accès à des analyses illimitées." },
               { q: "Mes données sont-elles sécurisées ?", r: "Oui. Le contenu de votre CV n'est jamais stocké en base de données — il transite uniquement en mémoire pendant l'analyse." },
-              { q: "Quelle est la différence entre Starter et Pro ?", r: "Le plan Pro inclut la préparation aux entretiens (pitch, questions probables, questions à poser) et 80 révélations d'email par mois au lieu de 20." },
+              { q: "Quelle est la différence entre Starter et Pro ?", r: "Le plan Pro inclut la préparation aux entretiens (pitch, questions probables, questions à poser), 50 analyses, 50 adaptations, 50 lettres par mois, et 10 révélations d'email. Le plan Starter est limité à 15 analyses, 10 adaptations, 10 lettres et 2 révélations d'email par mois." },
             ].map(({ q, r }) => (
               <div key={q} className="bg-white rounded-xl ring-1 ring-gray-200 p-5">
                 <p className="font-semibold text-gray-900 text-sm mb-1">{q}</p>

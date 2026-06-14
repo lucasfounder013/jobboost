@@ -36,23 +36,21 @@ export async function POST(req: NextRequest) {
     [session.user.id]
   );
   const planType: string | null = rowsUser[0]?.plan_type ?? null;
-  const estPro = planType === "pro";
   let lmCreditsRestants: number | null = null;
 
-  if (!estPro) {
-    const { rowCount, rows } = await pool.query(
-      'UPDATE "user" SET lm_credits = lm_credits - 1 WHERE id = $1 AND lm_credits > 0 RETURNING lm_credits',
-      [session.user.id]
-    );
-    if (rowCount === 0) {
-      const estAbonne: boolean = rowsUser[0]?.is_subscribed ?? false;
-      const msg = estAbonne
-        ? "Limite mensuelle de 50 lettres de motivation atteinte. Elle sera réinitialisée à votre prochain renouvellement."
-        : "Vous n'avez plus de crédits pour générer une lettre de motivation. Passez à un abonnement.";
-      return NextResponse.json({ error: msg }, { status: 403 });
-    }
-    lmCreditsRestants = rows[0].lm_credits;
+  const { rowCount, rows: rowsLm } = await pool.query(
+    'UPDATE "user" SET lm_credits = lm_credits - 1 WHERE id = $1 AND lm_credits > 0 RETURNING lm_credits',
+    [session.user.id]
+  );
+  if (rowCount === 0) {
+    const estAbonne: boolean = rowsUser[0]?.is_subscribed ?? false;
+    const limite = planType === "pro" ? "50" : planType === "starter" ? "10" : null;
+    const msg = estAbonne && limite
+      ? `Limite mensuelle de ${limite} lettres de motivation atteinte. Elle sera réinitialisée à votre prochain renouvellement.`
+      : "Vous n'avez plus de crédits pour générer une lettre de motivation. Passez à un abonnement.";
+    return NextResponse.json({ error: msg }, { status: 403 });
   }
+  lmCreditsRestants = rowsLm[0].lm_credits;
 
   // Appel Claude
   const message = await anthropic.messages.create({

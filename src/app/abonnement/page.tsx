@@ -13,22 +13,22 @@ const FEATURES_GRATUIT = [
 ];
 
 const FEATURES_STANDARD = [
+  "15 analyses CV / mois",
+  "10 adaptations CV / mois",
+  "10 lettres de motivation / mois",
+  "Export PDF & Word (.docx)",
+  "Recherche d'offres selon le CV",
+  "2 révélations d'email / mois",
+];
+
+const FEATURES_PREMIUM = [
   "50 analyses CV / mois",
   "50 adaptations CV / mois",
   "50 lettres de motivation / mois",
   "Export PDF & Word (.docx)",
-  "Recherche d'offres selon le CV",
-  "20 révélations d'email / mois",
-];
-
-const FEATURES_PREMIUM = [
-  "Analyses CV illimitées",
-  "Adaptations CV illimitées",
-  "Lettres de motivation illimitées",
-  "Export PDF & Word (.docx)",
   "Préparation aux entretiens",
   "Recherche d'offres selon le CV",
-  "80 révélations d'email / mois",
+  "10 révélations d'email / mois",
 ];
 
 function Check({ color = "emerald" }: { color?: "emerald" | "gray" }) {
@@ -182,7 +182,7 @@ export default function PageAbonnement() {
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-1">Starter</p>
               <div className="flex items-end gap-1">
-                <span className="text-3xl font-extrabold text-gray-900">9,99€</span>
+                <span className="text-3xl font-extrabold text-gray-900">4,99€</span>
                 <span className="text-gray-400 text-xs mb-1">/mois</span>
               </div>
             </div>
@@ -229,7 +229,7 @@ export default function PageAbonnement() {
             <div>
               <p className={`text-xs font-semibold uppercase tracking-widest mb-1 ${planType === "pro" ? "text-gray-400" : "text-indigo-400"}`}>Pro</p>
               <div className="flex items-end gap-1">
-                <span className="text-3xl font-extrabold text-gray-900">14,99€</span>
+                <span className="text-3xl font-extrabold text-gray-900">9,99€</span>
                 <span className="text-gray-400 text-xs mb-1">/mois</span>
               </div>
             </div>

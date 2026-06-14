@@ -37,17 +37,17 @@ export async function POST(req: NextRequest) {
       const userId = checkoutSession.metadata?.userId;
       const plan = checkoutSession.metadata?.plan ?? "starter";
       const subscriptionId = checkoutSession.subscription as string;
-      const rhCredits = plan === "pro" ? 80 : 20;
 
       if (userId && subscriptionId) {
         try {
           await pool.query(
-            `UPDATE "user" SET is_subscribed = true, stripe_subscription_id = $1, plan_type = $2, rh_credits = $3,
-              scans = CASE WHEN $2 = 'starter' THEN 50 ELSE scans END,
-              credits = CASE WHEN $2 = 'starter' THEN 50 ELSE credits END,
-              lm_credits = CASE WHEN $2 = 'starter' THEN 50 ELSE lm_credits END
-             WHERE id = $4`,
-            [subscriptionId, plan, rhCredits, userId]
+            `UPDATE "user" SET is_subscribed = true, stripe_subscription_id = $1, plan_type = $2,
+              scans = CASE WHEN $2 = 'starter' THEN 15 ELSE 50 END,
+              credits = CASE WHEN $2 = 'starter' THEN 10 ELSE 50 END,
+              lm_credits = CASE WHEN $2 = 'starter' THEN 10 ELSE 50 END,
+              rh_credits = CASE WHEN $2 = 'starter' THEN 2 ELSE 10 END
+             WHERE id = $3`,
+            [subscriptionId, plan, userId]
           );
           await phCapture(userId, "subscription_created", { plan, subscription_id: subscriptionId });
         } catch (err) {
@@ -90,10 +90,10 @@ export async function POST(req: NextRequest) {
       if (subId) {
         await pool.query(
           `UPDATE "user" SET
-            rh_credits = CASE WHEN plan_type = 'pro' THEN 80 ELSE 20 END,
-            scans = CASE WHEN plan_type = 'starter' THEN 50 ELSE scans END,
-            credits = CASE WHEN plan_type = 'starter' THEN 50 ELSE credits END,
-            lm_credits = CASE WHEN plan_type = 'starter' THEN 50 ELSE lm_credits END
+            scans = CASE WHEN plan_type = 'starter' THEN 15 ELSE 50 END,
+            credits = CASE WHEN plan_type = 'starter' THEN 10 ELSE 50 END,
+            lm_credits = CASE WHEN plan_type = 'starter' THEN 10 ELSE 50 END,
+            rh_credits = CASE WHEN plan_type = 'starter' THEN 2 ELSE 10 END
            WHERE stripe_subscription_id = $1 AND is_subscribed = true`,
           [subId]
         );

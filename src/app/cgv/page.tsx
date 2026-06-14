@@ -33,8 +33,8 @@ export default function CGV() {
           </p>
           <ul className="mt-2 text-sm text-gray-600 leading-relaxed list-disc list-inside space-y-1">
             <li>Une version gratuite : 3 analyses CV (sans adaptation de CV)</li>
-            <li>Abonnement Starter : <strong>9,99 € / mois</strong></li>
-            <li>Abonnement Pro : <strong>14,99 € / mois</strong></li>
+            <li>Abonnement Starter : <strong>4,99 € / mois</strong></li>
+            <li>Abonnement Pro : <strong>9,99 € / mois</strong></li>
           </ul>
         </section>
 

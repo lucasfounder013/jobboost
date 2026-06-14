@@ -33,24 +33,22 @@ export async function POST(req: NextRequest) {
   );
   const utilisateur = rows[0];
   const planType: string | null = utilisateur?.plan_type ?? null;
-  const estPro = planType === "pro";
   let scansRestants: number | null = null;
 
-  if (!estPro) {
-    // Décrémenter atomiquement — échoue si scans = 0
-    const { rowCount, rows: rowsMaj } = await pool.query(
-      'UPDATE "user" SET scans = scans - 1 WHERE id = $1 AND scans > 0 RETURNING scans',
-      [session.user.id]
-    );
-    if (rowCount === 0) {
-      const estAbonne: boolean = utilisateur?.is_subscribed ?? false;
-      const msg = estAbonne
-        ? "Limite mensuelle de 50 analyses atteinte. Elle sera réinitialisée à votre prochain renouvellement."
-        : "Vous avez utilisé vos 3 analyses gratuites. Passez à un abonnement pour continuer.";
-      return NextResponse.json({ error: msg }, { status: 403 });
-    }
-    scansRestants = rowsMaj[0].scans;
+  // Décrémenter atomiquement — échoue si scans = 0
+  const { rowCount, rows: rowsMaj } = await pool.query(
+    'UPDATE "user" SET scans = scans - 1 WHERE id = $1 AND scans > 0 RETURNING scans',
+    [session.user.id]
+  );
+  if (rowCount === 0) {
+    const estAbonne: boolean = utilisateur?.is_subscribed ?? false;
+    const limite = planType === "pro" ? "50" : planType === "starter" ? "15" : null;
+    const msg = estAbonne && limite
+      ? `Limite mensuelle de ${limite} analyses atteinte. Elle sera réinitialisée à votre prochain renouvellement.`
+      : "Vous avez utilisé vos 3 analyses gratuites. Passez à un abonnement pour continuer.";
+    return NextResponse.json({ error: msg }, { status: 403 });
   }
+  scansRestants = rowsMaj[0].scans;
 
   const message = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",

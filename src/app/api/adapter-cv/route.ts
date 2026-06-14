@@ -28,32 +28,30 @@ export async function POST(req: NextRequest) {
     [session.user.id]
   );
   const planType: string | null = rowsUser[0]?.plan_type ?? null;
-  const estPro = planType === "pro";
 
   let creditsRestants: number | null = null;
   let locked = false;
 
-  if (!estPro) {
-    // Décrémentation atomique : échoue si credits = 0
-    const { rowCount, rows } = await pool.query(
-      'UPDATE "user" SET credits = credits - 1 WHERE id = $1 AND credits > 0 RETURNING credits',
-      [session.user.id]
-    );
+  // Décrémentation atomique : échoue si credits = 0
+  const { rowCount, rows: rowsCredits } = await pool.query(
+    'UPDATE "user" SET credits = credits - 1 WHERE id = $1 AND credits > 0 RETURNING credits',
+    [session.user.id]
+  );
 
-    if (rowCount === 0) {
-      const estAbonne: boolean = rowsUser[0]?.is_subscribed ?? false;
-      if (estAbonne) {
-        return NextResponse.json(
-          { error: "Limite mensuelle de 50 adaptations atteinte. Elle sera réinitialisée à votre prochain renouvellement." },
-          { status: 403 }
-        );
-      }
-      // Gratuit : on génère quand même pour montrer un aperçu flou (conversion)
-      locked = true;
-      creditsRestants = 0;
-    } else {
-      creditsRestants = rows[0].credits;
+  if (rowCount === 0) {
+    const estAbonne: boolean = rowsUser[0]?.is_subscribed ?? false;
+    if (estAbonne) {
+      const limite = planType === "pro" ? "50" : "10";
+      return NextResponse.json(
+        { error: `Limite mensuelle de ${limite} adaptations atteinte. Elle sera réinitialisée à votre prochain renouvellement.` },
+        { status: 403 }
+      );
     }
+    // Gratuit : on génère quand même pour montrer un aperçu flou (conversion)
+    locked = true;
+    creditsRestants = 0;
+  } else {
+    creditsRestants = rowsCredits[0].credits;
   }
 
   const motsClesListe =
