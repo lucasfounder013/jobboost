@@ -198,6 +198,7 @@ function DashboardInner() {
   const [questionsCV, setQuestionsCV] = useState<QuestionCV[]>([]);
   const [reponsesCV, setReponsesCV] = useState<ReponseCV[]>([]);
   const [modaleQuestionsOuverte, setModaleQuestionsOuverte] = useState(false);
+  const [questionIndex, setQuestionIndex] = useState(0);
   const [modaleUpgrade, setModaleUpgrade] = useState<"scans" | "credits" | "lm" | null>(null);
   const [suppressionEnCours, setSuppressionEnCours] = useState<string | null>(null);
   const [editionPoste, setEditionPoste] = useState<{ id: string; valeur: string } | null>(null);
@@ -525,6 +526,7 @@ function DashboardInner() {
         if (qs.length > 0) {
           setQuestionsCV(qs);
           setReponsesCV(qs.map(q => ({ question: q.question, reponse: "" })));
+          setQuestionIndex(0);
           setEtapeAdaptation("questions");
           setModaleQuestionsOuverte(true);
           return;
@@ -554,6 +556,7 @@ function DashboardInner() {
         if (qs.length > 0) {
           setQuestionsCV(qs);
           setReponsesCV(qs.map(q => ({ question: q.question, reponse: "" })));
+          setQuestionIndex(0);
           setEtapeAdaptation("questions");
           setModaleQuestionsOuverte(true);
           return;
@@ -1352,10 +1355,33 @@ function DashboardInner() {
 
         {/* ── Vue : Nouvelle analyse ───────────────────────────────────────── */}
         {vue === "nouvelle-analyse" && (
-          <div className="max-w-6xl mx-auto px-6 py-10">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+
+            {/* État "analyse en cours" plein écran sur mobile */}
+            {chargement && (
+              <div className="sm:hidden flex flex-col items-center justify-center py-20 gap-6 text-center">
+                <div className="relative w-20 h-20">
+                  <svg className="animate-spin w-20 h-20 text-indigo-100" fill="none" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
+                  </svg>
+                  <svg className="animate-spin w-20 h-20 text-indigo-500 absolute inset-0" fill="none" viewBox="0 0 24 24" style={{ animationDuration: "1s" }}>
+                    <path stroke="currentColor" strokeWidth="2" strokeLinecap="round" d="M12 2a10 10 0 0 1 10 10" />
+                  </svg>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <svg className="w-8 h-8 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                </div>
+                <div>
+                  <p className="text-lg font-semibold text-gray-800 mb-1">Analyse en cours...</p>
+                  <p className="text-sm text-gray-400">Cela prend généralement 10 à 20 secondes.</p>
+                </div>
+              </div>
+            )}
 
             {/* En-tête */}
-            <div className="flex items-center justify-between mb-8">
+            <div className={`${chargement ? "hidden sm:flex" : "flex"} items-center justify-between mb-6 sm:mb-8`}>
               <h1 className="text-2xl font-bold text-gray-900">Nouvelle analyse</h1>
               {analyseId && (
                 <button
@@ -1370,8 +1396,8 @@ function DashboardInner() {
               )}
             </div>
 
-            {/* Formulaire CV + Offre */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">
+            {/* Formulaire CV + Offre — masqué sur mobile pendant le chargement et après résultat */}
+            <div className={`${(chargement || resultat) ? "hidden sm:grid" : "grid"} grid-cols-1 lg:grid-cols-2 gap-5 mb-6`}>
 
               {/* CV */}
               <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm hover:shadow-md hover:ring-indigo-200 transition-all duration-200 overflow-hidden">
@@ -1430,8 +1456,8 @@ function DashboardInner() {
               </div>
             </div>
 
-            {/* Bouton analyser + erreur */}
-            <div className="flex flex-col items-center gap-3 mb-10">
+            {/* Bouton analyser + erreur — masqué sur mobile pendant le chargement et après résultat */}
+            <div className={`${(chargement || resultat) ? "hidden sm:flex" : "flex"} flex-col items-center gap-3 mb-10`}>
               {erreur && <p className="text-rose-500 text-sm font-medium">{erreur}</p>}
               <button
                 onClick={analyser}
@@ -2962,68 +2988,98 @@ function DashboardInner() {
 
       {/* Modale questionnaire avant adaptation */}
       {modaleQuestionsOuverte && questionsCV.length > 0 && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4">
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
           <div
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={() => { setModaleQuestionsOuverte(false); setEtapeAdaptation("idle"); }}
           />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg flex flex-col max-h-[90vh]">
-            {/* Header */}
-            <div className="p-6 border-b border-gray-100 flex items-start justify-between gap-4">
-              <div>
-                <h2 className="text-lg font-bold text-gray-900">Quelques précisions sur votre parcours</h2>
-                <p className="text-sm text-gray-500 mt-1">Ces chiffres rendront votre CV plus convaincant. Répondez aux questions qui s&apos;appliquent, laissez vide sinon.</p>
+          <div className="relative bg-white w-full sm:max-w-lg sm:rounded-2xl shadow-2xl flex flex-col rounded-t-2xl" style={{ maxHeight: "92dvh" }}>
+
+            {/* Barre de navigation : retour + progression */}
+            <div className="px-6 pt-5 pb-4 flex items-center gap-4">
+              {questionIndex > 0 ? (
+                <button
+                  onClick={() => setQuestionIndex(i => i - 1)}
+                  className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 transition-colors text-gray-500"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+              ) : (
+                <div className="shrink-0 w-8" />
+              )}
+              {/* Barre de progression */}
+              <div className="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full transition-all duration-300"
+                  style={{ width: `${((questionIndex + 1) / questionsCV.length) * 100}%` }}
+                />
               </div>
-              <button
-                onClick={() => { setModaleQuestionsOuverte(false); setEtapeAdaptation("idle"); }}
-                className="shrink-0 text-gray-400 hover:text-gray-600 transition-colors mt-0.5"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+              <span className="shrink-0 text-xs font-semibold text-gray-400 tabular-nums">
+                {questionIndex + 1}/{questionsCV.length}
+              </span>
             </div>
 
-            {/* Questions */}
-            <div className="overflow-y-auto p-6 flex flex-col gap-5">
-              {questionsCV.map((q, i) => (
-                <div key={i}>
-                  <label className="block text-sm font-semibold text-gray-800 mb-1.5">
-                    {i + 1}. {q.question}
-                  </label>
-                  <input
-                    type="text"
-                    placeholder={q.placeholder ?? "Votre réponse..."}
-                    value={reponsesCV[i]?.reponse ?? ""}
-                    onChange={e => updateReponse(i, e.target.value)}
-                    onKeyDown={e => {
-                      if (e.key === "Enter") {
-                        if (i < questionsCV.length - 1) {
-                          (e.currentTarget.closest(".flex.flex-col")?.querySelectorAll("input")[i + 1] as HTMLElement | null)?.focus();
-                        } else {
-                          soumettreReponsesEtAdapter(reponsesCV);
-                        }
-                      }
-                    }}
-                    className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-shadow"
-                  />
-                </div>
-              ))}
+            {/* Question */}
+            <div className="px-6 pb-6 flex flex-col gap-6 overflow-y-auto flex-1">
+              <h2 className="text-xl font-bold text-gray-900 leading-snug">
+                {questionsCV[questionIndex].question}
+              </h2>
+              <input
+                key={questionIndex}
+                type="text"
+                placeholder={questionsCV[questionIndex].placeholder ?? "Votre réponse (laissez vide si non applicable)"}
+                value={reponsesCV[questionIndex]?.reponse ?? ""}
+                onChange={e => updateReponse(questionIndex, e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === "Enter") {
+                    if (questionIndex < questionsCV.length - 1) {
+                      setQuestionIndex(i => i + 1);
+                    } else {
+                      soumettreReponsesEtAdapter(reponsesCV);
+                    }
+                  }
+                }}
+                autoFocus
+                className="w-full border border-gray-200 rounded-2xl px-4 py-3.5 text-base focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-shadow placeholder-gray-300 bg-gray-50/50"
+              />
             </div>
 
             {/* Footer */}
-            <div className="p-6 border-t border-gray-100 flex flex-col gap-3">
+            <div className="px-6 pb-6 pt-2 flex flex-col gap-3">
+              {questionIndex < questionsCV.length - 1 ? (
+                <button
+                  onClick={() => setQuestionIndex(i => i + 1)}
+                  className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-3.5 rounded-2xl font-bold text-base hover:opacity-90 transition-opacity shadow-lg shadow-indigo-100"
+                >
+                  Continuer
+                </button>
+              ) : (
+                <button
+                  onClick={() => soumettreReponsesEtAdapter(reponsesCV)}
+                  className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-3.5 rounded-2xl font-bold text-base hover:opacity-90 transition-opacity shadow-lg shadow-indigo-100"
+                >
+                  Améliorer mon CV ✨
+                </button>
+              )}
               <button
-                onClick={() => soumettreReponsesEtAdapter(reponsesCV)}
-                className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 text-white py-2.5 rounded-xl font-bold text-sm hover:opacity-90 transition-opacity shadow-md shadow-indigo-100"
-              >
-                Améliorer mon CV
-              </button>
-              <button
-                onClick={() => soumettreReponsesEtAdapter([])}
+                onClick={() => {
+                  if (questionIndex < questionsCV.length - 1) {
+                    setQuestionIndex(i => i + 1);
+                  } else {
+                    soumettreReponsesEtAdapter(reponsesCV);
+                  }
+                }}
                 className="text-sm text-gray-400 hover:text-gray-600 text-center transition-colors py-1"
               >
-                Passer cette étape
+                Passer cette question
+              </button>
+              <button
+                onClick={() => soumettreReponsesEtAdapter(reponsesCV)}
+                className="text-xs text-gray-300 hover:text-gray-500 text-center transition-colors pb-1"
+              >
+                Passer toutes les questions
               </button>
             </div>
           </div>

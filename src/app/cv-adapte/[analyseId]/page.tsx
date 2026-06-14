@@ -186,49 +186,49 @@ export default function CvAdaptePage() {
 
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
+            <Link href="/dashboard" className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors shrink-0">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
               Dashboard
             </Link>
-            <span className="text-gray-300">/</span>
-            <span className="text-sm font-semibold text-gray-800 truncate max-w-xs">{data.nom_offre}</span>
+            <span className="text-gray-300 hidden sm:block">/</span>
+            <span className="text-sm font-semibold text-gray-800 truncate hidden sm:block max-w-xs">{data.nom_offre}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 shrink-0">
             <button
               onClick={() => exporterCV("pdf")}
               disabled={exportEnCours !== null || !data.cv_data}
-              className="flex items-center gap-1.5 text-sm font-semibold bg-gray-900 text-white px-4 py-2 rounded-xl hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-1.5 text-sm font-semibold bg-gray-900 text-white px-3 sm:px-4 py-2 rounded-xl hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {exportEnCours === "pdf" ? (
                 <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
               ) : (
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
               )}
-              Télécharger PDF
+              <span className="hidden sm:inline">Télécharger </span>PDF
             </button>
             <button
               onClick={() => exporterCV("docx")}
               disabled={exportEnCours !== null || !data.cv_data}
-              className="flex items-center gap-1.5 text-sm font-semibold bg-indigo-600 text-white px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-1.5 text-sm font-semibold bg-indigo-600 text-white px-3 sm:px-4 py-2 rounded-xl hover:bg-indigo-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {exportEnCours === "docx" ? (
                 <svg className="animate-spin w-4 h-4" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" /></svg>
               ) : (
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
               )}
-              Télécharger Word
+              <span className="hidden sm:inline">Télécharger </span>Word
             </button>
           </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {data.cv_data ? (
-          <div className="grid grid-cols-[1fr_1fr] gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6 items-start">
 
             {/* Colonne gauche — Analyse */}
             <div className="flex flex-col gap-4">
@@ -357,7 +357,7 @@ export default function CvAdaptePage() {
             </div>
 
             {/* Colonne droite — CV complet visible */}
-            <div className="bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm overflow-hidden sticky top-20">
+            <div className="bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm overflow-hidden lg:sticky lg:top-20">
               <div className="flex items-center justify-between px-4 py-3 border-b border-indigo-100 bg-indigo-50/40">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-indigo-400" />

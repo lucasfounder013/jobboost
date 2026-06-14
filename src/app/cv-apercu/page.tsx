@@ -243,34 +243,35 @@ export default function CvApercuPage() {
 
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <Link
               href="/dashboard"
-              className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors"
+              className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors shrink-0"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
               Dashboard
             </Link>
-            <span className="text-gray-300">/</span>
-            <span className="text-sm font-semibold text-gray-800">Aperçu CV adapté</span>
+            <span className="text-gray-300 hidden sm:block">/</span>
+            <span className="text-sm font-semibold text-gray-800 hidden sm:block">Aperçu CV adapté</span>
           </div>
           <Link
             href="/pricing"
-            className="flex items-center gap-2 text-sm font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-4 py-2 rounded-xl hover:opacity-90 transition-opacity shadow-sm"
+            className="flex items-center gap-2 text-sm font-semibold bg-gradient-to-r from-indigo-600 to-violet-600 text-white px-3 sm:px-4 py-2 rounded-xl hover:opacity-90 transition-opacity shadow-sm shrink-0"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
-            Débloquer le CV complet
+            <span className="hidden xs:inline sm:inline">Débloquer le CV complet</span>
+            <span className="sm:hidden">Débloquer</span>
           </Link>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        <div className="grid grid-cols-[1fr_1fr] gap-6 items-start">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-6 items-start">
 
           {/* Colonne gauche — Analyse IA */}
           <div className="flex flex-col gap-4">
@@ -370,7 +371,7 @@ export default function CvApercuPage() {
           </div>
 
           {/* Colonne droite — CV adapté réduit avec blur */}
-          <div className="bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm overflow-hidden sticky top-20">
+          <div className="bg-white rounded-2xl ring-1 ring-indigo-200 shadow-sm overflow-hidden lg:sticky lg:top-20">
             <div className="flex items-center justify-between px-4 py-3 border-b border-indigo-100 bg-indigo-50/40">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-indigo-400" />
