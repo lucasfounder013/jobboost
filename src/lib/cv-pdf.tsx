@@ -24,6 +24,11 @@ const styles = StyleSheet.create({
   projetDesc: { fontSize: 9, color: "#333333", marginTop: 1 },
 });
 
+function s(texte: string | null | undefined): string {
+  if (!texte) return "";
+  return texte.replace(/\[MOD\](.*?)\[\/MOD\]/g, "$1");
+}
+
 function SectionHeader({ titre }: { titre: string }) {
   return (
     <View style={styles.sectionHeader}>
@@ -46,14 +51,14 @@ export function CVPDFDocument({ cv }: { cv: CVStructure }) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-        <Text style={styles.nom}>{cv.nom}</Text>
-        {cv.titre && <Text style={styles.titre}>{cv.titre}</Text>}
+        <Text style={styles.nom}>{s(cv.nom)}</Text>
+        {cv.titre && <Text style={styles.titre}>{s(cv.titre)}</Text>}
         {contactItems ? <Text style={styles.contact}>{contactItems}</Text> : null}
 
         {cv.resume && (
           <>
             <SectionHeader titre="PROFIL" />
-            <Text style={styles.resume}>{cv.resume}</Text>
+            <Text style={styles.resume}>{s(cv.resume)}</Text>
           </>
         )}
 
@@ -63,12 +68,12 @@ export function CVPDFDocument({ cv }: { cv: CVStructure }) {
             {cv.experiences.map((exp, i) => (
               <View key={i} style={{ marginBottom: 4 }}>
                 <View style={styles.rowBetween}>
-                  <Text style={styles.poste}>{exp.poste}</Text>
-                  <Text style={styles.dateRange}>{exp.dates}</Text>
+                  <Text style={styles.poste}>{s(exp.poste)}</Text>
+                  <Text style={styles.dateRange}>{s(exp.dates)}</Text>
                 </View>
-                <Text style={styles.entreprise}>{exp.entreprise}{exp.lieu ? ` — ${exp.lieu}` : ""}</Text>
+                <Text style={styles.entreprise}>{s(exp.entreprise)}{exp.lieu ? ` — ${s(exp.lieu)}` : ""}</Text>
                 {exp.missions.map((m, j) => (
-                  <Text key={j} style={styles.mission}>• {m}</Text>
+                  <Text key={j} style={styles.mission}>• {s(m)}</Text>
                 ))}
               </View>
             ))}
@@ -81,11 +86,11 @@ export function CVPDFDocument({ cv }: { cv: CVStructure }) {
             {cv.formation.map((f, i) => (
               <View key={i} style={{ marginBottom: 4 }}>
                 <View style={styles.rowBetween}>
-                  <Text style={styles.poste}>{f.diplome}</Text>
-                  <Text style={styles.dateRange}>{f.dates}</Text>
+                  <Text style={styles.poste}>{s(f.diplome)}</Text>
+                  <Text style={styles.dateRange}>{s(f.dates)}</Text>
                 </View>
-                <Text style={styles.entreprise}>{f.etablissement}</Text>
-                {f.details ? <Text style={styles.mission}>{f.details}</Text> : null}
+                <Text style={styles.entreprise}>{s(f.etablissement)}</Text>
+                {f.details ? <Text style={styles.mission}>{s(f.details)}</Text> : null}
               </View>
             ))}
           </>
@@ -99,19 +104,19 @@ export function CVPDFDocument({ cv }: { cv: CVStructure }) {
             {cv.competences.techniques?.length ? (
               <View style={styles.competenceRow}>
                 <Text style={styles.competenceLabel}>Techniques : </Text>
-                <Text style={styles.competenceValeur}>{cv.competences.techniques.join(", ")}</Text>
+                <Text style={styles.competenceValeur}>{cv.competences.techniques.map(s).join(", ")}</Text>
               </View>
             ) : null}
             {cv.competences.langues?.length ? (
               <View style={styles.competenceRow}>
                 <Text style={styles.competenceLabel}>Langues : </Text>
-                <Text style={styles.competenceValeur}>{cv.competences.langues.join(", ")}</Text>
+                <Text style={styles.competenceValeur}>{cv.competences.langues.map(s).join(", ")}</Text>
               </View>
             ) : null}
             {cv.competences.autres?.length ? (
               <View style={styles.competenceRow}>
                 <Text style={styles.competenceLabel}>Autres : </Text>
-                <Text style={styles.competenceValeur}>{cv.competences.autres.join(", ")}</Text>
+                <Text style={styles.competenceValeur}>{cv.competences.autres.map(s).join(", ")}</Text>
               </View>
             ) : null}
           </>
@@ -123,10 +128,10 @@ export function CVPDFDocument({ cv }: { cv: CVStructure }) {
             {cv.projets.map((p, i) => (
               <View key={i} style={{ marginBottom: 4 }}>
                 <View style={styles.rowBetween}>
-                  <Text style={styles.projetNom}>{p.nom}</Text>
-                  {p.technologies ? <Text style={styles.projetTech}>{p.technologies}</Text> : null}
+                  <Text style={styles.projetNom}>{s(p.nom)}</Text>
+                  {p.technologies ? <Text style={styles.projetTech}>{s(p.technologies)}</Text> : null}
                 </View>
-                <Text style={styles.projetDesc}>{p.description}</Text>
+                <Text style={styles.projetDesc}>{s(p.description)}</Text>
               </View>
             ))}
           </>
@@ -139,9 +144,9 @@ export function CVPDFDocument({ cv }: { cv: CVStructure }) {
               <View key={i} style={{ marginBottom: 3 }}>
                 <View style={styles.rowBetween}>
                   <Text style={styles.poste}>
-                    {c.nom}{c.organisme ? ` — ${c.organisme}` : ""}
+                    {s(c.nom)}{c.organisme ? ` — ${s(c.organisme)}` : ""}
                   </Text>
-                  {c.date ? <Text style={styles.dateRange}>{c.date}</Text> : null}
+                  {c.date ? <Text style={styles.dateRange}>{s(c.date)}</Text> : null}
                 </View>
               </View>
             ))}

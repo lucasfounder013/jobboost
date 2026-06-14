@@ -2,7 +2,8 @@ import { CVStructure } from "@/types/cv";
 import React from "react";
 
 function renderHighlighted(text: string, show: boolean): React.ReactNode {
-  if (!show || !text.includes("[MOD]")) return text;
+  if (!text.includes("[MOD]")) return text;
+  if (!show) return text.replace(/\[MOD\](.*?)\[\/MOD\]/g, "$1");
   const regex = /\[MOD\](.*?)\[\/MOD\]/g;
   const parts: React.ReactNode[] = [];
   let lastIndex = 0;
@@ -53,7 +54,7 @@ export default function CVPreview({ cv, showHighlights = false, fluid = false }:
           {cv.experiences.map((exp, i) => (
             <div key={i} className={i > 0 ? "mt-4" : ""}>
               <div className="flex justify-between items-baseline">
-                <span className="font-bold">{exp.poste}</span>
+                <span className="font-bold">{renderHighlighted(exp.poste, showHighlights)}</span>
                 <span className="text-xs text-gray-500 ml-4 shrink-0">{exp.dates}</span>
               </div>
               <p className="text-gray-600 italic text-xs mb-1">
@@ -113,9 +114,9 @@ export default function CVPreview({ cv, showHighlights = false, fluid = false }:
         <Section titre="PROJETS">
           {cv.projets.map((p, i) => (
             <div key={i} className={i > 0 ? "mt-3" : ""}>
-              <span className="font-bold">{p.nom}</span>
+              <span className="font-bold">{renderHighlighted(p.nom, showHighlights)}</span>
               {p.technologies && (
-                <span className="text-gray-500 text-xs ml-2">— {p.technologies}</span>
+                <span className="text-gray-500 text-xs ml-2">— {renderHighlighted(p.technologies, showHighlights)}</span>
               )}
               <p className="text-gray-700 mt-0.5">{renderHighlighted(p.description, showHighlights)}</p>
             </div>
@@ -128,10 +129,10 @@ export default function CVPreview({ cv, showHighlights = false, fluid = false }:
           {cv.certifications.map((c, i) => (
             <div key={i} className={i > 0 ? "mt-2" : ""}>
               <div className="flex justify-between items-baseline">
-                <span className="font-bold">{c.nom}</span>
+                <span className="font-bold">{renderHighlighted(c.nom, showHighlights)}</span>
                 {c.date && <span className="text-xs text-gray-500 ml-4 shrink-0">{c.date}</span>}
               </div>
-              {c.organisme && <p className="text-gray-600 italic text-xs">{c.organisme}</p>}
+              {c.organisme && <p className="text-gray-600 italic text-xs">{renderHighlighted(c.organisme, showHighlights)}</p>}
             </div>
           ))}
         </Section>

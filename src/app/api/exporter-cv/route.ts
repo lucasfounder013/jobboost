@@ -197,7 +197,7 @@ function stripMarkersFromCV(cv: CVStructure): CVStructure {
           autres: cv.competences.autres?.map(strip),
         }
       : cv.competences,
-    projets: cv.projets?.map((p) => ({ ...p, description: strip(p.description) })),
+    projets: cv.projets?.map((p) => ({ ...p, nom: strip(p.nom), technologies: p.technologies ? strip(p.technologies) : p.technologies, description: strip(p.description) })),
     certifications: cv.certifications?.map((c) => ({ ...c, nom: strip(c.nom) })),
   };
 }
