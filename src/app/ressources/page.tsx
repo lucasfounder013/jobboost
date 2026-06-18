@@ -6,6 +6,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 21,
+    categorie: "CV & ATS",
+    titre: "Préparer son CV pour les ATS : le guide pratique",
+    extrait:
+      "Votre CV est-il vraiment prêt pour les ATS ? Voici les étapes concrètes pour qu'il soit bien lu et bien trouvé.",
+    slug: "/ressources/cv-ats/preparer-son-cv-pour-les-ats",
+    date: "18 juin 2026",
+  },
+  {
     id: 20,
     categorie: "CV & ATS",
     titre: "Comment tester son CV ATS gratuitement",
