@@ -6,6 +6,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 22,
+    categorie: "Lettre de motivation",
+    titre: "Exemple lettre de motivation : 5 modèles prêts à utiliser",
+    extrait:
+      "Pas d'inspiration pour votre lettre de motivation ? Voici 5 exemples concrets, adaptables en quelques minutes.",
+    slug: "/ressources/lettre-de-motivation/exemple-lettre-de-motivation",
+    date: "19 juin 2026",
+  },
+  {
     id: 21,
     categorie: "CV & ATS",
     titre: "Préparer son CV pour les ATS : le guide pratique",
