@@ -196,13 +196,12 @@ const articles = [
   },
 ];
 
-const CATEGORIES = ["Toutes", "CV & ATS", "Lettre de motivation", "Candidature spontanée", "Trouver des offres"];
+const CATEGORIES = ["Toutes", "CV & ATS", "Lettre de motivation", "Candidature spontanée"];
 
 const COULEURS_CATEGORIE: Record<string, string> = {
   "CV & ATS": "bg-violet-50 text-violet-700",
   "Lettre de motivation": "bg-violet-50 text-violet-700",
   "Candidature spontanée": "bg-violet-50 text-violet-700",
-  "Trouver des offres": "bg-violet-50 text-violet-700",
 };
 
 export default function RessourcesPage() {
