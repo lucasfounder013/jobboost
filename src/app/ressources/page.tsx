@@ -6,6 +6,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 23,
+    categorie: "Lettre de motivation",
+    titre: "Comment commencer une lettre de motivation : exemples et erreurs à éviter",
+    extrait:
+      "La première phrase de votre lettre de motivation est la plus importante. Voici comment l'écrire sans tomber dans les formules bateau.",
+    slug: "/ressources/lettre-de-motivation/comment-commencer-lettre-de-motivation",
+    date: "19 juin 2026",
+  },
+  {
     id: 22,
     categorie: "Lettre de motivation",
     titre: "Exemple lettre de motivation : 5 modèles prêts à utiliser",
