@@ -6,6 +6,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 24,
+    categorie: "Lettre de motivation",
+    titre: "Comment finir une lettre de motivation : exemples et formules",
+    extrait:
+      "La conclusion de votre lettre de motivation doit donner envie au recruteur de vous appeler. Voici comment la rédiger sans tomber dans les formules bateau.",
+    slug: "/ressources/lettre-de-motivation/comment-finir-lettre-de-motivation",
+    date: "19 juin 2026",
+  },
+  {
     id: 23,
     categorie: "Lettre de motivation",
     titre: "Comment commencer une lettre de motivation : exemples et erreurs à éviter",
