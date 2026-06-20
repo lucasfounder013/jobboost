@@ -83,6 +83,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    {
+      url: `${BASE_URL}/ressources/cv-ats/tester-son-cv-ats-gratuitement`,
+      lastModified: new Date("2026-06-20"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/ressources/cv-ats/preparer-son-cv-pour-les-ats`,
+      lastModified: new Date("2026-06-20"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     // Articles mots-clés CV par métier
     {
       url: `${BASE_URL}/ressources/cv-ats/mots-cles-cv-charge-rh`,
@@ -148,6 +160,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       url: `${BASE_URL}/ressources/lettre-de-motivation/comment-ecrire-une-lettre-de-motivation`,
       lastModified: new Date("2026-06-05"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/ressources/lettre-de-motivation/exemple-lettre-de-motivation`,
+      lastModified: new Date("2026-06-20"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/ressources/lettre-de-motivation/comment-commencer-lettre-de-motivation`,
+      lastModified: new Date("2026-06-20"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/ressources/lettre-de-motivation/comment-finir-lettre-de-motivation`,
+      lastModified: new Date("2026-06-20"),
       changeFrequency: "monthly",
       priority: 0.7,
     },
