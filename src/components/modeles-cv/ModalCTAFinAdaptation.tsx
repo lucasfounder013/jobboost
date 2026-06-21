@@ -33,8 +33,7 @@ export default function ModalCTAFinAdaptation({ cv, onClose }: Props) {
           Une étape de plus pour décrocher l&apos;entretien : <strong>adaptez votre CV à chaque offre d&apos;emploi</strong> avec notre IA.
         </p>
         <p className="text-sm text-gray-500 mb-6">
-          JobBoost analyse votre CV par rapport à l&apos;offre visée et le réécrit pour mettre en avant les bons mots-clés.{" "}
-          <strong className="text-gray-700">3 essais gratuits</strong>, sans engagement.
+          JobBoost analyse votre CV par rapport à l&apos;offre visée et le réécrit pour mettre en avant les bons mots-clés.
         </p>
 
         <div className="flex flex-col-reverse sm:flex-row gap-2">

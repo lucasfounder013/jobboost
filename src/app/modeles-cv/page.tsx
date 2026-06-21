@@ -50,7 +50,7 @@ const FAQ: QuestionFaq[] = [
   {
     question: "Les modèles passent-ils les ATS (logiciels de recrutement) ?",
     reponse:
-      "Oui. Tous nos modèles utilisent une mise en page simple et un texte sélectionnable, parfaitement lisible par les ATS comme Workday, Taleo ou Greenhouse. Le modèle « Classique ATS » est même conçu spécifiquement pour maximiser la compatibilité.",
+      "Oui. Tous nos modèles utilisent une mise en page simple et un texte sélectionnable, parfaitement lisible par les ATS comme Workday, Taleo ou Greenhouse. Le modèle Classique est même conçu spécifiquement pour maximiser la compatibilité ATS.",
   },
   {
     question: "Puis-je modifier mon CV après l'avoir téléchargé ?",
@@ -65,7 +65,7 @@ const FAQ: QuestionFaq[] = [
   {
     question: "Quel modèle de CV choisir ?",
     reponse:
-      "Pour une candidature via une plateforme de recrutement (Welcome to the Jungle, LinkedIn Easy Apply…), choisissez le modèle Classique ATS, le plus sûr. Pour un envoi direct à un recruteur dans un secteur créatif ou tech, le modèle Moderne se démarque. Pour mettre en avant vos compétences (profils expérimentés), le modèle Élégant en 2 colonnes est idéal.",
+      "Pour une candidature via une plateforme de recrutement (Welcome to the Jungle, LinkedIn Easy Apply…), choisissez le modèle Classique, le plus sûr pour passer les ATS. Pour un envoi direct à un recruteur dans un secteur créatif ou tech, le modèle Moderne se démarque. Pour mettre en avant vos compétences (profils expérimentés), le modèle Élégant en 2 colonnes est idéal.",
   },
   {
     question: "Combien de pages doit faire mon CV ?",
@@ -170,7 +170,6 @@ export default function ModelesCvPage() {
             </h2>
             <p className="text-indigo-50 mb-6 leading-relaxed">
               JobBoost analyse votre CV et l&apos;adapte automatiquement à l&apos;offre visée en mettant en avant les bons mots-clés.
-              3 essais gratuits, sans engagement.
             </p>
             <Link
               href="/"

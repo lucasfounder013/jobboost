@@ -53,7 +53,7 @@ export default function TraiterSauvegardePending() {
               <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
             </svg>
           </span>
-          <span className="font-semibold text-gray-900">CV enregistré dans votre compte</span>
+          <span className="font-semibold text-gray-900">Progression enregistrée dans votre compte</span>
         </>
       ) : (
         <>

@@ -11,7 +11,7 @@ export type Template = {
 export const TEMPLATES: Template[] = [
   {
     slug: "classique-ats",
-    nom: "Classique ATS",
+    nom: "Classique",
     tagline: "Sobre et 100% lisible par les robots de recrutement",
     descriptionLongue:
       "Le modèle classique en Times New Roman, monocolonne et sans fioritures. Idéal pour les candidatures via plateformes (Workday, Taleo, Greenhouse) ou pour les secteurs traditionnels (finance, droit, fonction publique).",
