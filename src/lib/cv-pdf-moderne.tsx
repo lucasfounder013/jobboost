@@ -2,24 +2,26 @@ import { Document, Page, Text, View, StyleSheet } from "@react-pdf/renderer";
 import { CVStructure } from "@/types/cv";
 import { SectionId, ORDRE_DEFAUT } from "@/lib/cv-sections";
 
+const ACCENT = "#4F46E5";
+
 const styles = StyleSheet.create({
-  page: { padding: 28, fontFamily: "Times-Roman", fontSize: 9.5, color: "#111111", lineHeight: 1.4 },
-  nom: { fontSize: 15, fontFamily: "Times-Bold", marginBottom: 8 },
-  titre: { fontSize: 9.5, color: "#444444", marginBottom: 5 },
-  contact: { fontSize: 8, color: "#666666", marginBottom: 2 },
-  sectionHeader: { marginTop: 8, marginBottom: 4 },
-  sectionTitre: { fontSize: 7.5, fontFamily: "Times-Bold", color: "#222222", marginBottom: 3 },
-  sectionLigne: { height: 1, backgroundColor: "#AAAAAA" },
-  poste: { fontFamily: "Times-Bold", fontSize: 10 },
-  entreprise: { fontSize: 9, color: "#555555", fontStyle: "italic", marginBottom: 2 },
+  page: { padding: 32, fontFamily: "Helvetica", fontSize: 9.5, color: "#111111", lineHeight: 1.45 },
+  nom: { fontSize: 22, fontFamily: "Helvetica-Bold", color: ACCENT, marginBottom: 3 },
+  titre: { fontSize: 10.5, color: "#555555", marginBottom: 6 },
+  contact: { fontSize: 8.5, color: "#666666", marginBottom: 2 },
+  sectionTitre: { fontSize: 9, fontFamily: "Helvetica-Bold", color: ACCENT, letterSpacing: 1, marginTop: 14, marginBottom: 5, textTransform: "uppercase" },
+  poste: { fontFamily: "Helvetica-Bold", fontSize: 10.5, color: "#111111" },
+  entreprise: { fontSize: 9, color: "#555555", marginBottom: 2 },
   dateRange: { fontSize: 8.5, color: "#777777" },
   rowBetween: { flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" },
-  mission: { fontSize: 8.5, color: "#333333", marginLeft: 6, marginBottom: 1 },
-  competenceLabel: { fontFamily: "Times-Bold", fontSize: 8, color: "#666666", marginRight: 4 },
-  competenceValeur: { fontSize: 8.5, color: "#333333" },
-  competenceRow: { flexDirection: "row", marginBottom: 1, flexWrap: "wrap" },
-  resume: { fontSize: 8.5, color: "#444444", marginBottom: 2 },
-  projetNom: { fontFamily: "Times-Bold", fontSize: 10 },
+  missionRow: { flexDirection: "row", marginBottom: 1.5 },
+  missionPuce: { width: 10, color: ACCENT, fontFamily: "Helvetica-Bold", fontSize: 9 },
+  missionTexte: { flex: 1, fontSize: 9, color: "#333333" },
+  competenceLabel: { fontFamily: "Helvetica-Bold", fontSize: 8.5, color: ACCENT, marginRight: 4, textTransform: "uppercase" },
+  competenceValeur: { fontSize: 9, color: "#333333" },
+  competenceRow: { flexDirection: "row", marginBottom: 1.5, flexWrap: "wrap" },
+  resume: { fontSize: 9, color: "#444444" },
+  projetNom: { fontFamily: "Helvetica-Bold", fontSize: 10.5 },
   projetTech: { fontSize: 8.5, color: "#666666" },
   projetDesc: { fontSize: 9, color: "#333333", marginTop: 1 },
 });
@@ -29,16 +31,7 @@ function s(texte: string | null | undefined): string {
   return texte.replace(/\[MOD\](.*?)\[\/MOD\]/g, "$1");
 }
 
-function SectionHeader({ titre }: { titre: string }) {
-  return (
-    <View style={styles.sectionHeader}>
-      <Text style={styles.sectionTitre}>{titre}</Text>
-      <View style={styles.sectionLigne} />
-    </View>
-  );
-}
-
-export function CVPDFDocument({ cv, ordreSections }: { cv: CVStructure; ordreSections?: SectionId[] }) {
+export function CVPDFModerneDocument({ cv, ordreSections }: { cv: CVStructure; ordreSections?: SectionId[] }) {
   const contactItems = [
     cv.contact.email,
     cv.contact.telephone,
@@ -55,16 +48,19 @@ export function CVPDFDocument({ cv, ordreSections }: { cv: CVStructure; ordreSec
         if (!cv.experiences?.length) return null;
         return (
           <View key="experiences">
-            <SectionHeader titre="EXPÉRIENCE PROFESSIONNELLE" />
+            <Text style={styles.sectionTitre}>Expérience professionnelle</Text>
             {cv.experiences.map((exp, i) => (
-              <View key={i} style={{ marginBottom: 4 }}>
+              <View key={i} style={{ marginBottom: 6 }}>
                 <View style={styles.rowBetween}>
                   <Text style={styles.poste}>{s(exp.poste)}</Text>
                   <Text style={styles.dateRange}>{s(exp.dates)}</Text>
                 </View>
                 <Text style={styles.entreprise}>{s(exp.entreprise)}{exp.lieu ? ` — ${s(exp.lieu)}` : ""}</Text>
                 {exp.missions.map((m, j) => (
-                  <Text key={j} style={styles.mission}>• {s(m)}</Text>
+                  <View key={j} style={styles.missionRow}>
+                    <Text style={styles.missionPuce}>▸</Text>
+                    <Text style={styles.missionTexte}>{s(m)}</Text>
+                  </View>
                 ))}
               </View>
             ))}
@@ -74,7 +70,7 @@ export function CVPDFDocument({ cv, ordreSections }: { cv: CVStructure; ordreSec
         if (!cv.formation?.length) return null;
         return (
           <View key="formation">
-            <SectionHeader titre="FORMATION" />
+            <Text style={styles.sectionTitre}>Formation</Text>
             {cv.formation.map((f, i) => (
               <View key={i} style={{ marginBottom: 4 }}>
                 <View style={styles.rowBetween}>
@@ -82,7 +78,7 @@ export function CVPDFDocument({ cv, ordreSections }: { cv: CVStructure; ordreSec
                   <Text style={styles.dateRange}>{s(f.dates)}</Text>
                 </View>
                 <Text style={styles.entreprise}>{s(f.etablissement)}</Text>
-                {f.details ? <Text style={styles.mission}>{s(f.details)}</Text> : null}
+                {f.details ? <Text style={{ fontSize: 9, color: "#333333" }}>{s(f.details)}</Text> : null}
               </View>
             ))}
           </View>
@@ -91,23 +87,23 @@ export function CVPDFDocument({ cv, ordreSections }: { cv: CVStructure; ordreSec
         if (!cv.competences || !(cv.competences.techniques?.length || cv.competences.langues?.length || cv.competences.autres?.length)) return null;
         return (
           <View key="competences">
-            <SectionHeader titre="COMPÉTENCES" />
+            <Text style={styles.sectionTitre}>Compétences</Text>
             {cv.competences.techniques?.length ? (
               <View style={styles.competenceRow}>
-                <Text style={styles.competenceLabel}>Techniques : </Text>
-                <Text style={styles.competenceValeur}>{cv.competences.techniques.map(s).join(", ")}</Text>
+                <Text style={styles.competenceLabel}>Techniques </Text>
+                <Text style={styles.competenceValeur}>{cv.competences.techniques.map(s).join(" · ")}</Text>
               </View>
             ) : null}
             {cv.competences.langues?.length ? (
               <View style={styles.competenceRow}>
-                <Text style={styles.competenceLabel}>Langues : </Text>
-                <Text style={styles.competenceValeur}>{cv.competences.langues.map(s).join(", ")}</Text>
+                <Text style={styles.competenceLabel}>Langues </Text>
+                <Text style={styles.competenceValeur}>{cv.competences.langues.map(s).join(" · ")}</Text>
               </View>
             ) : null}
             {cv.competences.autres?.length ? (
               <View style={styles.competenceRow}>
-                <Text style={styles.competenceLabel}>Autres : </Text>
-                <Text style={styles.competenceValeur}>{cv.competences.autres.map(s).join(", ")}</Text>
+                <Text style={styles.competenceLabel}>Autres </Text>
+                <Text style={styles.competenceValeur}>{cv.competences.autres.map(s).join(" · ")}</Text>
               </View>
             ) : null}
           </View>
@@ -116,7 +112,7 @@ export function CVPDFDocument({ cv, ordreSections }: { cv: CVStructure; ordreSec
         if (!cv.projets?.length) return null;
         return (
           <View key="projets">
-            <SectionHeader titre="PROJETS" />
+            <Text style={styles.sectionTitre}>Projets</Text>
             {cv.projets.map((p, i) => (
               <View key={i} style={{ marginBottom: 4 }}>
                 <View style={styles.rowBetween}>
@@ -132,7 +128,7 @@ export function CVPDFDocument({ cv, ordreSections }: { cv: CVStructure; ordreSec
         if (!cv.certifications?.length) return null;
         return (
           <View key="certifications">
-            <SectionHeader titre="CERTIFICATIONS" />
+            <Text style={styles.sectionTitre}>Certifications</Text>
             {cv.certifications.map((c, i) => (
               <View key={i} style={{ marginBottom: 3 }}>
                 <View style={styles.rowBetween}>
@@ -157,7 +153,7 @@ export function CVPDFDocument({ cv, ordreSections }: { cv: CVStructure; ordreSec
 
         {cv.resume && (
           <>
-            <SectionHeader titre="PROFIL" />
+            <Text style={styles.sectionTitre}>Profil</Text>
             <Text style={styles.resume}>{s(cv.resume)}</Text>
           </>
         )}

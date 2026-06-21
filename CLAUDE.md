@@ -96,4 +96,11 @@ npm run lint   # Vérifier le code
 - Polices built-in react-pdf : `Times-Roman`, `Times-Bold`, `Helvetica`, `Helvetica-Bold` — Georgia n'existe pas, utiliser Times-Roman comme équivalent serif
 - Pour d'autres polices, utiliser `Font.register()` — les polices système ne sont pas disponibles
 - `cv-pdf.tsx` utilise **Times-Roman / Times-Bold** (police serif built-in) — ne pas revenir à Helvetica
-- Fichiers orphelins à supprimer si présents : `cv-pdf-creatif.tsx`, `cv-pdf-moderne.tsx`, `cv-pdf-elegant.tsx`
+- `cv-pdf-moderne.tsx` utilise **Helvetica / Helvetica-Bold** avec accent `#4F46E5` — utilisé par la section `/modeles-cv/moderne`
+- `cv-pdf-elegant.tsx` utilise **Times-Roman / Times-Bold** avec layout 2 colonnes (`flexDirection: "row"` sur `<Page>`) — utilisé par la section `/modeles-cv/elegant`
+
+## Section /modeles-cv (templates de CV gratuits)
+- Source de vérité des templates : `src/lib/cv-templates.ts` (3 slugs : `classique-ats`, `moderne`, `elegant`)
+- CV d'exemple : `src/lib/cv-exemple.ts` (Marie Dupont)
+- Persistance navigateur uniquement (localStorage) — clés : `jobboost:modeles-cv:cv`, `jobboost:modeles-cv:template`, `jobboost:funnel:cv-prefill`. Helpers : `src/lib/cv-localstorage.ts`
+- Route `/api/exporter-cv` accepte `template?` optionnel (défaut `"classique-ats"`) → dispatch PDF + DOCX selon le slug

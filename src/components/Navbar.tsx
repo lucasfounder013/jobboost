@@ -9,6 +9,7 @@ const lienCentre = [
   { href: "/", label: "CV adapté" },
   { href: "/outils/lettre-motivation", label: "Lettre de motivation" },
   { href: "/outils/recherche-email", label: "Recherche d'email" },
+  { href: "/modeles-cv", label: "Modèles de CV" },
   { href: "/ressources", label: "Ressources" },
   { href: "/pricing", label: "Tarifs" },
 ];
