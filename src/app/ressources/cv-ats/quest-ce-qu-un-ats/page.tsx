@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -37,6 +38,18 @@ export default function ArticleATS() {
           <span>›</span>
           <span className="text-gray-600">Ce qu&apos;on vous a dit sur les ATS</span>
         </div>
+
+        <ArticleJsonLd
+          titre="C'est quoi un ATS ? Tout ce qu'il faut savoir | JobBoost"
+          description="Non, un ATS ne rejette pas automatiquement votre CV. Voici ce qu'un ATS fait vraiment, et pourquoi vous optimisez peut-être pour rien."
+          slug="/ressources/cv-ats/quest-ce-qu-un-ats"
+          datePublication="2026-05-09"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "Ce qu'on vous a dit sur les ATS", url: "/ressources/cv-ats/quest-ce-qu-un-ats" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

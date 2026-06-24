@@ -8,7 +8,7 @@ export const metadata = {
 
 const features = [
   {
-    titre: "Score ATS boosté",
+    titre: "Score de correspondance boosté",
     desc: "Votre score passe en moyenne de 34 à 87. Les ATS et les recruteurs repèrent immédiatement votre profil.",
     icone: (
       <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.8}>
@@ -69,7 +69,7 @@ export default function PageCVAdapte() {
             <div className="flex items-center justify-center gap-8 mt-10">
               <div className="text-center">
                 <p className="text-2xl font-extrabold text-indigo-600">+53 pts</p>
-                <p className="text-xs text-gray-400 font-medium mt-0.5">Score ATS moyen gagné</p>
+                <p className="text-xs text-gray-400 font-medium mt-0.5">Score de correspondance moyen gagné</p>
               </div>
               <div className="w-px h-10 bg-gray-200" />
               <div className="text-center">

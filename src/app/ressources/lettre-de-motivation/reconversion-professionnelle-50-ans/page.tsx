@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -45,6 +46,19 @@ export default function ArticleReconversion50Ans() {
           <span>›</span>
           <span className="text-gray-600">Reconversion professionnelle à 50 ans</span>
         </div>
+
+        <ArticleJsonLd
+          titre="Reconversion professionnelle à 50 ans : adapter son CV et ses candidatures 2026 | JobBoost"
+          description="Vous envisagez une reconversion professionnelle à 50 ans ? Découvrez comment adapter votre CV, rédiger votre lettre de motivation et convaincre les recruteurs en 2026."
+          slug="/ressources/lettre-de-motivation/reconversion-professionnelle-50-ans"
+          datePublication="2026-06-11"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "Lettre de motivation", url: "/ressources" },
+            { nom: "Reconversion professionnelle à 50 ans", url: "/ressources/lettre-de-motivation/reconversion-professionnelle-50-ans" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

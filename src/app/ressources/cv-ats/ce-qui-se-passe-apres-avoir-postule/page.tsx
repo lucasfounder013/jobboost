@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "../quest-ce-qu-un-ats/ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -41,6 +42,19 @@ export default function ArticleCeQuiSePasseApresPostule() {
           <span>›</span>
           <span className="text-gray-600">Ce qui se passe après avoir postulé</span>
         </div>
+
+        <ArticleJsonLd
+          titre="Ce qui se passe vraiment après que vous avez postulé | JobBoost"
+          description="Entre le moment où vous envoyez votre candidature et le premier appel du recruteur, que se passe-t-il vraiment ? Voici les coulisses d'un recrutement, étape par étape."
+          slug="/ressources/cv-ats/ce-qui-se-passe-apres-avoir-postule"
+          datePublication="2026-05-30"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "CV & ATS", url: "/ressources" },
+            { nom: "Ce qui se passe après avoir postulé", url: "/ressources/cv-ats/ce-qui-se-passe-apres-avoir-postule" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

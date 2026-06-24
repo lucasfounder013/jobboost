@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -40,6 +41,19 @@ export default function ArticlePreparerCvAts() {
           <span>›</span>
           <span className="text-gray-600">Préparer son CV pour les ATS</span>
         </div>
+
+        <ArticleJsonLd
+          titre="Préparer son CV pour les ATS : le guide pratique | JobBoost"
+          description="Comment préparer son CV pour les ATS en 2026 ? Format, structure, mots-clés, rubriques : le guide pratique pour qu'il soit bien parsé et bien trouvé."
+          slug="/ressources/cv-ats/preparer-son-cv-pour-les-ats"
+          datePublication="2026-06-18"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "CV & ATS", url: "/ressources" },
+            { nom: "Préparer son CV pour les ATS", url: "/ressources/cv-ats/preparer-son-cv-pour-les-ats" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

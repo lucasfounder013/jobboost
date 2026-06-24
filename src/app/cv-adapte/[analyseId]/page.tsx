@@ -174,7 +174,7 @@ export default function CvAdaptePage() {
   ].filter(Boolean).join(", ");
 
   const analyseTexte = totalMods > 0
-    ? `Votre CV a reçu ${totalMods} modification${totalMods > 1 ? "s" : ""} ciblées, faisant passer le score ATS de ${data.score ?? "—"} à ${scoreApres ?? "—"}${gainScore && gainScore > 0 ? ` (+${gainScore} points)` : ""}. ${insightsStr ? `Concrètement : ${insightsStr}.` : ""}`
+    ? `Votre CV a reçu ${totalMods} modification${totalMods > 1 ? "s" : ""} ciblées, faisant passer le score de correspondance de ${data.score ?? "—"} à ${scoreApres ?? "—"}${gainScore && gainScore > 0 ? ` (+${gainScore} points)` : ""}. ${insightsStr ? `Concrètement : ${insightsStr}.` : ""}`
     : `Votre CV a été optimisé pour correspondre aux critères ATS de cette offre.`;
 
   const motsClesAjoutes = (motsClesApresPresents ?? []).filter(
@@ -235,7 +235,7 @@ export default function CvAdaptePage() {
 
               {/* Score ATS */}
               <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6">
-                <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-5">Score ATS</p>
+                <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-5">Score de correspondance</p>
                 <div className="flex items-center gap-6 flex-wrap">
                   <div className="flex flex-col items-center gap-1">
                     <p className="text-xs text-gray-400">Avant</p>

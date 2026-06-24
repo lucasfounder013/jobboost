@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -38,6 +39,19 @@ export default function ArticleTestCV() {
           <span>›</span>
           <span className="text-gray-600">Tester son CV ATS gratuitement</span>
         </div>
+
+        <ArticleJsonLd
+          titre="Comment tester son CV ATS gratuitement | JobBoost"
+          description="Vous voulez savoir si votre CV passe bien les ATS avant de postuler ? Voici comment le tester gratuitement, et ce qu'il faut vraiment vérifier."
+          slug="/ressources/cv-ats/tester-son-cv-ats-gratuitement"
+          datePublication="2026-06-12"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "CV & ATS", url: "/ressources" },
+            { nom: "Tester son CV ATS gratuitement", url: "/ressources/cv-ats/tester-son-cv-ats-gratuitement" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

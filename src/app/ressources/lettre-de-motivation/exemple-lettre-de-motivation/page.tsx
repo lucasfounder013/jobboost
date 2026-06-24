@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -41,6 +42,19 @@ export default function ArticleExempleLettreDeMotivation() {
           <span>›</span>
           <span className="text-gray-600">Exemple lettre de motivation</span>
         </div>
+
+        <ArticleJsonLd
+          titre="Exemple lettre de motivation : 5 modèles prêts à utiliser | JobBoost"
+          description="Vous cherchez un exemple de lettre de motivation efficace ? Voici 5 modèles concrets et adaptables, pour un CDI, un stage, une reconversion ou une candidature spontanée."
+          slug="/ressources/lettre-de-motivation/exemple-lettre-de-motivation"
+          datePublication="2026-06-19"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "Lettre de motivation", url: "/ressources" },
+            { nom: "Exemple lettre de motivation", url: "/ressources/lettre-de-motivation/exemple-lettre-de-motivation" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

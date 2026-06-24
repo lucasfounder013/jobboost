@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "../quest-ce-qu-un-ats/ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -41,6 +42,19 @@ export default function ArticleATSLesPlusUtilises() {
           <span>›</span>
           <span className="text-gray-600">Les ATS les plus utilisés en France</span>
         </div>
+
+        <ArticleJsonLd
+          titre="Les ATS les plus utilisés en France, et ce que ça change pour vous | JobBoost"
+          description="Workday, Taleo, SAP, Greenhouse, Welcome to the Jungle... Quels ATS les entreprises françaises utilisent vraiment, et est-ce que ça change quelque chose pour votre CV ?"
+          slug="/ressources/cv-ats/ats-les-plus-utilises-en-france"
+          datePublication="2026-05-20"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "CV & ATS", url: "/ressources" },
+            { nom: "Les ATS les plus utilisés en France", url: "/ressources/cv-ats/ats-les-plus-utilises-en-france" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

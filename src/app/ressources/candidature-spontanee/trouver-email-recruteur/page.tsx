@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -42,6 +43,19 @@ export default function ArticleTrouverEmailRecruteur() {
           <span>›</span>
           <span className="text-gray-600">Trouver l&apos;email d&apos;un recruteur</span>
         </div>
+
+        <ArticleJsonLd
+          titre="Comment trouver l'email d'un recruteur en 2026 : 8 méthodes efficaces | JobBoost"
+          description="8 méthodes pour trouver l'adresse email d'un recruteur ou DRH pour votre candidature spontanée. Hunter.io, LinkedIn, patterns email, RGPD : guide complet."
+          slug="/ressources/candidature-spontanee/trouver-email-recruteur"
+          datePublication="2026-06-09"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "Candidature spontanée", url: "/ressources" },
+            { nom: "Trouver l'email d'un recruteur", url: "/ressources/candidature-spontanee/trouver-email-recruteur" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

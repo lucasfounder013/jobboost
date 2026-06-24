@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "../quest-ce-qu-un-ats/ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -40,6 +41,19 @@ export default function ArticleCeQueVoitLeRecruteur() {
           <span>›</span>
           <span className="text-gray-600">Ce que voit le recruteur dans son ATS</span>
         </div>
+
+        <ArticleJsonLd
+          titre="Ce que voit le recruteur dans son ATS quand il reçoit votre CV | JobBoost"
+          description="Vous imaginez un algorithme qui juge votre CV. Voici ce que voit vraiment un recruteur dans son ATS, et ce qui attire son attention en premier."
+          slug="/ressources/cv-ats/ce-que-voit-le-recruteur-dans-son-ats"
+          datePublication="2026-05-16"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "CV & ATS", url: "/ressources" },
+            { nom: "Ce que voit le recruteur dans son ATS", url: "/ressources/cv-ats/ce-que-voit-le-recruteur-dans-son-ats" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

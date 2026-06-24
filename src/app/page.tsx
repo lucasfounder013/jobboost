@@ -7,6 +7,35 @@ import { useSession } from "@/lib/auth-client";
 import { usePostHog } from "posthog-js/react";
 import Footer from "@/components/Footer";
 
+const FAQ = [
+  {
+    q: "JobBoost est-il vraiment gratuit ?",
+    r: "Oui. L'analyse CV vs offre (score + mots-clés manquants) est gratuite pour les 3 premières analyses. Au-delà, un abonnement Starter (4,99 €/mois) ou Pro (9,99 €/mois) débloque davantage d'analyses et d'adaptations chaque mois.",
+  },
+  {
+    q: "Qu'est-ce qu'un ATS et pourquoi est-ce important ?",
+    r: "Un ATS (Applicant Tracking System) est un logiciel utilisé par les recruteurs pour extraire et structurer les informations clés de votre CV, afin de faciliter leur travail. Un CV bien optimisé avec les bons mots-clés sera mieux mis en valeur auprès du recruteur.",
+  },
+  {
+    q: "Quels formats de CV sont acceptés ?",
+    r: "JobBoost accepte les fichiers PDF et DOCX jusqu'à 5 Mo, ainsi que le copier-coller de texte brut. Les PDF scannés (images sans couche texte) ne sont pas supportés.",
+  },
+  {
+    q: "Puis-je annuler mon abonnement à tout moment ?",
+    r: "Oui, sans engagement. Vous pouvez annuler depuis la page Mon abonnement. L'accès reste actif jusqu'à la fin de la période payée.",
+  },
+];
+
+const faqJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  mainEntity: FAQ.map(({ q, r }) => ({
+    "@type": "Question",
+    name: q,
+    acceptedAnswer: { "@type": "Answer", text: r },
+  })),
+};
+
 export default function PagePrincipale() {
   const { data: session } = useSession();
   const router = useRouter();
@@ -113,7 +142,7 @@ export default function PagePrincipale() {
               <div className="rounded-xl shadow-xl overflow-hidden ring-2 ring-red-100">
                 <div className="px-5 py-3 flex items-center justify-between bg-red-50 border-b border-red-100">
                   <span className="text-xs font-bold text-red-600">Avant JobBoost</span>
-                  <span className="text-sm font-extrabold px-3 py-1 rounded-full bg-red-100 text-red-700">Score ATS : 34 / 100</span>
+                  <span className="text-sm font-extrabold px-3 py-1 rounded-full bg-red-100 text-red-700">Score de correspondance : 34 / 100</span>
                 </div>
                 <div className="relative overflow-hidden max-h-[680px] flex font-sans text-[11px] text-gray-900 leading-snug">
 
@@ -278,7 +307,7 @@ export default function PagePrincipale() {
               <div className="rounded-xl shadow-xl overflow-hidden ring-2 ring-emerald-100">
                 <div className="px-5 py-3 flex items-center justify-between bg-emerald-50 border-b border-emerald-100">
                   <span className="text-xs font-bold text-emerald-700">Après JobBoost</span>
-                  <span className="text-sm font-extrabold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700">Score ATS : 91 / 100</span>
+                  <span className="text-sm font-extrabold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700">Score de correspondance : 91 / 100</span>
                 </div>
                 <div className="relative">
                   <div className="bg-white p-5 overflow-hidden max-h-[680px]">
@@ -402,7 +431,7 @@ export default function PagePrincipale() {
                     </svg>
                   ),
                   titre: "Analyser",
-                  desc: "Voyez exactement comment votre CV correspond à l'offre. Score ATS, mots-clés manquants et lacunes. En 30 secondes.",
+                  desc: "Voyez exactement comment votre CV correspond à l'offre. Score de correspondance, mots-clés manquants et lacunes. En 30 secondes.",
                 },
                 {
                   icon: (
@@ -626,27 +655,14 @@ export default function PagePrincipale() {
 
         {/* FAQ */}
         <section className="bg-white border-t border-gray-100 px-6 py-16">
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+          />
           <div className="max-w-2xl mx-auto">
             <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 text-center mb-10">Questions fréquentes</h2>
             <div className="flex flex-col divide-y divide-gray-100">
-              {[
-                {
-                  q: "JobBoost est-il vraiment gratuit ?",
-                  r: "Oui. L'analyse CV vs offre (score + mots-clés manquants) est gratuite pour les 3 premières analyses. Au-delà, un abonnement Starter (4,99 €/mois) ou Pro (9,99 €/mois) débloque davantage d'analyses et d'adaptations chaque mois.",
-                },
-                {
-                  q: "Qu'est-ce qu'un ATS et pourquoi est-ce important ?",
-                  r: "Un ATS (Applicant Tracking System) est un logiciel utilisé par les recruteurs pour extraire et structurer les informations clés de votre CV, afin de faciliter leur travail. Un CV bien optimisé avec les bons mots-clés sera mieux mis en valeur auprès du recruteur.",
-                },
-                {
-                  q: "Quels formats de CV sont acceptés ?",
-                  r: "JobBoost accepte les fichiers PDF et DOCX jusqu'à 5 Mo, ainsi que le copier-coller de texte brut. Les PDF scannés (images sans couche texte) ne sont pas supportés.",
-                },
-                {
-                  q: "Puis-je annuler mon abonnement à tout moment ?",
-                  r: "Oui, sans engagement. Vous pouvez annuler depuis la page Mon abonnement. L'accès reste actif jusqu'à la fin de la période payée.",
-                },
-              ].map(({ q, r }, i) => (
+              {FAQ.map(({ q, r }, i) => (
                 <details key={i} className="group py-5 cursor-pointer list-none">
                   <summary className="flex items-center justify-between gap-4 font-semibold text-gray-900 text-sm sm:text-base select-none list-none">
                     {q}

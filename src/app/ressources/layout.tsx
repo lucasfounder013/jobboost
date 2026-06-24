@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
+import { ogMeta } from "@/lib/seo";
+
+const TITRE = "Ressources CV, ATS et recherche d'emploi | JobBoost";
+const DESCRIPTION = "Guides pratiques et gratuits sur le CV, les ATS, la lettre de motivation et la recherche d'emploi. 24+ articles écrits par l'équipe JobBoost.";
 
 export const metadata: Metadata = {
-  title: "Guides CV & ATS gratuits | JobBoost",
-  description: "Guides pratiques et gratuits pour optimiser votre CV, comprendre les ATS et maximiser vos chances d'être retenu par les recruteurs.",
+  title: TITRE,
+  description: DESCRIPTION,
+  ...ogMeta(TITRE, DESCRIPTION, "/ressources"),
 };
 
 export default function RessourcesLayout({ children }: { children: React.ReactNode }) {

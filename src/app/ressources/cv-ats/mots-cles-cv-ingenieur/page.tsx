@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -42,6 +43,19 @@ export default function ArticleMotsClesIngenieur() {
           <span>›</span>
           <span className="text-gray-600">Mots-clés CV Ingénieur</span>
         </div>
+
+        <ArticleJsonLd
+          titre="Mots-clés CV Ingénieur : liste complète 2026 | JobBoost"
+          description="Découvrez les 30+ mots-clés indispensables pour un CV Ingénieur qui passe les filtres ATS en 2026. Liste complète par catégorie + exemples."
+          slug="/ressources/cv-ats/mots-cles-cv-ingenieur"
+          datePublication="2026-06-09"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "CV & ATS", url: "/ressources" },
+            { nom: "Mots-clés CV Ingénieur", url: "/ressources/cv-ats/mots-cles-cv-ingenieur" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

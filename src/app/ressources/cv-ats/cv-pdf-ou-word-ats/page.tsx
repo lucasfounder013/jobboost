@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "../quest-ce-qu-un-ats/ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -40,6 +41,19 @@ export default function ArticlePDFouWord() {
           <span>›</span>
           <span className="text-gray-600">PDF ou Word : quel format de CV ?</span>
         </div>
+
+        <ArticleJsonLd
+          titre="PDF ou Word : quel format de CV passe vraiment mieux les ATS ? | JobBoost"
+          description="PDF ou Word ? La réponse n'est pas celle que vous croyez. On démonte les idées reçues sur le format de CV idéal pour les ATS."
+          slug="/ressources/cv-ats/cv-pdf-ou-word-ats"
+          datePublication="2026-05-14"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "CV & ATS", url: "/ressources" },
+            { nom: "PDF ou Word : quel format de CV ?", url: "/ressources/cv-ats/cv-pdf-ou-word-ats" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "../quest-ce-qu-un-ats/ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -42,6 +43,19 @@ export default function ArticleRubriquesCV() {
           <span>›</span>
           <span className="text-gray-600">Les rubriques indispensables d&apos;un CV en 2026</span>
         </div>
+
+        <ArticleJsonLd
+          titre="Les rubriques indispensables d'un CV en 2026 | JobBoost"
+          description="Quelles rubriques mettre sur son CV en 2026 ? Celles que tous les recruteurs cherchent, celles à éviter, et celles qui font vraiment la différence."
+          slug="/ressources/cv-ats/rubriques-indispensables-cv-2026"
+          datePublication="2026-05-31"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "CV & ATS", url: "/ressources" },
+            { nom: "Les rubriques indispensables d'un CV en 2026", url: "/ressources/cv-ats/rubriques-indispensables-cv-2026" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

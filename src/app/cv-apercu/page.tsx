@@ -235,7 +235,7 @@ export default function CvApercuPage() {
   ].filter(Boolean).join(", ");
 
   const analyseTexte = totalMods > 0
-    ? `Votre CV a reçu ${totalMods} modification${totalMods > 1 ? "s" : ""} ciblées, faisant passer le score ATS de ${data.scoreBefore ?? "—"} à ${data.scoreAfter ?? "—"}${gainScore && gainScore > 0 ? ` (+${gainScore} points)` : ""}. ${insightsStr ? `Concrètement : ${insightsStr}.` : ""}`
+    ? `Votre CV a reçu ${totalMods} modification${totalMods > 1 ? "s" : ""} ciblées, faisant passer le score de correspondance de ${data.scoreBefore ?? "—"} à ${data.scoreAfter ?? "—"}${gainScore && gainScore > 0 ? ` (+${gainScore} points)` : ""}. ${insightsStr ? `Concrètement : ${insightsStr}.` : ""}`
     : `Votre CV a été analysé et optimisé pour correspondre au mieux à l'offre d'emploi.`;
 
   return (
@@ -278,7 +278,7 @@ export default function CvApercuPage() {
 
             {/* Score avant / après */}
             <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6">
-              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-5">Score ATS</p>
+              <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-5">Score de correspondance</p>
               <div className="flex items-center gap-6 flex-wrap">
                 <div className="flex flex-col items-center gap-1">
                   <p className="text-xs text-gray-400">Avant</p>

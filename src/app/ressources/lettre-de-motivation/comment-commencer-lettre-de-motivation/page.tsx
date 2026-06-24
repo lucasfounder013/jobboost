@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -44,6 +45,19 @@ export default function ArticleCommentCommencerLDM() {
           <span>›</span>
           <span className="text-gray-600">Comment commencer une lettre de motivation</span>
         </div>
+
+        <ArticleJsonLd
+          titre="Comment commencer une lettre de motivation : exemples et erreurs | JobBoost"
+          description={'Comment commencer une lettre de motivation sans dire "je me permets de vous contacter" ? Voici les formules qui fonctionnent, avec des exemples concrets adaptables.'}
+          slug="/ressources/lettre-de-motivation/comment-commencer-lettre-de-motivation"
+          datePublication="2026-06-19"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "Lettre de motivation", url: "/ressources" },
+            { nom: "Comment commencer une lettre de motivation", url: "/ressources/lettre-de-motivation/comment-commencer-lettre-de-motivation" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

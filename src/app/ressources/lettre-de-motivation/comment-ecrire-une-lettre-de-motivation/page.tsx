@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -43,6 +44,19 @@ export default function ArticleCommentEcrireLDM() {
           <span>›</span>
           <span className="text-gray-600">Comment écrire une lettre de motivation</span>
         </div>
+
+        <ArticleJsonLd
+          titre="Comment écrire une lettre de motivation en 2026 : méthode, exemples et erreurs | JobBoost"
+          description="La méthode en 4 étapes pour écrire une lettre de motivation efficace en 2026. Exemples concrets, erreurs à éviter, et conseils pour décrocher un entretien."
+          slug="/ressources/lettre-de-motivation/comment-ecrire-une-lettre-de-motivation"
+          datePublication="2026-06-08"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "Lettre de motivation", url: "/ressources" },
+            { nom: "Comment écrire une lettre de motivation", url: "/ressources/lettre-de-motivation/comment-ecrire-une-lettre-de-motivation" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -45,6 +46,19 @@ export default function ArticleCommentFinirLDM() {
           <span>›</span>
           <span className="text-gray-600">Comment finir une lettre de motivation</span>
         </div>
+
+        <ArticleJsonLd
+          titre="Comment finir une lettre de motivation : exemples et formules | JobBoost"
+          description="Comment finir une lettre de motivation efficacement ? Formules de politesse, phrases de conclusion, erreurs à éviter : voici ce qui fonctionne vraiment."
+          slug="/ressources/lettre-de-motivation/comment-finir-lettre-de-motivation"
+          datePublication="2026-06-19"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "Lettre de motivation", url: "/ressources" },
+            { nom: "Comment finir une lettre de motivation", url: "/ressources/lettre-de-motivation/comment-finir-lettre-de-motivation" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

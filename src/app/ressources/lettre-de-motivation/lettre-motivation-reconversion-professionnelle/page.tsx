@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -43,6 +44,19 @@ export default function ArticleLettreMotivationReconversion() {
           <span>›</span>
           <span className="text-gray-600">Lettre de motivation reconversion professionnelle</span>
         </div>
+
+        <ArticleJsonLd
+          titre="Lettre de motivation reconversion professionnelle : guide + exemple 2026 | JobBoost"
+          description="Comment rédiger une lettre de motivation convaincante pour une reconversion professionnelle en 2026. Guide complet avec exemple concret et conseils pratiques."
+          slug="/ressources/lettre-de-motivation/lettre-motivation-reconversion-professionnelle"
+          datePublication="2026-06-11"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "Lettre de motivation", url: "/ressources" },
+            { nom: "Lettre de motivation reconversion professionnelle", url: "/ressources/lettre-de-motivation/lettre-motivation-reconversion-professionnelle" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

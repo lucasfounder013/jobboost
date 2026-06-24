@@ -40,6 +40,16 @@ export const metadata: Metadata = {
   },
 };
 
+const organizationJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: "JobBoost",
+  url: "https://www.jobboost.fr",
+  logo: "https://www.jobboost.fr/favicon.ico",
+  description: "JobBoost analyse votre CV face à une offre d'emploi et l'adapte automatiquement pour maximiser vos chances d'être retenu.",
+  sameAs: ["https://github.com/lucasfounder013/jobboost"],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -48,6 +58,10 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-[#FAFAFA] text-gray-900 font-sans overflow-x-hidden">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationJsonLd) }}
+        />
         <Providers>
           <Suspense fallback={null}>
             <PostHogPageView />

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ArticleJsonLd from "@/components/ArticleJsonLd";
 import Footer from "@/components/Footer";
 import ShareButtons from "../quest-ce-qu-un-ats/ShareButtons";
 import { ogMeta } from "@/lib/seo";
@@ -39,6 +40,19 @@ export default function ArticleSavoirSiATS() {
           <span>›</span>
           <span className="text-gray-600">Comment savoir si une entreprise utilise un ATS</span>
         </div>
+
+        <ArticleJsonLd
+          titre="Comment savoir si une entreprise utilise un ATS avant de postuler | JobBoost"
+          description="Il existe des indices simples pour détecter si une entreprise utilise un ATS avant même de postuler. Voici comment les repérer et ce que ça change pour votre candidature."
+          slug="/ressources/cv-ats/comment-savoir-si-entreprise-utilise-ats"
+          datePublication="2026-05-23"
+          filAriane={[
+            { nom: "Accueil", url: "/" },
+            { nom: "Ressources", url: "/ressources" },
+            { nom: "CV & ATS", url: "/ressources" },
+            { nom: "Comment savoir si une entreprise utilise un ATS", url: "/ressources/cv-ats/comment-savoir-si-entreprise-utilise-ats" },
+          ]}
+        />
 
         {/* H1 */}
         <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 leading-tight mb-3 max-w-3xl">

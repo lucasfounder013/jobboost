@@ -1329,7 +1329,7 @@ function DashboardInner() {
 
                   {/* Score ATS */}
                   <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-8 flex flex-col items-center justify-center text-center">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Score ATS</p>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Score de correspondance</p>
                     <div className={`w-24 h-24 rounded-full flex flex-col items-center justify-center ring-4 bg-white ${ringScore(resultat.score)}`}>
                       <span className="text-3xl font-black">{resultat.score}</span>
                       <span className="text-xs font-semibold text-gray-400">/ 100</span>
