@@ -1,0 +1,76 @@
+# JobBoost
+
+> JobBoost est une plateforme française d'analyse et d'adaptation de CV face aux offres d'emploi. L'outil compare un CV à une offre, calcule un score de correspondance, identifie les mots-clés manquants et propose une version adaptée du CV optimisée pour passer les filtres ATS (Applicant Tracking System) des recruteurs.
+
+JobBoost est une alternative française à Jobscan.co, gratuite à l'analyse et payante pour l'adaptation automatique de CV.
+
+Fonctionnalités principales :
+- Analyse gratuite : score de correspondance CV / offre d'emploi + liste des mots-clés manquants
+- Adaptation automatique de CV par IA (Claude API)
+- Génération de lettres de motivation personnalisées
+- Modèles de CV gratuits téléchargeables (PDF et DOCX), compatibles ATS
+- Bibliothèque d'articles sur les ATS, les lettres de motivation et la candidature spontanée
+
+Public cible : candidats francophones en recherche d'emploi qui veulent optimiser leur CV pour les ATS utilisés par les recruteurs français.
+
+## Outils
+
+- [Analyser son CV face à une offre](https://www.jobboost.fr/): outil principal d'analyse de correspondance CV / offre d'emploi
+- [Adapter son CV automatiquement](https://www.jobboost.fr/outils/cv-adapte): génération d'un CV adapté à une offre via IA
+- [Générer une lettre de motivation](https://www.jobboost.fr/outils/lettre-motivation): création d'une lettre personnalisée à partir d'un CV et d'une offre
+- [Trouver l'email d'un recruteur](https://www.jobboost.fr/outils/recherche-email): recherche d'adresse email professionnelle pour candidature spontanée
+
+## Modèles de CV gratuits
+
+- [Tous les modèles de CV](https://www.jobboost.fr/modeles-cv): page de sélection avec aperçu et téléchargement PDF/DOCX
+- [Modèle CV Classique ATS](https://www.jobboost.fr/modeles-cv/classique-ats): template sobre Times-Roman optimisé pour le passage des ATS
+- [Modèle CV Moderne](https://www.jobboost.fr/modeles-cv/moderne): template Helvetica avec accent violet
+- [Modèle CV Élégant](https://www.jobboost.fr/modeles-cv/elegant): template Times-Roman en deux colonnes
+
+## Ressources — CV et ATS
+
+- [Qu'est-ce qu'un ATS ?](https://www.jobboost.fr/ressources/cv-ats/quest-ce-qu-un-ats): définition complète d'un Applicant Tracking System, ce qu'il fait vraiment (et ce qu'il ne fait pas)
+- [Tester son CV ATS gratuitement](https://www.jobboost.fr/ressources/cv-ats/tester-son-cv-ats-gratuitement): méthode et outils pour vérifier la compatibilité ATS d'un CV
+- [Préparer son CV pour les ATS](https://www.jobboost.fr/ressources/cv-ats/preparer-son-cv-pour-les-ats): bonnes pratiques de structure, format et vocabulaire pour passer les filtres ATS
+- [Les ATS les plus utilisés en France](https://www.jobboost.fr/ressources/cv-ats/ats-les-plus-utilises-en-france): panorama des ATS dominants sur le marché français (Workday, Taleo, SmartRecruiters, etc.)
+- [Ce que voit le recruteur dans son ATS](https://www.jobboost.fr/ressources/cv-ats/ce-que-voit-le-recruteur-dans-son-ats): interface réelle côté recruteur, comment un CV est affiché et classé
+- [Ce qui se passe après avoir postulé](https://www.jobboost.fr/ressources/cv-ats/ce-qui-se-passe-apres-avoir-postule): étapes du parcours d'une candidature dans un ATS
+- [Comment savoir si une entreprise utilise un ATS](https://www.jobboost.fr/ressources/cv-ats/comment-savoir-si-entreprise-utilise-ats): signaux pour identifier un processus de recrutement automatisé
+- [CV PDF ou Word pour un ATS ?](https://www.jobboost.fr/ressources/cv-ats/cv-pdf-ou-word-ats): comparaison des formats et recommandations selon le contexte
+- [Rubriques indispensables d'un CV en 2026](https://www.jobboost.fr/ressources/cv-ats/rubriques-indispensables-cv-2026): structure type d'un CV moderne compatible ATS
+
+## Ressources — Mots-clés CV par métier
+
+- [Mots-clés CV chargé(e) de recrutement RH](https://www.jobboost.fr/ressources/cv-ats/mots-cles-cv-charge-rh)
+- [Mots-clés CV chef de projet](https://www.jobboost.fr/ressources/cv-ats/mots-cles-cv-chef-de-projet)
+- [Mots-clés CV commercial](https://www.jobboost.fr/ressources/cv-ats/mots-cles-cv-commercial)
+- [Mots-clés CV comptable](https://www.jobboost.fr/ressources/cv-ats/mots-cles-cv-comptable)
+- [Mots-clés CV développeur web](https://www.jobboost.fr/ressources/cv-ats/mots-cles-cv-developpeur-web)
+- [Mots-clés CV ingénieur](https://www.jobboost.fr/ressources/cv-ats/mots-cles-cv-ingenieur)
+- [Mots-clés CV marketing manager](https://www.jobboost.fr/ressources/cv-ats/mots-cles-cv-marketing-manager)
+- [Mots-clés CV assistant(e) RH](https://www.jobboost.fr/ressources/cv-ats/mots-cles-cv-assistant-rh)
+
+## Ressources — Lettre de motivation
+
+- [Comment écrire une lettre de motivation](https://www.jobboost.fr/ressources/lettre-de-motivation/comment-ecrire-une-lettre-de-motivation): méthode complète, structure et erreurs à éviter
+- [Exemple de lettre de motivation](https://www.jobboost.fr/ressources/lettre-de-motivation/exemple-lettre-de-motivation): modèles commentés, adaptables à plusieurs métiers
+- [Comment commencer une lettre de motivation](https://www.jobboost.fr/ressources/lettre-de-motivation/comment-commencer-lettre-de-motivation): formules d'accroche efficaces selon le contexte
+- [Comment finir une lettre de motivation](https://www.jobboost.fr/ressources/lettre-de-motivation/comment-finir-lettre-de-motivation): formules de politesse et call-to-action
+- [Lettre de motivation pour reconversion professionnelle](https://www.jobboost.fr/ressources/lettre-de-motivation/lettre-motivation-reconversion-professionnelle): structure et arguments adaptés à un changement de carrière
+- [Reconversion professionnelle après 50 ans](https://www.jobboost.fr/ressources/lettre-de-motivation/reconversion-professionnelle-50-ans): spécificités d'une lettre pour reconversion seniors
+
+## Ressources — Candidature spontanée
+
+- [Trouver l'email d'un recruteur](https://www.jobboost.fr/ressources/candidature-spontanee/trouver-email-recruteur): méthodes pour identifier l'adresse email d'un contact RH
+
+## Tarifs et abonnement
+
+- [Tarifs JobBoost](https://www.jobboost.fr/pricing): plans Starter et Pro avec quotas mensuels d'analyses, adaptations CV et lettres de motivation
+
+## Optional
+
+- [Mentions légales](https://www.jobboost.fr/mentions-legales)
+- [Politique de confidentialité](https://www.jobboost.fr/politique-confidentialite)
+- [Politique de cookies](https://www.jobboost.fr/politique-cookies)
+- [Conditions générales d'utilisation](https://www.jobboost.fr/cgu)
+- [Conditions générales de vente](https://www.jobboost.fr/cgv)
