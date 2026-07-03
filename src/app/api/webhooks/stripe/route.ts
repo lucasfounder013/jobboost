@@ -76,7 +76,8 @@ export async function POST(req: NextRequest) {
 
     case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
-      const actif = subscription.status === "active" || subscription.status === "trialing";
+      const statutOK = subscription.status === "active" || subscription.status === "trialing";
+      const actif = statutOK && !subscription.cancel_at_period_end;
       await pool.query(
         'UPDATE "user" SET is_subscribed = $1 WHERE stripe_subscription_id = $2',
         [actif, subscription.id]
@@ -109,8 +110,14 @@ export async function POST(req: NextRequest) {
           'SELECT id, plan_type FROM "user" WHERE stripe_subscription_id = $1',
           [subId]
         );
+        // Annuler immédiatement pour arrêter les Smart Retries Stripe (retries en boucle sinon)
+        try {
+          await stripe.subscriptions.cancel(subId);
+        } catch (err) {
+          console.error("[webhook] Erreur annulation souscription après échec paiement :", err);
+        }
         await pool.query(
-          'UPDATE "user" SET is_subscribed = false WHERE stripe_subscription_id = $1',
+          'UPDATE "user" SET is_subscribed = false, stripe_subscription_id = NULL, plan_type = NULL WHERE stripe_subscription_id = $1',
           [subId]
         );
         if (rows[0]) {
