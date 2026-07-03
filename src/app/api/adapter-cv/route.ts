@@ -64,13 +64,7 @@ export async function POST(req: NextRequest) {
       ? `\n\nInformations complémentaires fournies par le candidat :\n${(reponses as { question: string; reponse: string }[]).filter(r => r.reponse?.trim()).map(r => `- ${r.question} → ${r.reponse}`).join("\n")}\nUtilise ces informations pour enrichir le CV — ne les invente pas si elles ne sont pas fournies.`
       : "";
 
-  const message = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
-    max_tokens: 4096,
-    messages: [
-      {
-        role: "user",
-        content: `Tu es un expert en rédaction de CV ATS-friendly. Réécris ce CV pour maximiser sa correspondance avec l'offre d'emploi, en intégrant naturellement les mots-clés manquants. Ne fabrique pas d'expériences ni de diplômes — reformule et mets en valeur ce qui existe déjà. Les concours, compétitions et hackathons vont dans "projets", pas dans "certifications". Les certifications sont uniquement des diplômes ou titres officiels (ex : TOEIC, certifications professionnelles).${motsClesListe}${reponsesListe}
+  const prompt = `Tu es un expert en rédaction de CV ATS-friendly. Réécris ce CV pour maximiser sa correspondance avec l'offre d'emploi, en intégrant naturellement les mots-clés manquants. Ne fabrique pas d'expériences ni de diplômes — reformule et mets en valeur ce qui existe déjà. Les concours, compétitions et hackathons vont dans "projets", pas dans "certifications". Les certifications sont uniquement des diplômes ou titres officiels (ex : TOEIC, certifications professionnelles).${motsClesListe}${reponsesListe}
 
 MARQUAGE DES MODIFICATIONS — règle stricte : entoure UNIQUEMENT les mots ou groupes de mots que tu AJOUTES ou CHANGES par rapport au texte original. Si une partie de la phrase existait déjà telle quelle dans le CV original, ne la marque PAS. Ne marque jamais toute une phrase si seule une partie a changé.
 Exemples corrects :
@@ -135,29 +129,50 @@ CV ORIGINAL :
 ${cv}
 
 OFFRE D'EMPLOI :
-${offre}`,
-      },
-    ],
-  });
+${offre}`;
 
-  const contenu = message.content[0];
-  if (contenu.type !== "text") {
-    return NextResponse.json({ error: "Réponse inattendue de l'IA." }, { status: 500 });
+  // Appelle Claude puis parse le JSON — retourne null si la réponse ne parse pas
+  // (réponse tronquée, texte hors-JSON, etc.). Un retry est effectué par l'appelant.
+  async function appelerEtParser(): Promise<Record<string, unknown> | null> {
+    const message = await anthropic.messages.create({
+      model: "claude-haiku-4-5-20251001",
+      max_tokens: 8192,
+      messages: [{ role: "user", content: prompt }],
+    });
+    const contenu = message.content[0];
+    if (contenu.type !== "text") return null;
+    const texteNettoye = contenu.text.replace(/^```(?:json)?\n?/i, "").replace(/\n?```$/i, "").trim();
+    try {
+      return JSON.parse(texteNettoye);
+    } catch {
+      console.error("[adapter-cv] Parse JSON échoué. Extrait :", texteNettoye.slice(0, 500));
+      return null;
+    }
   }
 
-  // Nettoyer les backticks markdown éventuels avant le parse
-  const texteNettoye = contenu.text.replace(/^```(?:json)?\n?/i, "").replace(/\n?```$/i, "").trim();
+  let parsed = await appelerEtParser();
+  if (parsed === null) {
+    // Retry unique — Claude peut renvoyer occasionnellement du texte non parseable
+    parsed = await appelerEtParser();
+  }
 
-  let parsed;
-  try {
-    parsed = JSON.parse(texteNettoye);
-  } catch {
-    return NextResponse.json({ error: "Format de réponse invalide. Veuillez réessayer." }, { status: 500 });
+  if (parsed === null) {
+    // Échec définitif : rendre le crédit s'il a été décrémenté (utilisateur non locked)
+    if (!locked) {
+      await pool.query(
+        'UPDATE "user" SET credits = credits + 1 WHERE id = $1',
+        [session.user.id]
+      );
+    }
+    return NextResponse.json(
+      { error: "Nous n'avons pas pu adapter votre CV cette fois-ci. Votre crédit n'a pas été consommé, merci de réessayer." },
+      { status: 500 }
+    );
   }
 
   // Support ancien format (CVStructure directe) et nouveau format { original, adapte }
-  const cvAdapte = parsed?.adapte ?? parsed;
-  const cvOriginal = parsed?.original ?? null;
+  const cvAdapte = (parsed.adapte ?? parsed) as { titre?: string } & Record<string, unknown>;
+  const cvOriginal = parsed.original ?? null;
 
   pool.query(
     `INSERT INTO user_events (user_id, action, metadata) VALUES ($1, 'adaptation_cv', $2)`,

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSession } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
@@ -49,8 +49,23 @@ export default function PageAbonnement() {
   const [chargementPortail, setChargementPortail] = useState(false);
   const [erreur, setErreur] = useState("");
 
-  const planType = (session?.user as { planType?: string } | undefined)?.planType ?? null;
+  // Source de vérité DB : useSession() n'expose pas de façon fiable les additionalFields
+  // (planType/isSubscribed) — on fetch /api/dashboard qui lit directement la DB.
+  const [planType, setPlanType] = useState<"starter" | "pro" | null>(null);
+  const [statutCharge, setStatutCharge] = useState(false);
   const estAbonne = planType !== null;
+  const chargementStatut = !!session && !statutCharge;
+
+  useEffect(() => {
+    if (isPending || !session) return;
+    fetch("/api/dashboard")
+      .then((r) => r.json())
+      .then((data) => {
+        setPlanType((data.planType as "starter" | "pro" | null) ?? null);
+      })
+      .catch(() => setPlanType(null))
+      .finally(() => setStatutCharge(true));
+  }, [session, isPending]);
 
   async function souscrire(plan: "starter" | "pro") {
     if (!session) {
@@ -96,7 +111,7 @@ export default function PageAbonnement() {
     }
   }
 
-  if (isPending) {
+  if (isPending || chargementStatut) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="w-5 h-5 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin" />
