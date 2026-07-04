@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { CVStructure } from "@/types/cv";
 import { TemplateSlug, getTemplate } from "@/lib/cv-templates";
 import { SectionId, normaliserOrdre } from "@/lib/cv-sections";
@@ -15,7 +16,6 @@ import {
 import { CV_EXEMPLE } from "@/lib/cv-exemple";
 import FormulaireCV from "@/components/modeles-cv/FormulaireCV";
 import PreviewRouter from "@/components/modeles-cv/PreviewRouter";
-import SelecteurTemplate from "@/components/modeles-cv/SelecteurTemplate";
 import ModalCTAFinAdaptation from "@/components/modeles-cv/ModalCTAFinAdaptation";
 import BoutonEnregistrer from "@/components/modeles-cv/BoutonEnregistrer";
 
@@ -24,14 +24,47 @@ type Props = {
 };
 
 export default function EditeurCV({ templateSlug }: Props) {
-  // Initialisation paresseuse : on lit localStorage si dispo, sinon CV exemple
+  const searchParams = useSearchParams();
+  const cvIdParam = searchParams.get("cvId");
+
+  // Initialisation paresseuse : on lit localStorage si dispo, sinon CV exemple.
+  // Si un cvId est présent dans l'URL, on écrase avec le CV distant dès que la requête aboutit.
   const [cv, setCv] = useState<CVStructure>(() => chargerCvBrouillon() ?? CV_EXEMPLE);
   const [ordreSections, setOrdreSectionsLocal] = useState<SectionId[]>(() => normaliserOrdre(chargerOrdreSections()));
   const [telechargementEnCours, setTelechargementEnCours] = useState<"pdf" | "docx" | null>(null);
   const [erreur, setErreur] = useState<string | null>(null);
   const [modalOuvert, setModalOuvert] = useState(false);
+  const [cvId, setCvId] = useState<string | null>(cvIdParam);
+  const [chargementCv, setChargementCv] = useState<boolean>(!!cvIdParam);
 
   const template = getTemplate(templateSlug);
+
+  // Charger le CV depuis l'API quand ?cvId=xxx est présent
+  useEffect(() => {
+    if (!cvIdParam) return;
+    let annule = false;
+    setChargementCv(true);
+    fetch(`/api/cv-modele/${cvIdParam}`)
+      .then((r) => {
+        if (!r.ok) throw new Error("CV introuvable ou accès refusé.");
+        return r.json();
+      })
+      .then((data: { cv: CVStructure; ordreSections: SectionId[]; id: string }) => {
+        if (annule) return;
+        setCv(data.cv);
+        setOrdreSectionsLocal(normaliserOrdre(data.ordreSections));
+        setCvId(data.id);
+      })
+      .catch((e: Error) => {
+        if (!annule) setErreur(e.message);
+      })
+      .finally(() => {
+        if (!annule) setChargementCv(false);
+      });
+    return () => {
+      annule = true;
+    };
+  }, [cvIdParam]);
 
   function onOrdreChange(nouvelOrdre: SectionId[]) {
     setOrdreSectionsLocal(nouvelOrdre);
@@ -43,13 +76,15 @@ export default function EditeurCV({ templateSlug }: Props) {
     sauvegarderTemplateActif(templateSlug);
   }, [templateSlug]);
 
-  // Debounce 500ms sur la persistance du CV
+  // Debounce 500ms sur la persistance du CV en localStorage.
+  // On ne persiste pas pendant le chargement d'un CV distant (évite d'écraser le brouillon anonyme).
   useEffect(() => {
+    if (chargementCv) return;
     const timer = setTimeout(() => {
       sauvegarderCvBrouillon(cv);
     }, 500);
     return () => clearTimeout(timer);
-  }, [cv]);
+  }, [cv, chargementCv]);
 
   async function telecharger(format: "pdf" | "docx") {
     setErreur(null);
@@ -123,7 +158,13 @@ export default function EditeurCV({ templateSlug }: Props) {
                 {telechargementEnCours === "docx" ? "Génération…" : "Télécharger en Word"}
               </button>
             </div>
-            <BoutonEnregistrer cv={cv} templateSlug={templateSlug} ordreSections={ordreSections} />
+            <BoutonEnregistrer
+              cv={cv}
+              templateSlug={templateSlug}
+              ordreSections={ordreSections}
+              cvId={cvId}
+              onSaved={(id) => setCvId(id)}
+            />
           </div>
 
           {erreur && (
@@ -131,8 +172,6 @@ export default function EditeurCV({ templateSlug }: Props) {
               {erreur}
             </div>
           )}
-
-          <SelecteurTemplate slugActif={templateSlug} />
 
           <FormulaireCV
             cv={cv}

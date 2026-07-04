@@ -7,6 +7,7 @@ import CarteTemplate from "@/components/modeles-cv/CarteTemplate";
 import Faq, { QuestionFaq } from "@/components/modeles-cv/Faq";
 import SectionsPublic from "@/components/modeles-cv/SectionsPublic";
 import BoutonRetour from "@/components/modeles-cv/BoutonRetour";
+import MesCvsEnregistres from "@/components/modeles-cv/MesCvsEnregistres";
 
 const TITRE = "Modèles de CV gratuits 2026 — PDF & Word à télécharger | JobBoost";
 const DESCRIPTION =
@@ -110,33 +111,34 @@ export default function ModelesCvPage() {
         <BoutonRetour />
       </div>
 
-      {/* Hero */}
-      <section className="px-6 pt-10 pb-12 text-center">
+      {/* Hero — compact pour laisser voir les CV enregistrés + templates dans le viewport */}
+      <section className="px-6 pt-6 pb-6 text-center">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900 leading-tight mb-5">
+          <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 leading-tight mb-3">
             Modèles de CV <SectionsPublic>gratuits </SectionsPublic>à télécharger en{" "}
             <span className="bg-gradient-to-r from-indigo-500 to-violet-500 bg-clip-text text-transparent">
               PDF et Word
             </span>
           </h1>
           <SectionsPublic>
-            <p className="text-gray-600 text-lg leading-relaxed">
+            <p className="text-gray-600 text-base leading-relaxed">
               Personnalisez votre CV en ligne avec un aperçu en temps réel, puis téléchargez-le gratuitement.
-              <br className="hidden sm:block" />
-              Sans inscription, sans filigrane, optimisés pour les ATS.
             </p>
           </SectionsPublic>
         </div>
       </section>
 
       {/* Grille des modèles */}
-      <section className="max-w-5xl mx-auto w-full px-6 pb-16">
+      <section className="max-w-5xl mx-auto w-full px-6 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {TEMPLATES.map((t) => (
             <CarteTemplate key={t.slug} template={t} />
           ))}
         </div>
       </section>
+
+      {/* CV enregistrés de l'utilisateur (rien si non connecté ou vide) */}
+      <MesCvsEnregistres />
 
       <SectionsPublic>
         {/* Pourquoi nos modèles */}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, ReactNode } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import {
   DndContext,
   closestCenter,
@@ -174,10 +174,10 @@ function FormulaireExperiences({ cv, onChange }: { cv: CVStructure; onChange: (c
             <Champ label="Lieu" valeur={exp.lieu ?? ""} onChange={(v) => majTableau(cv, "experiences", i, { ...exp, lieu: v }, onChange)} />
           </div>
           <Champ label="Dates (ex: Jan 2023 – Aujourd'hui)" valeur={exp.dates} onChange={(v) => majTableau(cv, "experiences", i, { ...exp, dates: v }, onChange)} />
-          <ChampZone
+          <ChampZoneMissions
             label="Missions (une par ligne)"
-            valeur={exp.missions.join("\n")}
-            onChange={(v) => majTableau(cv, "experiences", i, { ...exp, missions: v.split("\n").filter((m) => m.trim().length > 0) }, onChange)}
+            valeur={exp.missions}
+            onChange={(m) => majTableau(cv, "experiences", i, { ...exp, missions: m }, onChange)}
             lignes={4}
             placeholder="Chaque ligne devient une puce dans le CV."
           />
@@ -464,6 +464,35 @@ function Champ({ label, valeur, onChange, placeholder }: { label: string; valeur
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className="px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400"
+      />
+    </label>
+  );
+}
+
+// Variante spécialisée pour les missions : garde les \n dans le textarea pendant la saisie,
+// tout en ne stockant que les lignes non vides dans le tableau parent (pas de puces vides dans le preview).
+function ChampZoneMissions({ label, valeur, onChange, lignes = 3, placeholder }: { label: string; valeur: string[]; onChange: (v: string[]) => void; lignes?: number; placeholder?: string }) {
+  const [texte, setTexte] = useState<string>(() => valeur.join("\n"));
+  useEffect(() => {
+    const filtre = texte.split("\n").filter((m) => m.trim().length > 0);
+    if (filtre.join("\n") !== valeur.join("\n")) {
+      setTexte(valeur.join("\n"));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [valeur]);
+  return (
+    <label className="flex flex-col gap-1">
+      <span className="text-xs font-semibold text-gray-600">{label}</span>
+      <textarea
+        value={texte}
+        onChange={(e) => {
+          const nouveau = e.target.value;
+          setTexte(nouveau);
+          onChange(nouveau.split("\n").filter((m) => m.trim().length > 0));
+        }}
+        rows={lignes}
+        placeholder={placeholder}
+        className="px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-200 focus:border-indigo-400 resize-y"
       />
     </label>
   );

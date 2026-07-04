@@ -1,5 +1,6 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Suspense } from "react";
 import { TEMPLATES, getTemplate, TemplateSlug } from "@/lib/cv-templates";
 import { ogMeta } from "@/lib/seo";
 import EditeurCV from "./EditeurCV";
@@ -61,7 +62,9 @@ export default async function PageModeleCV({ params }: { params: Promise<{ slug:
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <EditeurCV templateSlug={template.slug} />
+      <Suspense fallback={<div className="min-h-screen bg-[#FAFAFA]" />}>
+        <EditeurCV templateSlug={template.slug} />
+      </Suspense>
     </>
   );
 }

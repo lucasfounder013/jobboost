@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json() as {
+    id?: string;
     cv?: CVStructure;
     templateSlug?: string;
     ordreSections?: unknown;
@@ -29,9 +30,31 @@ export async function POST(req: NextRequest) {
   const cv = body.cv;
   const templateSlug: TemplateSlug = body.templateSlug;
   const ordreSections: SectionId[] = normaliserOrdre(body.ordreSections);
-
   const nom = (cv.nom || "Mon CV").slice(0, 200);
 
+  // Mise à jour d'un CV existant
+  if (body.id) {
+    const { rows } = await pool.query(
+      `UPDATE cv_modele
+       SET nom = $1, template_slug = $2, cv_data = $3, ordre_sections = $4, updated_at = now()
+       WHERE id = $5 AND user_id = $6
+       RETURNING id, updated_at`,
+      [
+        nom,
+        templateSlug,
+        JSON.stringify(cv),
+        JSON.stringify(ordreSections),
+        body.id,
+        session.user.id,
+      ]
+    );
+    if (rows.length === 0) {
+      return NextResponse.json({ error: "CV introuvable." }, { status: 404 });
+    }
+    return NextResponse.json({ id: rows[0].id, updatedAt: rows[0].updated_at });
+  }
+
+  // Création d'un nouveau CV
   const { rows } = await pool.query(
     `INSERT INTO cv_modele (user_id, nom, template_slug, cv_data, ordre_sections)
      VALUES ($1, $2, $3, $4, $5)

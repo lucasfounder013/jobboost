@@ -12,11 +12,13 @@ type Props = {
   cv: CVStructure;
   templateSlug: TemplateSlug;
   ordreSections: SectionId[];
+  cvId?: string | null;
+  onSaved?: (id: string) => void;
 };
 
 type Etat = "idle" | "loading" | "saved" | "error";
 
-export default function BoutonEnregistrer({ cv, templateSlug, ordreSections }: Props) {
+export default function BoutonEnregistrer({ cv, templateSlug, ordreSections, cvId, onSaved }: Props) {
   const { data: session, isPending } = useSession();
   const router = useRouter();
   const [etat, setEtat] = useState<Etat>("idle");
@@ -32,18 +34,20 @@ export default function BoutonEnregistrer({ cv, templateSlug, ordreSections }: P
       return;
     }
 
-    // Utilisateur connecté → POST API
+    // Utilisateur connecté → POST API (INSERT ou UPDATE selon présence de cvId)
     setEtat("loading");
     try {
       const reponse = await fetch("/api/cv-modele/sauvegarder", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cv, templateSlug, ordreSections }),
+        body: JSON.stringify({ id: cvId ?? undefined, cv, templateSlug, ordreSections }),
       });
       if (!reponse.ok) {
         const data = await reponse.json().catch(() => ({ error: "Erreur inconnue" }));
         throw new Error(data.error || "Erreur lors de l'enregistrement");
       }
+      const data = (await reponse.json()) as { id?: string };
+      if (data.id && onSaved) onSaved(data.id);
       setEtat("saved");
       // Retour à idle après 3 secondes pour permettre une nouvelle sauvegarde
       setTimeout(() => setEtat("idle"), 3000);
@@ -77,7 +81,7 @@ export default function BoutonEnregistrer({ cv, templateSlug, ordreSections }: P
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
             </svg>
-            Enregistrer ma progression
+            Enregistrer mon CV
           </>
         )}
       </button>
