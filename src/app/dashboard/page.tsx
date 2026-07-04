@@ -296,16 +296,10 @@ function DashboardInner() {
         const pt = data.planType as "starter" | "pro" | null ?? null;
         setPlanType(pt);
         setRhCreditsRestants(data.rhCredits ?? 0);
-        if (data.estAbonne) {
-          setEstAbonne(true);
-          setScansRestants(null);
-          setCreditsRestants(null);
-          setLmCreditsRestants(null);
-        } else {
-          setScansRestants(data.scans ?? 0);
-          setCreditsRestants(data.credits ?? 0);
-          setLmCreditsRestants(data.lmCredits ?? 0);
-        }
+        setEstAbonne(!!data.estAbonne);
+        setScansRestants(data.scans ?? 0);
+        setCreditsRestants(data.credits ?? 0);
+        setLmCreditsRestants(data.lmCredits ?? 0);
       })
       .finally(() => setChargementHistorique(false));
   };
@@ -870,31 +864,43 @@ function DashboardInner() {
             </svg>
             Nouvelle analyse
           </button>
-          {!chargementHistorique && (
-            estAbonne ? (
-              <div className="flex items-center justify-center gap-1.5 text-xs text-emerald-400 font-medium py-1">
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" /></svg>
-                Analyses illimitées
-              </div>
-            ) : (
+          {!chargementHistorique && (() => {
+            // Quotas mensuels par plan (identiques au webhook Stripe qui reset ces valeurs)
+            const limiteScans = planType === "pro" ? 50 : planType === "starter" ? 15 : 3;
+            const limiteCredits = planType === "pro" ? 50 : planType === "starter" ? 10 : 0;
+            const limiteLm = planType === "pro" ? 50 : planType === "starter" ? 10 : 0;
+            const limiteRh = planType === "pro" ? 10 : planType === "starter" ? 2 : 3;
+            return (
               <div className="bg-indigo-900/50 rounded-xl px-3 py-2 flex flex-col gap-1">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-indigo-300">Analyses</span>
-                  <span className="font-bold text-white">{scansRestants ?? 0}/3</span>
+                  <span className="font-bold text-white">{scansRestants ?? 0}/{limiteScans}</span>
                 </div>
                 <div className="w-full bg-indigo-800 rounded-full h-1.5">
                   <div
                     className="h-1.5 rounded-full transition-all bg-indigo-400"
-                    style={{ width: `${Math.max(0, Math.min(100, ((scansRestants ?? 0) / 3) * 100))}%` }}
+                    style={{ width: `${Math.max(0, Math.min(100, ((scansRestants ?? 0) / limiteScans) * 100))}%` }}
                   />
                 </div>
-                {(creditsRestants ?? 0) > 0 && (
+                {limiteCredits > 0 && (
+                  <div className="flex items-center justify-between text-xs mt-0.5">
+                    <span className="text-indigo-300">Adaptation CV</span>
+                    <span className="font-bold text-white">{creditsRestants ?? 0}/{limiteCredits}</span>
+                  </div>
+                )}
+                {limiteCredits === 0 && (creditsRestants ?? 0) > 0 && (
                   <div className="flex items-center justify-between text-xs mt-0.5">
                     <span className="text-indigo-300">Adaptation CV</span>
                     <span className="font-bold text-white">{creditsRestants} crédit</span>
                   </div>
                 )}
-                {(lmCreditsRestants ?? 0) > 0 && (
+                {limiteLm > 0 && (
+                  <div className="flex items-center justify-between text-xs mt-0.5">
+                    <span className="text-indigo-300">Lettre de motivation</span>
+                    <span className="font-bold text-white">{lmCreditsRestants ?? 0}/{limiteLm}</span>
+                  </div>
+                )}
+                {limiteLm === 0 && (lmCreditsRestants ?? 0) > 0 && (
                   <div className="flex items-center justify-between text-xs mt-0.5">
                     <span className="text-indigo-300">Lettre de motivation</span>
                     <span className="font-bold text-white">{lmCreditsRestants} crédit</span>
@@ -903,17 +909,17 @@ function DashboardInner() {
                 {(rhCreditsRestants ?? 0) > 0 && (
                   <div className="flex items-center justify-between text-xs mt-0.5">
                     <span className="text-indigo-300">Trouver un mail pro</span>
-                    <span className="font-bold text-white">{rhCreditsRestants} email{(rhCreditsRestants ?? 0) > 1 ? "s" : ""}</span>
+                    <span className="font-bold text-white">{rhCreditsRestants}/{limiteRh}</span>
                   </div>
                 )}
-                {(scansRestants ?? 0) <= 2 && (
+                {!estAbonne && (scansRestants ?? 0) <= 2 && (
                   <Link href="/pricing" className="mt-1 text-center text-xs font-semibold text-indigo-300 hover:text-white bg-indigo-800/60 hover:bg-indigo-700/60 rounded-lg py-1.5 transition-colors">
                     Passer à l&apos;abonnement →
                   </Link>
                 )}
               </div>
-            )
-          )}
+            );
+          })()}
         </div>
 
         <nav className="flex-1 px-3 pt-6 flex flex-col gap-1">
@@ -927,16 +933,6 @@ function DashboardInner() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
             </svg>
             Dashboard
-          </button>
-
-          <button
-            onClick={() => { setVue("historique"); setSidebarOuverte(false); }}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-indigo-200 hover:bg-indigo-800/60 hover:text-white font-medium text-sm transition-colors text-left"
-          >
-            <svg className="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-            </svg>
-            Mes candidatures
           </button>
 
           <button
