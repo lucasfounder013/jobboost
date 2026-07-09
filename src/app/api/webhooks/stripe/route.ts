@@ -116,6 +116,14 @@ export async function POST(req: NextRequest) {
         } catch (err) {
           console.error("[webhook] Erreur annulation souscription après échec paiement :", err);
         }
+        // Voider la facture pour stopper les relances Stripe côté client (email "Update your payment method")
+        try {
+          if (invoice.id) {
+            await stripe.invoices.voidInvoice(invoice.id);
+          }
+        } catch (err) {
+          console.error("[webhook] Erreur void facture après échec paiement :", err);
+        }
         await pool.query(
           'UPDATE "user" SET is_subscribed = false, stripe_subscription_id = NULL, plan_type = NULL WHERE stripe_subscription_id = $1',
           [subId]
