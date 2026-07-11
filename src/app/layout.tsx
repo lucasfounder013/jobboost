@@ -15,22 +15,22 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.jobboost.fr"),
-  title: "Analysez votre CV face à une offre d'emploi | JobBoost",
+  title: "Analysez votre CV face à une offre d'emploi | Mon Petit Piston",
   description: "Collez votre CV et une offre d'emploi pour obtenir votre score de correspondance, les mots-clés manquants et un CV adapté en quelques secondes.",
   alternates: {
     canonical: "https://www.jobboost.fr",
   },
   openGraph: {
-    title: "Analysez votre CV face à une offre d'emploi | JobBoost",
+    title: "Analysez votre CV face à une offre d'emploi | Mon Petit Piston",
     description: "Collez votre CV et une offre d'emploi pour obtenir votre score de correspondance, les mots-clés manquants et un CV adapté en quelques secondes.",
     url: "https://www.jobboost.fr",
-    siteName: "JobBoost",
+    siteName: "Mon Petit Piston",
     locale: "fr_FR",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Analysez votre CV face à une offre d'emploi | JobBoost",
+    title: "Analysez votre CV face à une offre d'emploi | Mon Petit Piston",
     description: "Collez votre CV et une offre d'emploi pour obtenir votre score de correspondance, les mots-clés manquants et un CV adapté en quelques secondes.",
   },
   verification: {
