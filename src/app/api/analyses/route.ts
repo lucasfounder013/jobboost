@@ -21,11 +21,13 @@ export async function GET() {
             f.fichier_nom AS cv_fichier_nom,
             f.fichier_type AS cv_fichier_type,
             lm.id AS lettre_id,
-            lm.lettre_texte AS lettre_texte
+            lm.lettre_texte AS lettre_texte,
+            cand.id AS candidature_id
      FROM analyses a
      LEFT JOIN cv_adapte cv ON cv.analyse_id = a.id
      LEFT JOIN cv_fichier_original f ON f.analyse_id = a.id::text
      LEFT JOIN lettres_motivation lm ON lm.analyse_id = a.id::text AND lm.user_id = $1
+     LEFT JOIN candidatures cand ON cand.analyse_id = a.id AND cand.user_id = $1
      WHERE a.user_id = $1
      ORDER BY a.created_at DESC`,
     [session.user.id]

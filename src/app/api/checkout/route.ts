@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
         mode: "subscription",
         line_items: [{ price: priceId, quantity: 1 }],
         success_url: `${baseUrl}/success`,
-        cancel_url: `${baseUrl}/dashboard`,
+        cancel_url: `${baseUrl}/analyses`,
         metadata: { userId: session.user.id, plan },
       });
     } catch {
@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
         mode: "subscription",
         line_items: [{ price: priceId, quantity: 1 }],
         success_url: `${baseUrl}/success`,
-        cancel_url: `${baseUrl}/dashboard`,
+        cancel_url: `${baseUrl}/analyses`,
         metadata: { userId: session.user.id, plan },
       });
     }

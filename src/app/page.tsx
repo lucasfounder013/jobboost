@@ -81,10 +81,10 @@ export default function PagePrincipale() {
       setErreur("Veuillez remplir les deux champs.");
       return;
     }
-    // Connecté ou non : on sauvegarde et on redirige vers le dashboard (ou login)
+    // Connecté ou non : on sauvegarde et on redirige vers /analyses (ou register)
     posthog?.capture("analyse_lancee", { connecte: !!session });
     localStorage.setItem("pendingAnalysis", JSON.stringify({ cv, offre, nomFichier }));
-    router.push(session ? "/dashboard" : "/register");
+    router.push(session ? "/analyses" : "/register");
   }
 
   return (

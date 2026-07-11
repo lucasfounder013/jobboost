@@ -73,7 +73,7 @@ export function email1({ nom, unsubscribeUrl }: EmailProps): EmailTemplate {
   `;
   return {
     subject: `Bienvenue sur JobBoost, ${nom.split(" ")[0]}`,
-    html: base(contenu, "Analyser mon CV maintenant →", `${appUrl}/dashboard`, unsubscribeUrl),
+    html: base(contenu, "Analyser mon CV maintenant →", `${appUrl}/analyses?vue=nouvelle-analyse`, unsubscribeUrl),
   };
 }
 
@@ -88,7 +88,7 @@ export function email2({ nom, unsubscribeUrl }: EmailProps): EmailTemplate {
   `;
   return {
     subject: "Avez-vous testé votre CV ?",
-    html: base(contenu, "Tester mon CV gratuitement →", `${appUrl}/dashboard`, unsubscribeUrl),
+    html: base(contenu, "Tester mon CV gratuitement →", `${appUrl}/analyses?vue=nouvelle-analyse`, unsubscribeUrl),
   };
 }
 
@@ -116,7 +116,7 @@ export function email3({ nom, unsubscribeUrl, poste }: EmailProps): EmailTemplat
   `;
   return {
     subject,
-    html: base(contenu, "Analyser mon CV →", `${appUrl}/dashboard`, unsubscribeUrl),
+    html: base(contenu, "Analyser mon CV →", `${appUrl}/analyses?vue=nouvelle-analyse`, unsubscribeUrl),
   };
 }
 
@@ -149,7 +149,7 @@ export function email4({ nom, unsubscribeUrl, poste }: EmailProps): EmailTemplat
   `;
   return {
     subject,
-    html: base(contenu, "Générer ma lettre de motivation →", `${appUrl}/dashboard`, unsubscribeUrl),
+    html: base(contenu, "Générer ma lettre de motivation →", `${appUrl}/analyses?vue=nouvelle-analyse`, unsubscribeUrl),
   };
 }
 

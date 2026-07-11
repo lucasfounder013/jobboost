@@ -63,7 +63,7 @@ export default function PageRechercheEmail() {
               Accédez aux emails professionnels des responsables recrutement pour envoyer vos candidatures directement, sans intermédiaire.
             </p>
             <Link
-              href="/register?redirect=%2Fdashboard%3Fvue%3Dtrouver-rh"
+              href="/register?redirect=%2Fanalyses%3Fvue%3Dtrouver-rh"
               className="inline-block bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500 text-white px-10 py-4 rounded-xl font-bold text-lg shadow-xl shadow-indigo-200 hover:shadow-indigo-300 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
             >
               Trouver mon premier contact →
@@ -195,7 +195,7 @@ export default function PageRechercheEmail() {
         <section className="px-6 py-20">
           <div className="max-w-2xl mx-auto text-center">
             <Link
-              href="/register?redirect=%2Fdashboard%3Fvue%3Dtrouver-rh"
+              href="/register?redirect=%2Fanalyses%3Fvue%3Dtrouver-rh"
               className="inline-block bg-gradient-to-r from-indigo-500 to-violet-500 text-white font-bold px-10 py-4 rounded-xl shadow-xl shadow-indigo-200 hover:shadow-indigo-300 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200"
             >
               Trouver mon premier contact →

@@ -56,7 +56,7 @@ export default function CvApercuPage() {
         setData(JSON.parse(rawResult));
         setChargement(false);
       } catch {
-        router.replace("/dashboard");
+        router.replace("/analyses");
       }
       return;
     }
@@ -67,7 +67,7 @@ export default function CvApercuPage() {
       try {
         params = JSON.parse(rawParams);
       } catch {
-        router.replace("/dashboard");
+        router.replace("/analyses");
         return;
       }
 
@@ -134,7 +134,7 @@ export default function CvApercuPage() {
     }
 
     // Ni params ni result → retour dashboard
-    router.replace("/dashboard");
+    router.replace("/analyses");
   }, [router]);
 
   if (chargement) {
@@ -175,7 +175,7 @@ export default function CvApercuPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-500 mb-4">{erreur || "Données introuvables."}</p>
-          <Link href="/dashboard" className="text-indigo-600 font-semibold hover:underline">← Retour au dashboard</Link>
+          <Link href="/analyses" className="text-indigo-600 font-semibold hover:underline">← Retour aux analyses</Link>
         </div>
       </div>
     );
@@ -246,13 +246,13 @@ export default function CvApercuPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <Link
-              href="/dashboard"
+              href="/analyses"
               className="flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-gray-800 transition-colors shrink-0"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
               </svg>
-              Dashboard
+              Analyses
             </Link>
             <span className="text-gray-300 hidden sm:block">/</span>
             <span className="text-sm font-semibold text-gray-800 hidden sm:block">Aperçu CV adapté</span>

@@ -58,8 +58,9 @@ function FormulaireInscription() {
         );
       } else {
         posthog?.identify(email, { email, name: `${prenom} ${nom}`.trim() });
-        posthog?.capture("user_registered", { redirect: redirectApres ?? "/dashboard" });
-        router.push(redirectApres ?? "/dashboard");
+        const cible = redirectApres ?? (localStorage.getItem("pendingAnalysis") ? "/analyses" : "/dashboard");
+        posthog?.capture("user_registered", { redirect: cible });
+        router.push(cible);
       }
     } catch {
       setErreur("Une erreur est survenue. Veuillez réessayer.");
