@@ -66,9 +66,6 @@ export default function PagePrincipale() {
   const [nomFichier, setNomFichier] = useState("");
   const [extractionEnCours, setExtractionEnCours] = useState(false);
   const [dragActif, setDragActif] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [videoLu, setVideoLu] = useState(false);
-  const [muet, setMuet] = useState(true);
   const briquesContainerRef = useRef<HTMLDivElement>(null);
   // Effet "stacked cards on scroll" (façon gojiberry.ai) : chaque carte se
   // réduit/s'estompe légèrement quand la suivante vient la recouvrir, piloté
@@ -190,56 +187,15 @@ export default function PagePrincipale() {
               </div>
             </div>
 
-            {/* Lecteur vidéo */}
+            {/* Placeholder démo */}
             <div className="relative rounded-b-xl overflow-hidden border border-gray-200 aspect-video bg-gray-900">
-              <video
-                ref={videoRef}
-                muted={muet}
-                loop
-                autoPlay
-                playsInline
-                onPlay={() => setVideoLu(true)}
-                className="w-full h-full object-cover"
-              >
-                <source src="/videos/demo-jobboost.mp4" type="video/mp4" />
-              </video>
-
-              {!videoLu && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-indigo-600 to-violet-700 text-white">
-                  <span className="w-16 h-16 rounded-full bg-white/15 backdrop-blur flex items-center justify-center">
-                    <svg className="w-7 h-7 translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </span>
-                  <p className="text-sm font-medium text-white/80">Démo vidéo à venir</p>
-                </div>
-              )}
-
-              {/* Barre de contrôle */}
-              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-3 bg-black/60 backdrop-blur rounded-full px-4 py-2 text-white/80">
-                <button
-                  onClick={() => (videoRef.current?.paused ? videoRef.current?.play() : videoRef.current?.pause())}
-                  aria-label="Lecture / Pause"
-                >
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-indigo-600 to-violet-700 text-white">
+                <span className="w-16 h-16 rounded-full bg-white/15 backdrop-blur flex items-center justify-center">
+                  <svg className="w-7 h-7 translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
-                </button>
-                <div className="w-24 h-1 rounded-full bg-white/30 sm:w-40" />
-                <button
-                  onClick={() => setMuet((v) => !v)}
-                  aria-label="Son"
-                >
-                  {muet ? (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 14l2 2m0-2l-2 2M9 9H5a1 1 0 00-1 1v4a1 1 0 001 1h4l5 4V5L9 9z" />
-                    </svg>
-                  ) : (
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.536 8.464a5 5 0 010 7.072M9 9H5a1 1 0 00-1 1v4a1 1 0 001 1h4l5 4V5L9 9z" />
-                    </svg>
-                  )}
-                </button>
+                </span>
+                <p className="text-sm font-medium text-white/80">Démo vidéo à venir</p>
               </div>
             </div>
           </Reveal>
