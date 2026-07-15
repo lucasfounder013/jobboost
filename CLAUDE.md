@@ -104,3 +104,31 @@ npm run lint   # Vérifier le code
 - CV d'exemple : `src/lib/cv-exemple.ts` (Marie Dupont)
 - Persistance navigateur uniquement (localStorage) — clés préfixées `jobboost:*` (conservées après le rebrand pour ne pas perdre les brouillons utilisateurs) : `jobboost:modeles-cv:cv`, `jobboost:modeles-cv:template`, `jobboost:funnel:cv-prefill`. Helpers : `src/lib/cv-localstorage.ts`
 - Route `/api/exporter-cv` accepte `template?` optionnel (défaut `"classique-ats"`) → dispatch PDF + DOCX selon le slug
+
+## Routine de session (Augustin & Lucas)
+
+### 🟢 Début de session
+```bash
+cd jobboost
+git pull          # récupérer le travail de l'autre
+npm install       # au cas où de nouvelles dépendances
+npm run dev       # site sur http://localhost:3000 (laisser ce terminal ouvert)
+```
+Puis dans un **2e terminal** : `cd jobboost` → `claude`
+
+### 🔴 Fin de session
+```bash
+git add .
+git commit -m "Description claire de ce qui a été fait"
+git pull          # toujours pull AVANT push
+git push
+```
+Puis Ctrl+C dans le terminal du serveur.
+
+### ⚠️ Règles d'or
+- **Commits toujours à la main dans le terminal** — jamais via Claude Code (email noreply@anthropic.com → bloque Vercel)
+- **Prévenir l'autre sur WhatsApp** avant de toucher un fichier sensible (évite les conflits)
+- Ne jamais lancer `npm audit fix --force`
+- Ne jamais commiter de secrets (`.env.local` reste local)
+
+**IMPORTANT pour Claude Code** : rappelle cette routine à Augustin ou Lucas dès qu'une session commence (checklist début de session) ou se termine (checklist fin de session + règles d'or), sans attendre qu'on te le demande.
