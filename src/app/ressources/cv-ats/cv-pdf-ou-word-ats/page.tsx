@@ -5,11 +5,11 @@ import ShareButtons from "../quest-ce-qu-un-ats/ShareButtons";
 import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
-  title: "PDF ou Word : quel format de CV passe vraiment mieux les ATS ? | JobBoost",
+  title: "PDF ou Word : quel format de CV passe vraiment mieux les ATS ? | Rivjob",
   description:
     "PDF ou Word ? La réponse n'est pas celle que vous croyez. On démonte les idées reçues sur le format de CV idéal pour les ATS.",
   ...ogMeta(
-    "PDF ou Word : quel format de CV passe vraiment mieux les ATS ? | JobBoost",
+    "PDF ou Word : quel format de CV passe vraiment mieux les ATS ? | Rivjob",
     "PDF ou Word ? La réponse n'est pas celle que vous croyez. On démonte les idées reçues sur le format de CV idéal pour les ATS.",
     "/ressources/cv-ats/cv-pdf-ou-word-ats"
   ),
@@ -22,7 +22,7 @@ const TOC = [
   { id: "pdf-ou-word",          titre: "Alors PDF ou Word ?",                               niveau: 2 },
   { id: "ce-qui-compte",        titre: "Ce qui compte vraiment",                            niveau: 2 },
   { id: "regles-mise-en-page",  titre: "Les règles de mise en page qui font la différence", niveau: 2 },
-  { id: "ce-que-fait-jobboost", titre: "Ce que fait JobBoost",                              niveau: 2 },
+  { id: "ce-que-fait-rivjob", titre: "Ce que fait Rivjob",                              niveau: 2 },
   { id: "retenir",              titre: "Ce qu'il faut retenir",                             niveau: 2 },
 ];
 
@@ -43,7 +43,7 @@ export default function ArticlePDFouWord() {
         </div>
 
         <ArticleJsonLd
-          titre="PDF ou Word : quel format de CV passe vraiment mieux les ATS ? | JobBoost"
+          titre="PDF ou Word : quel format de CV passe vraiment mieux les ATS ? | Rivjob"
           description="PDF ou Word ? La réponse n'est pas celle que vous croyez. On démonte les idées reçues sur le format de CV idéal pour les ATS."
           slug="/ressources/cv-ats/cv-pdf-ou-word-ats"
           datePublication="2026-05-14"
@@ -69,9 +69,9 @@ export default function ArticlePDFouWord() {
             {/* Méta-ligne */}
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-10 pb-10 border-b border-gray-100">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-extrabold">JB</span>
+                <span className="text-white text-[10px] font-extrabold">RJ</span>
               </div>
-              <span className="font-medium text-gray-700">JobBoost</span>
+              <span className="font-medium text-gray-700">Rivjob</span>
               <span className="text-gray-300">|</span>
               <span>14 mai 2026</span>
               <span className="text-gray-300">|</span>
@@ -221,11 +221,11 @@ export default function ArticlePDFouWord() {
             </ul>
 
             {/* Section 7 */}
-            <h2 id="ce-que-fait-jobboost" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
-              Ce que fait JobBoost
+            <h2 id="ce-que-fait-rivjob" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
+              Ce que fait Rivjob
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              JobBoost analyse votre CV face à une offre d&apos;emploi spécifique et identifie ce qui pourrait poser problème, que ce soit le format, la structure ou les mots-clés.
+              Rivjob analyse votre CV face à une offre d&apos;emploi spécifique et identifie ce qui pourrait poser problème, que ce soit le format, la structure ou les mots-clés.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               L&apos;objectif : que votre CV soit lu correctement, puis trouvé par le bon recruteur.

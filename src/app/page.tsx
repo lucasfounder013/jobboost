@@ -9,7 +9,7 @@ import Footer from "@/components/Footer";
 
 const FAQ = [
   {
-    q: "JobBoost est-il vraiment gratuit ?",
+    q: "Rivjob est-il vraiment gratuit ?",
     r: "Oui. L'analyse CV vs offre (score + mots-clés manquants) est gratuite pour les 3 premières analyses. Au-delà, un abonnement Starter (4,99 €/mois) ou Pro (9,99 €/mois) débloque davantage d'analyses et d'adaptations chaque mois.",
   },
   {
@@ -18,7 +18,7 @@ const FAQ = [
   },
   {
     q: "Quels formats de CV sont acceptés ?",
-    r: "JobBoost accepte les fichiers PDF et DOCX jusqu'à 5 Mo, ainsi que le copier-coller de texte brut. Les PDF scannés (images sans couche texte) ne sont pas supportés.",
+    r: "Rivjob accepte les fichiers PDF et DOCX jusqu'à 5 Mo, ainsi que le copier-coller de texte brut. Les PDF scannés (images sans couche texte) ne sont pas supportés.",
   },
   {
     q: "Puis-je annuler mon abonnement à tout moment ?",
@@ -129,10 +129,10 @@ export default function PagePrincipale() {
                 Démonstration
               </span>
               <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-4">
-                La différence JobBoost en un coup d&apos;œil
+                La différence Rivjob en un coup d&apos;œil
               </h2>
               <p className="text-gray-500 text-base max-w-xl mx-auto">
-                Voyez par vous-même ce que JobBoost transforme sur votre CV.
+                Voyez par vous-même ce que Rivjob transforme sur votre CV.
               </p>
             </div>
 
@@ -141,7 +141,7 @@ export default function PagePrincipale() {
               {/* ── Carte AVANT ── */}
               <div className="rounded-xl shadow-xl overflow-hidden ring-2 ring-red-100">
                 <div className="px-5 py-3 flex items-center justify-between bg-red-50 border-b border-red-100">
-                  <span className="text-xs font-bold text-red-600">Avant JobBoost</span>
+                  <span className="text-xs font-bold text-red-600">Avant Rivjob</span>
                   <span className="text-sm font-extrabold px-3 py-1 rounded-full bg-red-100 text-red-700">Score de correspondance : 34 / 100</span>
                 </div>
                 <div className="relative overflow-hidden max-h-[680px] flex font-sans text-[11px] text-gray-900 leading-snug">
@@ -306,7 +306,7 @@ export default function PagePrincipale() {
               {/* ── Carte APRÈS ── */}
               <div className="rounded-xl shadow-xl overflow-hidden ring-2 ring-emerald-100">
                 <div className="px-5 py-3 flex items-center justify-between bg-emerald-50 border-b border-emerald-100">
-                  <span className="text-xs font-bold text-emerald-700">Après JobBoost</span>
+                  <span className="text-xs font-bold text-emerald-700">Après Rivjob</span>
                   <span className="text-sm font-extrabold px-3 py-1 rounded-full bg-emerald-100 text-emerald-700">Score de correspondance : 91 / 100</span>
                 </div>
                 <div className="relative">
@@ -632,7 +632,7 @@ export default function PagePrincipale() {
                   initiales: "LB",
                   prenom: "Laura B.",
                   poste: "Responsable RH",
-                  citation: "Je recommande JobBoost à tous mes candidats. L'outil est simple, rapide et les résultats sont concrets.",
+                  citation: "Je recommande Rivjob à tous mes candidats. L'outil est simple, rapide et les résultats sont concrets.",
                 },
               ].map(({ initiales, prenom, poste, citation }) => (
                 <div key={prenom} className="bg-white rounded-2xl shadow-sm ring-1 ring-indigo-100 p-6 flex flex-col gap-4">

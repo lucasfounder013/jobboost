@@ -5,11 +5,11 @@ import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
-  title: "Préparer son CV pour les ATS : le guide pratique | JobBoost",
+  title: "Préparer son CV pour les ATS : le guide pratique | Rivjob",
   description:
     "Comment préparer son CV pour les ATS en 2026 ? Format, structure, mots-clés, rubriques : le guide pratique pour qu'il soit bien parsé et bien trouvé.",
   ...ogMeta(
-    "Préparer son CV pour les ATS : le guide pratique | JobBoost",
+    "Préparer son CV pour les ATS : le guide pratique | Rivjob",
     "Comment préparer son CV pour les ATS en 2026 ? Format, structure, mots-clés, rubriques : le guide pratique pour qu'il soit bien parsé et bien trouvé.",
     "/ressources/cv-ats/preparer-son-cv-pour-les-ats"
   ),
@@ -43,7 +43,7 @@ export default function ArticlePreparerCvAts() {
         </div>
 
         <ArticleJsonLd
-          titre="Préparer son CV pour les ATS : le guide pratique | JobBoost"
+          titre="Préparer son CV pour les ATS : le guide pratique | Rivjob"
           description="Comment préparer son CV pour les ATS en 2026 ? Format, structure, mots-clés, rubriques : le guide pratique pour qu'il soit bien parsé et bien trouvé."
           slug="/ressources/cv-ats/preparer-son-cv-pour-les-ats"
           datePublication="2026-06-18"
@@ -69,9 +69,9 @@ export default function ArticlePreparerCvAts() {
             {/* Méta-ligne */}
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-10 pb-10 border-b border-gray-100">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-extrabold">JB</span>
+                <span className="text-white text-[10px] font-extrabold">RJ</span>
               </div>
-              <span className="font-medium text-gray-700">JobBoost</span>
+              <span className="font-medium text-gray-700">Rivjob</span>
               <span className="text-gray-300">|</span>
               <span>18 juin 2026</span>
               <span className="text-gray-300">|</span>
@@ -251,7 +251,7 @@ export default function ArticlePreparerCvAts() {
               Le test le plus simple : copiez-collez tout le texte de votre CV dans un bloc-notes. Ce que vous voyez est ce que l&apos;ATS extrait. Si c&apos;est lisible et ordonné, c&apos;est bon. Si c&apos;est mélangé, retravaillez la mise en page.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Pour aller plus loin, utilisez un outil comme JobBoost qui analyse automatiquement la correspondance entre votre CV et une offre d&apos;emploi précise. Notre article sur <Link href="/ressources/cv-ats/tester-son-cv-ats-gratuitement" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">comment tester son CV ATS gratuitement</Link> détaille les trois méthodes.
+              Pour aller plus loin, utilisez un outil comme Rivjob qui analyse automatiquement la correspondance entre votre CV et une offre d&apos;emploi précise. Notre article sur <Link href="/ressources/cv-ats/tester-son-cv-ats-gratuitement" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">comment tester son CV ATS gratuitement</Link> détaille les trois méthodes.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Il identifie les mots-clés manquants et vous indique exactement quoi ajuster.

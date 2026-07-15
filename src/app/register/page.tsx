@@ -76,7 +76,7 @@ function FormulaireInscription() {
       <div className="flex-1 flex flex-col items-center justify-center bg-gray-50 px-8 py-12">
         <div className="w-full max-w-sm">
           <Link href="/" className="text-2xl font-bold text-indigo-600 mb-8 block">
-            JobBoost
+            Rivjob
           </Link>
 
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Créer un compte</h1>

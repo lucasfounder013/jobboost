@@ -9,7 +9,7 @@ type EmailTemplate = {
   html: string;
 };
 
-const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.jobboost.fr";
+const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.rivjob.ai";
 
 function base(contenu: string, ctaTexte: string, ctaUrl: string, unsubscribeUrl: string): string {
   return `<!DOCTYPE html>
@@ -17,7 +17,7 @@ function base(contenu: string, ctaTexte: string, ctaUrl: string, unsubscribeUrl:
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JobBoost</title>
+  <title>Rivjob</title>
 </head>
 <body style="margin:0;padding:0;background:#f4f4f5;font-family:system-ui,-apple-system,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 16px;">
@@ -28,7 +28,7 @@ function base(contenu: string, ctaTexte: string, ctaUrl: string, unsubscribeUrl:
           <!-- Header -->
           <tr>
             <td style="background:#4f46e5;border-radius:12px 12px 0 0;padding:20px 32px;">
-              <span style="color:#fff;font-size:18px;font-weight:700;letter-spacing:-0.3px;">JobBoost</span>
+              <span style="color:#fff;font-size:18px;font-weight:700;letter-spacing:-0.3px;">Rivjob</span>
             </td>
           </tr>
 
@@ -48,7 +48,7 @@ function base(contenu: string, ctaTexte: string, ctaUrl: string, unsubscribeUrl:
           <tr>
             <td style="background:#f9fafb;border-radius:0 0 12px 12px;padding:16px 32px;border-top:1px solid #e5e7eb;">
               <p style="margin:0;font-size:12px;color:#9ca3af;line-height:1.6;">
-                Vous recevez cet email car vous avez créé un compte sur <a href="${appUrl}" style="color:#6366f1;text-decoration:none;">jobboost.fr</a>.<br/>
+                Vous recevez cet email car vous avez créé un compte sur <a href="${appUrl}" style="color:#6366f1;text-decoration:none;">rivjob.ai</a>.<br/>
                 <a href="${unsubscribeUrl}" style="color:#9ca3af;">Se désabonner</a>
               </p>
             </td>
@@ -67,12 +67,12 @@ export function email1({ nom, unsubscribeUrl }: EmailProps): EmailTemplate {
   const prenom = nom.split(" ")[0];
   const contenu = `
     <p style="margin:0 0 16px;">Bonjour ${prenom},</p>
-    <p style="margin:0 0 16px;">Bienvenue sur JobBoost !</p>
-    <p style="margin:0 0 16px;">JobBoost analyse votre CV face à une offre d'emploi et vous dit exactement ce qui manque pour passer les filtres automatiques des recruteurs.</p>
+    <p style="margin:0 0 16px;">Bienvenue sur Rivjob !</p>
+    <p style="margin:0 0 16px;">Rivjob analyse votre CV face à une offre d'emploi et vous dit exactement ce qui manque pour passer les filtres automatiques des recruteurs.</p>
     <p style="margin:0;">C'est gratuit, ça prend moins de 30 secondes, et vous obtenez un score immédiat avec les mots-clés manquants.</p>
   `;
   return {
-    subject: `Bienvenue sur JobBoost, ${nom.split(" ")[0]}`,
+    subject: `Bienvenue sur Rivjob, ${nom.split(" ")[0]}`,
     html: base(contenu, "Analyser mon CV maintenant →", `${appUrl}/analyses?vue=nouvelle-analyse`, unsubscribeUrl),
   };
 }
@@ -84,7 +84,7 @@ export function email2({ nom, unsubscribeUrl }: EmailProps): EmailTemplate {
     <p style="margin:0 0 16px;">Bonjour ${prenom},</p>
     <p style="margin:0 0 16px;">La plupart des candidats envoient le même CV à toutes les offres et attendent. Résultat : peu de réponses, beaucoup de silence.</p>
     <p style="margin:0 0 16px;">Ce que vous gagnez en adaptant votre CV à chaque offre : un taux de réponse plus élevé, moins de candidatures dans le vide, et une vraie visibilité auprès des recruteurs qui cherchent exactement votre profil.</p>
-    <p style="margin:0;">JobBoost vous montre en 30 secondes ce qui manque dans votre CV pour cette offre précise.</p>
+    <p style="margin:0;">Rivjob vous montre en 30 secondes ce qui manque dans votre CV pour cette offre précise.</p>
   `;
   return {
     subject: "Avez-vous testé votre CV ?",
@@ -112,7 +112,7 @@ export function email3({ nom, unsubscribeUrl, poste }: EmailProps): EmailTemplat
       <li style="margin-bottom:8px;">Un format lisible par l'ATS (PDF texte ou Word, pas d'image)</li>
       <li style="margin-bottom:8px;">Des sections bien structurées (expériences, compétences, formation)</li>
     </ul>
-    <p style="margin:0;">JobBoost analyse votre CV face à une offre et vous montre exactement quels mots-clés ajouter pour apparaître dans les recherches du recruteur.</p>
+    <p style="margin:0;">Rivjob analyse votre CV face à une offre et vous montre exactement quels mots-clés ajouter pour apparaître dans les recherches du recruteur.</p>
   `;
   return {
     subject,
@@ -145,7 +145,7 @@ export function email4({ nom, unsubscribeUrl, poste }: EmailProps): EmailTemplat
       <li style="margin-bottom:8px;">"Ma candidature saura répondre à vos attentes" : formule creuse</li>
       <li style="margin-bottom:8px;">Répéter le contenu du CV mot pour mot</li>
     </ul>
-    <p style="margin:0;">JobBoost génère une lettre sobre et personnalisée à partir de votre CV et de l'offre.</p>
+    <p style="margin:0;">Rivjob génère une lettre sobre et personnalisée à partir de votre CV et de l'offre.</p>
   `;
   return {
     subject,
@@ -173,7 +173,7 @@ export function email5({ nom, unsubscribeUrl, poste }: EmailProps): EmailTemplat
       <li style="margin-bottom:10px;"><strong>Ils écrivent une lettre courte et directe.</strong> Trois paragraphes, des faits concrets, zéro formule creuse.</li>
       <li style="margin-bottom:10px;"><strong>Ils candidatent tôt.</strong> Les offres publiées depuis moins de 3 jours reçoivent 4 fois moins de candidatures que celles publiées depuis une semaine.</li>
     </ol>
-    <p style="margin:0 0 16px;">JobBoost automatise les étapes 1, 2 et 4 : l'analyse ATS, l'adaptation du CV et la génération de lettre de motivation.</p>
+    <p style="margin:0 0 16px;">Rivjob automatise les étapes 1, 2 et 4 : l'analyse ATS, l'adaptation du CV et la génération de lettre de motivation.</p>
     <p style="margin:0;">Avec l'abonnement, toutes ces fonctionnalités sont illimitées.</p>
   `;
   return {
@@ -189,7 +189,7 @@ export function triggerRH({ nom, unsubscribeUrl }: EmailProps): EmailTemplate {
     <p style="margin:0 0 16px;">Bonjour ${prenom},</p>
     <p style="margin:0 0 16px;">Vous avez utilisé votre recherche de contact RH gratuite.</p>
     <p style="margin:0 0 16px;">Trouver le bon interlocuteur avant d'envoyer une candidature augmente significativement vos chances d'obtenir une réponse. Une candidature adressée directement à un RH ou un manager est lue bien plus souvent qu'une candidature déposée sur une plateforme.</p>
-    <p style="margin:0;">Avec l'abonnement JobBoost, vous débloquez des recherches illimitées pour toutes vos candidatures.</p>
+    <p style="margin:0;">Avec l'abonnement Rivjob, vous débloquez des recherches illimitées pour toutes vos candidatures.</p>
   `;
   return {
     subject: "Votre recherche RH gratuite a été utilisée",
@@ -210,7 +210,7 @@ export function triggerScans({ nom, unsubscribeUrl, poste }: EmailProps): EmailT
     <p style="margin:0 0 16px;">Bonjour ${prenom},</p>
     ${ouverture}
     <p style="margin:0 0 16px;">Chaque offre d'emploi est différente. Un CV non adapté passe rarement les filtres ATS, même avec une bonne expérience. Analyser votre CV à chaque nouvelle candidature est la façon la plus efficace d'augmenter votre taux de réponse.</p>
-    <p style="margin:0;">Avec l'abonnement JobBoost, toutes vos analyses sont illimitées.</p>
+    <p style="margin:0;">Avec l'abonnement Rivjob, toutes vos analyses sont illimitées.</p>
   `;
   return {
     subject,

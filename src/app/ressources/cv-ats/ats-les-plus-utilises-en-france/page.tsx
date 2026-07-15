@@ -5,11 +5,11 @@ import ShareButtons from "../quest-ce-qu-un-ats/ShareButtons";
 import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
-  title: "Les ATS les plus utilisés en France, et ce que ça change pour vous | JobBoost",
+  title: "Les ATS les plus utilisés en France, et ce que ça change pour vous | Rivjob",
   description:
     "Workday, Taleo, SAP, Greenhouse, Welcome to the Jungle... Quels ATS les entreprises françaises utilisent vraiment, et est-ce que ça change quelque chose pour votre CV ?",
   ...ogMeta(
-    "Les ATS les plus utilisés en France, et ce que ça change pour vous | JobBoost",
+    "Les ATS les plus utilisés en France, et ce que ça change pour vous | Rivjob",
     "Workday, Taleo, SAP, Greenhouse, Welcome to the Jungle... Quels ATS les entreprises françaises utilisent vraiment, et est-ce que ça change quelque chose pour votre CV ?",
     "/ressources/cv-ats/ats-les-plus-utilises-en-france"
   ),
@@ -23,7 +23,7 @@ const TOC = [
   { id: "greenhouse",           titre: "Greenhouse, le favori des startups et scaleups",     niveau: 2 },
   { id: "welcome",              titre: "Welcome to the Jungle, le cas particulier",           niveau: 2 },
   { id: "ca-change-vraiment",   titre: "Est-ce que ça change vraiment quelque chose ?",      niveau: 2 },
-  { id: "ce-que-fait-jobboost", titre: "Ce que fait JobBoost",                               niveau: 2 },
+  { id: "ce-que-fait-rivjob", titre: "Ce que fait Rivjob",                               niveau: 2 },
   { id: "retenir",              titre: "Ce qu'il faut retenir",                              niveau: 2 },
 ];
 
@@ -44,7 +44,7 @@ export default function ArticleATSLesPlusUtilises() {
         </div>
 
         <ArticleJsonLd
-          titre="Les ATS les plus utilisés en France, et ce que ça change pour vous | JobBoost"
+          titre="Les ATS les plus utilisés en France, et ce que ça change pour vous | Rivjob"
           description="Workday, Taleo, SAP, Greenhouse, Welcome to the Jungle... Quels ATS les entreprises françaises utilisent vraiment, et est-ce que ça change quelque chose pour votre CV ?"
           slug="/ressources/cv-ats/ats-les-plus-utilises-en-france"
           datePublication="2026-05-20"
@@ -70,9 +70,9 @@ export default function ArticleATSLesPlusUtilises() {
             {/* Méta-ligne */}
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-10 pb-10 border-b border-gray-100">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-extrabold">JB</span>
+                <span className="text-white text-[10px] font-extrabold">RJ</span>
               </div>
-              <span className="font-medium text-gray-700">JobBoost</span>
+              <span className="font-medium text-gray-700">Rivjob</span>
               <span className="text-gray-300">|</span>
               <span>20 mai 2026</span>
               <span className="text-gray-300">|</span>
@@ -225,11 +225,11 @@ export default function ArticleATSLesPlusUtilises() {
             </p>
 
             {/* Section 8 */}
-            <h2 id="ce-que-fait-jobboost" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
-              Ce que fait JobBoost
+            <h2 id="ce-que-fait-rivjob" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
+              Ce que fait Rivjob
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Peu importe l&apos;ATS que l&apos;entreprise utilise, JobBoost analyse la correspondance entre votre CV et l&apos;offre d&apos;emploi.
+              Peu importe l&apos;ATS que l&apos;entreprise utilise, Rivjob analyse la correspondance entre votre CV et l&apos;offre d&apos;emploi.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Il identifie les mots-clés présents dans l&apos;offre qui manquent dans votre CV, ceux que le recruteur tapera dans sa barre de recherche.

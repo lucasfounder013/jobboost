@@ -5,11 +5,11 @@ import ShareButtons from "../quest-ce-qu-un-ats/ShareButtons";
 import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
-  title: "Ce que voit le recruteur dans son ATS quand il reçoit votre CV | JobBoost",
+  title: "Ce que voit le recruteur dans son ATS quand il reçoit votre CV | Rivjob",
   description:
     "Vous imaginez un algorithme qui juge votre CV. Voici ce que voit vraiment un recruteur dans son ATS, et ce qui attire son attention en premier.",
   ...ogMeta(
-    "Ce que voit le recruteur dans son ATS quand il reçoit votre CV | JobBoost",
+    "Ce que voit le recruteur dans son ATS quand il reçoit votre CV | Rivjob",
     "Vous imaginez un algorithme qui juge votre CV. Voici ce que voit vraiment un recruteur dans son ATS, et ce qui attire son attention en premier.",
     "/ressources/cv-ats/ce-que-voit-le-recruteur-dans-son-ats"
   ),
@@ -22,7 +22,7 @@ const TOC = [
   { id: "ensuite",          titre: "Ce qu'il fait ensuite",                            niveau: 2 },
   { id: "ne-voit-pas",      titre: "Ce que le recruteur ne voit pas",                 niveau: 2 },
   { id: "change-pour-cv",   titre: "Ce que ça change pour votre CV",                  niveau: 2 },
-  { id: "ce-que-fait-jobboost", titre: "Ce que fait JobBoost",                        niveau: 2 },
+  { id: "ce-que-fait-rivjob", titre: "Ce que fait Rivjob",                        niveau: 2 },
   { id: "retenir",          titre: "Ce qu'il faut retenir",                           niveau: 2 },
 ];
 
@@ -43,7 +43,7 @@ export default function ArticleCeQueVoitLeRecruteur() {
         </div>
 
         <ArticleJsonLd
-          titre="Ce que voit le recruteur dans son ATS quand il reçoit votre CV | JobBoost"
+          titre="Ce que voit le recruteur dans son ATS quand il reçoit votre CV | Rivjob"
           description="Vous imaginez un algorithme qui juge votre CV. Voici ce que voit vraiment un recruteur dans son ATS, et ce qui attire son attention en premier."
           slug="/ressources/cv-ats/ce-que-voit-le-recruteur-dans-son-ats"
           datePublication="2026-05-16"
@@ -69,9 +69,9 @@ export default function ArticleCeQueVoitLeRecruteur() {
             {/* Méta-ligne */}
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-10 pb-10 border-b border-gray-100">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-extrabold">JB</span>
+                <span className="text-white text-[10px] font-extrabold">RJ</span>
               </div>
-              <span className="font-medium text-gray-700">JobBoost</span>
+              <span className="font-medium text-gray-700">Rivjob</span>
               <span className="text-gray-300">|</span>
               <span>16 mai 2026</span>
               <span className="text-gray-300">|</span>
@@ -221,11 +221,11 @@ export default function ArticleCeQueVoitLeRecruteur() {
             </p>
 
             {/* Section 7 */}
-            <h2 id="ce-que-fait-jobboost" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
-              Ce que fait JobBoost
+            <h2 id="ce-que-fait-rivjob" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
+              Ce que fait Rivjob
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              JobBoost analyse votre CV face à une offre d&apos;emploi et identifie les mots-clés présents dans l&apos;offre qui manquent dans votre CV.
+              Rivjob analyse votre CV face à une offre d&apos;emploi et identifie les mots-clés présents dans l&apos;offre qui manquent dans votre CV.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Ce sont précisément ces mots que le recruteur tapera dans son ATS pour trouver le bon profil.

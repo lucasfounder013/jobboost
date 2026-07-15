@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
   }
 
   return new NextResponse(
-    pageHtml("Désabonnement confirmé", "Vous ne recevrez plus d'emails de JobBoost. Votre préférence a bien été enregistrée."),
+    pageHtml("Désabonnement confirmé", "Vous ne recevrez plus d'emails de Rivjob. Votre préférence a bien été enregistrée."),
     { headers: { "Content-Type": "text/html; charset=utf-8" } }
   );
 }
@@ -39,14 +39,14 @@ function pageHtml(titre: string, message: string): string {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${titre} — JobBoost</title>
+  <title>${titre} — Rivjob</title>
 </head>
 <body style="margin:0;padding:0;background:#f4f4f5;font-family:system-ui,-apple-system,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;">
   <div style="background:#fff;border-radius:12px;padding:40px 48px;max-width:440px;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.08);">
     <div style="font-size:28px;margin-bottom:16px;">✓</div>
     <h1 style="font-size:18px;font-weight:700;color:#111827;margin:0 0 12px;">${titre}</h1>
     <p style="font-size:14px;color:#6b7280;margin:0 0 24px;line-height:1.6;">${message}</p>
-    <a href="https://www.jobboost.fr" style="display:inline-block;background:#4f46e5;color:#fff;text-decoration:none;font-weight:600;font-size:13px;padding:10px 24px;border-radius:8px;">Retour à JobBoost</a>
+    <a href="https://www.rivjob.ai" style="display:inline-block;background:#4f46e5;color:#fff;text-decoration:none;font-weight:600;font-size:13px;padding:10px 24px;border-radius:8px;">Retour à Rivjob</a>
   </div>
 </body>
 </html>`;

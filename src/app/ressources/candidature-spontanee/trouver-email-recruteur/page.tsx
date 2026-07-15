@@ -5,11 +5,11 @@ import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
-  title: "Comment trouver l'email d'un recruteur en 2026 : 8 méthodes efficaces | JobBoost",
+  title: "Comment trouver l'email d'un recruteur en 2026 : 8 méthodes efficaces | Rivjob",
   description:
     "8 méthodes pour trouver l'adresse email d'un recruteur ou DRH pour votre candidature spontanée. Hunter.io, LinkedIn, patterns email, RGPD : guide complet.",
   ...ogMeta(
-    "Comment trouver l'email d'un recruteur en 2026 : 8 méthodes efficaces | JobBoost",
+    "Comment trouver l'email d'un recruteur en 2026 : 8 méthodes efficaces | Rivjob",
     "8 méthodes pour trouver l'adresse email d'un recruteur ou DRH pour votre candidature spontanée. Hunter.io, LinkedIn, patterns email, RGPD : guide complet.",
     "/ressources/candidature-spontanee/trouver-email-recruteur"
   ),
@@ -19,7 +19,7 @@ const TOC = [
   { id: "pourquoi-email-direct",  titre: "Pourquoi cibler directement le recruteur ?",      niveau: 2 },
   { id: "site-entreprise",        titre: "1. Le site web de l'entreprise",                   niveau: 2 },
   { id: "linkedin",               titre: "2. LinkedIn : profil et messagerie",                niveau: 2 },
-  { id: "outils-specialises",     titre: "3. Les outils spécialisés (JobBoost, Hunter.io…)", niveau: 2 },
+  { id: "outils-specialises",     titre: "3. Les outils spécialisés (Rivjob, Hunter.io…)", niveau: 2 },
   { id: "pattern-email",          titre: "4. Déduire le format email",                       niveau: 2 },
   { id: "google-dorking",         titre: "5. Google dorking",                                niveau: 2 },
   { id: "autres-methodes",        titre: "6. La Bonne Boîte, Societe.com, mentions légales", niveau: 2 },
@@ -45,7 +45,7 @@ export default function ArticleTrouverEmailRecruteur() {
         </div>
 
         <ArticleJsonLd
-          titre="Comment trouver l'email d'un recruteur en 2026 : 8 méthodes efficaces | JobBoost"
+          titre="Comment trouver l'email d'un recruteur en 2026 : 8 méthodes efficaces | Rivjob"
           description="8 méthodes pour trouver l'adresse email d'un recruteur ou DRH pour votre candidature spontanée. Hunter.io, LinkedIn, patterns email, RGPD : guide complet."
           slug="/ressources/candidature-spontanee/trouver-email-recruteur"
           datePublication="2026-06-09"
@@ -71,9 +71,9 @@ export default function ArticleTrouverEmailRecruteur() {
             {/* Méta-ligne */}
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-10 pb-10 border-b border-gray-100">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-extrabold">JB</span>
+                <span className="text-white text-[10px] font-extrabold">RJ</span>
               </div>
-              <span className="font-medium text-gray-700">JobBoost</span>
+              <span className="font-medium text-gray-700">Rivjob</span>
               <span className="text-gray-300">|</span>
               <span>9 juin 2026</span>
               <span className="text-gray-300">|</span>
@@ -166,7 +166,7 @@ export default function ArticleTrouverEmailRecruteur() {
 
             {/* Section 4 */}
             <h2 id="outils-specialises" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
-              3. Les outils spécialisés (JobBoost, Hunter.io…)
+              3. Les outils spécialisés (Rivjob, Hunter.io…)
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Des outils dédiés agrègent des données publiques pour retrouver ou vérifier des adresses email professionnelles en quelques secondes. Les plus utiles en 2026 :
@@ -175,19 +175,19 @@ export default function ArticleTrouverEmailRecruteur() {
               <div className="bg-gradient-to-br from-indigo-50 to-violet-50 rounded-xl p-5 ring-1 ring-indigo-100">
                 <div className="flex items-center gap-2 mb-2">
                   <div className="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                    <span className="text-white text-[9px] font-extrabold">JB</span>
+                    <span className="text-white text-[9px] font-extrabold">RJ</span>
                   </div>
-                  <p className="font-semibold text-gray-900">JobBoost</p>
+                  <p className="font-semibold text-gray-900">Rivjob</p>
                   <span className="bg-indigo-100 text-indigo-600 text-[10px] font-bold px-2 py-0.5 rounded-full">Recommandé</span>
                 </div>
                 <p className="text-gray-600 leading-7 text-sm mb-3">
-                  JobBoost intègre un outil de recherche de contacts RH directement dans la plateforme. Entrez le nom d&apos;une entreprise et accédez aux emails professionnels vérifiés des responsables recrutement. Les crédits de révélation sont inclus dans votre abonnement.
+                  Rivjob intègre un outil de recherche de contacts RH directement dans la plateforme. Entrez le nom d&apos;une entreprise et accédez aux emails professionnels vérifiés des responsables recrutement. Les crédits de révélation sont inclus dans votre abonnement.
                 </p>
                 <Link
                   href="/outils/recherche-email"
                   className="inline-flex items-center gap-1.5 text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition-colors"
                 >
-                  Trouver un contact RH sur JobBoost →
+                  Trouver un contact RH sur Rivjob →
                 </Link>
               </div>
               <div className="bg-gray-50 rounded-xl p-5 ring-1 ring-gray-100">
@@ -341,19 +341,19 @@ export default function ArticleTrouverEmailRecruteur() {
               Au contraire, une candidature spontanée efficace doit être encore plus ciblée qu&apos;une réponse à une offre. Le recruteur se demande immédiatement : « Pourquoi cette personne nous contacte-t-elle ? Qu&apos;est-ce qu&apos;elle peut apporter à notre équipe ? »
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Pour y répondre, votre CV doit utiliser les bons mots-clés liés au secteur, au poste et aux compétences attendues par l&apos;entreprise, même sans offre publiée. JobBoost analyse votre CV par rapport à une description de poste et vous indique exactement ce qui manque ou ce qui peut être amélioré.
+              Pour y répondre, votre CV doit utiliser les bons mots-clés liés au secteur, au poste et aux compétences attendues par l&apos;entreprise, même sans offre publiée. Rivjob analyse votre CV par rapport à une description de poste et vous indique exactement ce qui manque ou ce qui peut être amélioré.
             </p>
 
-            {/* CTA JobBoost */}
+            {/* CTA Rivjob */}
             <div className="my-10 rounded-2xl bg-gradient-to-br from-indigo-50 to-violet-50 ring-1 ring-indigo-100 p-7">
               <div className="flex items-center gap-3 mb-3">
                 <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                  <span className="text-white text-xs font-extrabold">JB</span>
+                  <span className="text-white text-xs font-extrabold">RJ</span>
                 </div>
                 <p className="font-bold text-gray-900 text-lg">Optimisez votre CV avant d&apos;envoyer</p>
               </div>
               <p className="text-gray-600 leading-7 mb-5">
-                JobBoost analyse votre CV par rapport à une description de poste et vous donne un score de correspondance, la liste des mots-clés manquants, et un CV adapté en un clic. Gratuit pour commencer.
+                Rivjob analyse votre CV par rapport à une description de poste et vous donne un score de correspondance, la liste des mots-clés manquants, et un CV adapté en un clic. Gratuit pour commencer.
               </p>
               <Link
                 href="/"
@@ -372,7 +372,7 @@ export default function ArticleTrouverEmailRecruteur() {
               Peut-on trouver un email de recruteur sans LinkedIn Premium ?
             </h3>
             <p className="text-gray-700 leading-8 mb-8 text-lg">
-              Oui. LinkedIn Premium n&apos;est pas nécessaire pour la plupart des recherches. Le profil gratuit permet de voir les coordonnées lorsqu&apos;elles sont rendues publiques par l&apos;utilisateur. JobBoost, Kaspr (extension gratuite), Hunter.io et la méthode du pattern email fonctionnent tous indépendamment de LinkedIn Premium.
+              Oui. LinkedIn Premium n&apos;est pas nécessaire pour la plupart des recherches. Le profil gratuit permet de voir les coordonnées lorsqu&apos;elles sont rendues publiques par l&apos;utilisateur. Rivjob, Kaspr (extension gratuite), Hunter.io et la méthode du pattern email fonctionnent tous indépendamment de LinkedIn Premium.
             </p>
 
             <h3 className="text-xl font-semibold text-gray-900 mb-3">
@@ -393,7 +393,7 @@ export default function ArticleTrouverEmailRecruteur() {
               Hunter.io ou Kaspr : lequel choisir ?
             </h3>
             <p className="text-gray-700 leading-8 mb-8 text-lg">
-              Ces deux outils sont complémentaires. <strong>Hunter.io</strong> est idéal pour trouver des emails à partir du domaine d&apos;une entreprise et identifier le pattern utilisé. <strong>Kaspr</strong> est plus efficace pour extraire un email depuis un profil LinkedIn identifié. Pour une recherche ciblée, commencez par Kaspr sur LinkedIn ; pour une prospection plus large par domaine, utilisez Hunter. Et pour accéder directement aux contacts RH vérifiés sans jongler entre plusieurs outils, utilisez <Link href="/outils/recherche-email" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">la recherche d&apos;email JobBoost</Link>.
+              Ces deux outils sont complémentaires. <strong>Hunter.io</strong> est idéal pour trouver des emails à partir du domaine d&apos;une entreprise et identifier le pattern utilisé. <strong>Kaspr</strong> est plus efficace pour extraire un email depuis un profil LinkedIn identifié. Pour une recherche ciblée, commencez par Kaspr sur LinkedIn ; pour une prospection plus large par domaine, utilisez Hunter. Et pour accéder directement aux contacts RH vérifiés sans jongler entre plusieurs outils, utilisez <Link href="/outils/recherche-email" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">la recherche d&apos;email Rivjob</Link>.
             </p>
 
             <h3 className="text-xl font-semibold text-gray-900 mb-3">

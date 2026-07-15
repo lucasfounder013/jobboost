@@ -2,7 +2,7 @@ import Link from "next/link";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "Lettre de motivation générée par IA | JobBoost",
+  title: "Lettre de motivation générée par IA | Rivjob",
   description: "Générez une lettre de motivation personnalisée en 30 secondes. L'IA analyse l'offre et votre CV pour rédiger une lettre sur-mesure, exportable en PDF ou Word.",
 };
 
@@ -56,7 +56,7 @@ export default function PageLettreMotivation() {
               </span>
             </h1>
             <p className="text-gray-500 text-lg max-w-xl mx-auto leading-relaxed mb-10">
-              Fini les lettres génériques. JobBoost génère une lettre de motivation personnalisée à partir de votre CV et de l&apos;offre visée.
+              Fini les lettres génériques. Rivjob génère une lettre de motivation personnalisée à partir de votre CV et de l&apos;offre visée.
             </p>
             <Link
               href="/"
@@ -88,7 +88,7 @@ export default function PageLettreMotivation() {
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-10">
               <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-3">De l&apos;offre à la lettre en un clic</h2>
-              <p className="text-gray-400 text-base max-w-lg mx-auto">JobBoost lit l&apos;offre, comprend le contexte et rédige une lettre qui parle au recruteur.</p>
+              <p className="text-gray-400 text-base max-w-lg mx-auto">Rivjob lit l&apos;offre, comprend le contexte et rédige une lettre qui parle au recruteur.</p>
             </div>
 
             <div className="bg-gray-50 rounded-2xl border border-gray-100 shadow-inner p-6">
@@ -132,7 +132,7 @@ export default function PageLettreMotivation() {
                       <div className="w-2.5 h-2.5 rounded-full bg-yellow-300" />
                       <div className="w-2.5 h-2.5 rounded-full bg-green-300" />
                     </div>
-                    <span className="text-xs font-bold text-violet-600">Lettre générée par JobBoost</span>
+                    <span className="text-xs font-bold text-violet-600">Lettre générée par Rivjob</span>
                     <span className="bg-violet-100 text-violet-700 text-[10px] font-bold px-2 py-0.5 rounded-full">✓ Prête</span>
                   </div>
                   <div className="bg-white p-5 text-[11px] text-gray-700 leading-relaxed space-y-2.5">

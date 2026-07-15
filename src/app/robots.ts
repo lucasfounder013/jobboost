@@ -18,6 +18,6 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: "https://www.jobboost.fr/sitemap.xml",
+    sitemap: "https://www.rivjob.ai/sitemap.xml",
   };
 }

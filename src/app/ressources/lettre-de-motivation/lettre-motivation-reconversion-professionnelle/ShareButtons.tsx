@@ -4,7 +4,7 @@ export default function ShareButtons() {
   return (
     <div className="flex items-center gap-3">
       <a
-        href="https://www.linkedin.com/sharing/share-offsite/?url=https://www.jobboost.fr/ressources/lettre-de-motivation/lettre-motivation-reconversion-professionnelle"
+        href="https://www.linkedin.com/sharing/share-offsite/?url=https://www.rivjob.ai/ressources/lettre-de-motivation/lettre-motivation-reconversion-professionnelle"
         target="_blank"
         rel="noopener noreferrer"
         className="w-9 h-9 rounded-full bg-gray-100 hover:bg-indigo-50 hover:text-indigo-600 flex items-center justify-center text-gray-500 transition-colors"
@@ -15,7 +15,7 @@ export default function ShareButtons() {
         </svg>
       </a>
       <a
-        href="https://twitter.com/intent/tweet?url=https://www.jobboost.fr/ressources/lettre-de-motivation/lettre-motivation-reconversion-professionnelle&text=Lettre%20de%20motivation%20reconversion%20professionnelle%20%3A%20guide%20complet%20%2B%20exemple%202026"
+        href="https://twitter.com/intent/tweet?url=https://www.rivjob.ai/ressources/lettre-de-motivation/lettre-motivation-reconversion-professionnelle&text=Lettre%20de%20motivation%20reconversion%20professionnelle%20%3A%20guide%20complet%20%2B%20exemple%202026"
         target="_blank"
         rel="noopener noreferrer"
         className="w-9 h-9 rounded-full bg-gray-100 hover:bg-indigo-50 hover:text-indigo-600 flex items-center justify-center text-gray-500 transition-colors"
@@ -26,7 +26,7 @@ export default function ShareButtons() {
         </svg>
       </a>
       <button
-        onClick={() => navigator.clipboard.writeText("https://www.jobboost.fr/ressources/lettre-de-motivation/lettre-motivation-reconversion-professionnelle")}
+        onClick={() => navigator.clipboard.writeText("https://www.rivjob.ai/ressources/lettre-de-motivation/lettre-motivation-reconversion-professionnelle")}
         className="w-9 h-9 rounded-full bg-gray-100 hover:bg-indigo-50 hover:text-indigo-600 flex items-center justify-center text-gray-500 transition-colors"
         aria-label="Copier le lien"
       >

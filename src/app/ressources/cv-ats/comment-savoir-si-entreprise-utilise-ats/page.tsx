@@ -5,11 +5,11 @@ import ShareButtons from "../quest-ce-qu-un-ats/ShareButtons";
 import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
-  title: "Comment savoir si une entreprise utilise un ATS avant de postuler | JobBoost",
+  title: "Comment savoir si une entreprise utilise un ATS avant de postuler | Rivjob",
   description:
     "Il existe des indices simples pour détecter si une entreprise utilise un ATS avant même de postuler. Voici comment les repérer et ce que ça change pour votre candidature.",
   ...ogMeta(
-    "Comment savoir si une entreprise utilise un ATS avant de postuler | JobBoost",
+    "Comment savoir si une entreprise utilise un ATS avant de postuler | Rivjob",
     "Il existe des indices simples pour détecter si une entreprise utilise un ATS avant même de postuler. Voici comment les repérer et ce que ça change pour votre candidature.",
     "/ressources/cv-ats/comment-savoir-si-entreprise-utilise-ats"
   ),
@@ -21,7 +21,7 @@ const TOC = [
   { id: "taille-entreprise",  titre: "La taille de l'entreprise",              niveau: 2 },
   { id: "plateforme",         titre: "La plateforme où est publiée l'offre",   niveau: 2 },
   { id: "changer-approche",   titre: "Est-ce que ça change votre approche ?",  niveau: 2 },
-  { id: "jobboost",           titre: "Ce que fait JobBoost",                   niveau: 2 },
+  { id: "rivjob",           titre: "Ce que fait Rivjob",                   niveau: 2 },
   { id: "conclusion",         titre: "Ce qu'il faut retenir",                  niveau: 2 },
 ];
 
@@ -42,7 +42,7 @@ export default function ArticleSavoirSiATS() {
         </div>
 
         <ArticleJsonLd
-          titre="Comment savoir si une entreprise utilise un ATS avant de postuler | JobBoost"
+          titre="Comment savoir si une entreprise utilise un ATS avant de postuler | Rivjob"
           description="Il existe des indices simples pour détecter si une entreprise utilise un ATS avant même de postuler. Voici comment les repérer et ce que ça change pour votre candidature."
           slug="/ressources/cv-ats/comment-savoir-si-entreprise-utilise-ats"
           datePublication="2026-05-23"
@@ -68,9 +68,9 @@ export default function ArticleSavoirSiATS() {
             {/* Méta-ligne */}
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-10 pb-10 border-b border-gray-100">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-extrabold">JB</span>
+                <span className="text-white text-[10px] font-extrabold">RJ</span>
               </div>
-              <span className="font-medium text-gray-700">JobBoost</span>
+              <span className="font-medium text-gray-700">Rivjob</span>
               <span className="text-gray-300">|</span>
               <span>23 mai 2026</span>
               <span className="text-gray-300">|</span>
@@ -214,11 +214,11 @@ export default function ArticleSavoirSiATS() {
             </p>
 
             {/* Section 6 */}
-            <h2 id="jobboost" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
-              Ce que fait JobBoost
+            <h2 id="rivjob" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
+              Ce que fait Rivjob
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Que votre candidature passe par un ATS ou arrive directement chez un recruteur, JobBoost analyse la correspondance entre votre CV et l&apos;offre d&apos;emploi.
+              Que votre candidature passe par un ATS ou arrive directement chez un recruteur, Rivjob analyse la correspondance entre votre CV et l&apos;offre d&apos;emploi.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Il identifie les mots-clés de l&apos;offre qui manquent dans votre CV et vous indique exactement quoi ajuster.

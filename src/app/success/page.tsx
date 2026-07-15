@@ -5,7 +5,7 @@ export default function PageSucces() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
       <Link href="/" className="flex items-center gap-1.5 mb-10">
         
-        <span className="text-base font-bold tracking-tight text-gray-900">JobBoost</span>
+        <span className="text-base font-bold tracking-tight text-gray-900">Rivjob</span>
       </Link>
 
       <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-10 w-full max-w-sm text-center">
@@ -17,7 +17,7 @@ export default function PageSucces() {
 
         <h1 className="text-xl font-bold text-gray-900 mb-2">Abonnement activé !</h1>
         <p className="text-gray-500 text-sm leading-relaxed mb-6">
-          Votre abonnement JobBoost est maintenant actif. Profitez d&apos;analyses et d&apos;adaptations CV illimitées.
+          Votre abonnement Rivjob est maintenant actif. Profitez d&apos;analyses et d&apos;adaptations CV illimitées.
         </p>
         <p className="text-gray-400 text-xs mb-8">
           L&apos;activation peut prendre quelques secondes.

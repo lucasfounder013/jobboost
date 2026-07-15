@@ -1,5 +1,5 @@
 ## Project Overview
-JobBoost (https://www.jobboost.fr) est une alternative française à Jobscan.co.
+Rivjob (https://www.rivjob.ai) est une alternative française à Jobscan.co (anciennement JobBoost / jobboost.fr — rebrand 2026-07).
 L'utilisateur colle son CV + une offre d'emploi. L'outil analyse la correspondance gratuitement (score + mots-clés manquants), puis propose d'adapter le CV via un compte (3 essais gratuits, ensuite payant).
 
 ## Tech Stack
@@ -37,8 +37,8 @@ src/
 ```
 
 ## Deployment & Repository
-- Production : https://www.jobboost.fr (Vercel)
-- GitHub : https://github.com/lucasfounder013/jobboost
+- Production : https://www.rivjob.ai (Vercel) — anciennement jobboost.fr, redirection 301 en place
+- GitHub : https://github.com/lucasfounder013/rivjob (repo renommé depuis lucasfounder013/jobboost)
 - Git config : user.name = Lucas Ledonne, user.email = lucasledonne@live.fr
 - **Toujours commiter depuis le terminal de Lucas** — les commits faits par Claude Code utilisent noreply@anthropic.com ce qui peut bloquer Vercel
 
@@ -60,7 +60,7 @@ npm run lint   # Vérifier le code
 - Appliquer les migrations : `npx @better-auth/cli migrate`
 - Côté serveur : `auth.api.getSession({ headers: await headers() })`
 - Côté client : `useSession()` dans les composants `"use client"` uniquement
-- `requireEmailVerification` est activé — tester Resend avant toute démo (domaine jobboost.fr doit être vérifié)
+- `requireEmailVerification` est activé — tester Resend avant toute démo (domaine rivjob.ai doit être vérifié)
 
 ## PDF/DOCX Parsing
 - pdf-parse v1.1.1 — importer via `require("pdf-parse/lib/pdf-parse")` et non `index.js` (charge du code canvas qui crashe le build Next.js)
@@ -102,5 +102,5 @@ npm run lint   # Vérifier le code
 ## Section /modeles-cv (templates de CV gratuits)
 - Source de vérité des templates : `src/lib/cv-templates.ts` (3 slugs : `classique-ats`, `moderne`, `elegant`)
 - CV d'exemple : `src/lib/cv-exemple.ts` (Marie Dupont)
-- Persistance navigateur uniquement (localStorage) — clés : `jobboost:modeles-cv:cv`, `jobboost:modeles-cv:template`, `jobboost:funnel:cv-prefill`. Helpers : `src/lib/cv-localstorage.ts`
+- Persistance navigateur uniquement (localStorage) — clés préfixées `jobboost:*` (conservées après le rebrand pour ne pas perdre les brouillons utilisateurs) : `jobboost:modeles-cv:cv`, `jobboost:modeles-cv:template`, `jobboost:funnel:cv-prefill`. Helpers : `src/lib/cv-localstorage.ts`
 - Route `/api/exporter-cv` accepte `template?` optionnel (défaut `"classique-ats"`) → dispatch PDF + DOCX selon le slug

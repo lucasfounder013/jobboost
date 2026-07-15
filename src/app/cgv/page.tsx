@@ -2,8 +2,8 @@ import Link from "next/link";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "Conditions Générales de Vente | JobBoost",
-  description: "Consultez les CGV de JobBoost : tarifs, modalités de souscription et de résiliation de nos offres Pro d'optimisation de CV.",
+  title: "Conditions Générales de Vente | Rivjob",
+  description: "Consultez les CGV de Rivjob : tarifs, modalités de souscription et de résiliation de nos offres Pro d'optimisation de CV.",
 };
 
 export default function CGV() {
@@ -15,14 +15,14 @@ export default function CGV() {
         <section className="mb-8">
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">1. Objet</h2>
           <p className="text-sm text-gray-600 leading-relaxed">
-            Les présentes CGV régissent les ventes de services numériques proposés sur le site jobboost.fr par Lucas LE DONNE (SIRET : 99395382700017).
+            Les présentes CGV régissent les ventes de services numériques proposés sur le site rivjob.ai par Lucas LE DONNE (SIRET : 99395382700017).
           </p>
         </section>
 
         <section className="mb-8">
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">2. Description du service</h2>
           <p className="text-sm text-gray-600 leading-relaxed">
-            JobBoost permet d&apos;analyser automatiquement la correspondance entre un CV et une offre d&apos;emploi, et d&apos;adapter le CV pour optimiser sa lisibilité par les systèmes ATS (Applicant Tracking System), grâce à l&apos;intelligence artificielle.
+            Rivjob permet d&apos;analyser automatiquement la correspondance entre un CV et une offre d&apos;emploi, et d&apos;adapter le CV pour optimiser sa lisibilité par les systèmes ATS (Applicant Tracking System), grâce à l&apos;intelligence artificielle.
           </p>
         </section>
 
@@ -51,7 +51,7 @@ export default function CGV() {
         <section className="mb-8">
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">5. Paiement</h2>
           <p className="text-sm text-gray-600 leading-relaxed">
-            Les paiements sont sécurisés et traités exclusivement via <strong>Stripe</strong>. Les informations bancaires ne sont pas stockées par JobBoost.
+            Les paiements sont sécurisés et traités exclusivement via <strong>Stripe</strong>. Les informations bancaires ne sont pas stockées par Rivjob.
           </p>
         </section>
 
@@ -79,7 +79,7 @@ export default function CGV() {
         <section className="mb-8">
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">9. Litiges</h2>
           <p className="text-sm text-gray-600 leading-relaxed">
-            Le droit applicable est le droit français. En cas de litige, une solution amiable sera recherchée en priorité. Contact : <a href="mailto:contact@jobboost.fr" className="text-indigo-600 hover:underline">contact@jobboost.fr</a>
+            Le droit applicable est le droit français. En cas de litige, une solution amiable sera recherchée en priorité. Contact : <a href="mailto:contact@rivjob.ai" className="text-indigo-600 hover:underline">contact@rivjob.ai</a>
           </p>
         </section>
       </main>

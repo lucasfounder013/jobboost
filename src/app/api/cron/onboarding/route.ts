@@ -6,7 +6,7 @@ import { email1, email2, email3, email4, email5, triggerRH, triggerScans } from 
 
 
 
-const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.jobboost.fr";
+const appUrl = process.env.NEXT_PUBLIC_APP_URL ?? "https://www.rivjob.ai";
 
 type UserRow = {
   id: string;
@@ -103,7 +103,7 @@ export async function GET(req: NextRequest) {
       if (user.rh_credits === 0 && !user.is_subscribed && !user.trigger_rh_sent_at) {
         const { subject, html } = triggerRH(props);
         const { error } = await resend.emails.send({
-          from: "JobBoost <equipe@jobboost.fr>",
+          from: "Rivjob <equipe@rivjob.ai>",
           to: user.email,
           subject,
           html,
@@ -124,7 +124,7 @@ export async function GET(req: NextRequest) {
       if (user.scans === 0 && !user.is_subscribed && !user.trigger_scans_sent_at) {
         const { subject, html } = triggerScans(props);
         const { error } = await resend.emails.send({
-          from: "JobBoost <equipe@jobboost.fr>",
+          from: "Rivjob <equipe@rivjob.ai>",
           to: user.email,
           subject,
           html,
@@ -180,7 +180,7 @@ export async function GET(req: NextRequest) {
       const { subject, html } = emailFns[emailIndex](props);
 
       const { error: resendError } = await resend.emails.send({
-        from: "JobBoost <equipe@jobboost.fr>",
+        from: "Rivjob <equipe@rivjob.ai>",
         to: user.email,
         subject,
         html,

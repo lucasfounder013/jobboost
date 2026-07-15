@@ -1,4 +1,4 @@
-const BASE_URL = "https://www.jobboost.fr";
+const BASE_URL = "https://www.rivjob.ai";
 
 export function ogMeta(title: string, description: string, path: string) {
   return {
@@ -9,7 +9,7 @@ export function ogMeta(title: string, description: string, path: string) {
       title,
       description,
       url: `${BASE_URL}${path}`,
-      siteName: "JobBoost",
+      siteName: "Rivjob",
       locale: "fr_FR",
       type: "article" as const,
     },

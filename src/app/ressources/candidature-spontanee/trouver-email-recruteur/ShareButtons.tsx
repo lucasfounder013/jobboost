@@ -4,7 +4,7 @@ export default function ShareButtons() {
   return (
     <div className="flex items-center gap-3">
       <a
-        href="https://www.linkedin.com/sharing/share-offsite/?url=https://www.jobboost.fr/ressources/candidature-spontanee/trouver-email-recruteur"
+        href="https://www.linkedin.com/sharing/share-offsite/?url=https://www.rivjob.ai/ressources/candidature-spontanee/trouver-email-recruteur"
         target="_blank"
         rel="noopener noreferrer"
         className="w-9 h-9 rounded-full bg-gray-100 hover:bg-indigo-50 hover:text-indigo-600 flex items-center justify-center text-gray-500 transition-colors"
@@ -15,7 +15,7 @@ export default function ShareButtons() {
         </svg>
       </a>
       <a
-        href="https://twitter.com/intent/tweet?url=https://www.jobboost.fr/ressources/candidature-spontanee/trouver-email-recruteur&text=Comment%20trouver%20l%27email%20d%27un%20recruteur%20en%202026%20%3A%208%20m%C3%A9thodes%20efficaces"
+        href="https://twitter.com/intent/tweet?url=https://www.rivjob.ai/ressources/candidature-spontanee/trouver-email-recruteur&text=Comment%20trouver%20l%27email%20d%27un%20recruteur%20en%202026%20%3A%208%20m%C3%A9thodes%20efficaces"
         target="_blank"
         rel="noopener noreferrer"
         className="w-9 h-9 rounded-full bg-gray-100 hover:bg-indigo-50 hover:text-indigo-600 flex items-center justify-center text-gray-500 transition-colors"
@@ -26,7 +26,7 @@ export default function ShareButtons() {
         </svg>
       </a>
       <button
-        onClick={() => navigator.clipboard.writeText("https://www.jobboost.fr/ressources/candidature-spontanee/trouver-email-recruteur")}
+        onClick={() => navigator.clipboard.writeText("https://www.rivjob.ai/ressources/candidature-spontanee/trouver-email-recruteur")}
         className="w-9 h-9 rounded-full bg-gray-100 hover:bg-indigo-50 hover:text-indigo-600 flex items-center justify-center text-gray-500 transition-colors"
         aria-label="Copier le lien"
       >

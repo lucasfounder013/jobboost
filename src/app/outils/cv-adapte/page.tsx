@@ -2,8 +2,8 @@ import Link from "next/link";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "CV adapté aux offres d'emploi | JobBoost",
-  description: "Adaptez votre CV à chaque offre en quelques secondes. JobBoost optimise vos mots-clés ATS et améliore votre score de correspondance automatiquement.",
+  title: "CV adapté aux offres d'emploi | Rivjob",
+  description: "Adaptez votre CV à chaque offre en quelques secondes. Rivjob optimise vos mots-clés ATS et améliore votre score de correspondance automatiquement.",
 };
 
 const features = [
@@ -58,7 +58,7 @@ export default function PageCVAdapte() {
               en secondes
             </h1>
             <p className="text-gray-500 text-lg max-w-xl mx-auto leading-relaxed mb-10">
-              Collez votre CV et une offre d&apos;emploi. JobBoost identifie les mots-clés manquants et réécrit votre CV pour passer les filtres ATS.
+              Collez votre CV et une offre d&apos;emploi. Rivjob identifie les mots-clés manquants et réécrit votre CV pour passer les filtres ATS.
             </p>
             <Link
               href="/"
@@ -90,7 +90,7 @@ export default function PageCVAdapte() {
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-10">
               <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-3">La différence en un coup d&apos;œil</h2>
-              <p className="text-gray-400 text-base max-w-lg mx-auto">Un CV générique vs le même CV optimisé par JobBoost pour une offre de Chef de Projet.</p>
+              <p className="text-gray-400 text-base max-w-lg mx-auto">Un CV générique vs le même CV optimisé par Rivjob pour une offre de Chef de Projet.</p>
             </div>
 
             <div className="bg-gray-50 rounded-2xl border border-gray-100 shadow-inner p-6">
@@ -104,7 +104,7 @@ export default function PageCVAdapte() {
                       <div className="w-2.5 h-2.5 rounded-full bg-yellow-300" />
                       <div className="w-2.5 h-2.5 rounded-full bg-green-300" />
                     </div>
-                    <span className="text-xs font-bold text-red-600">Avant JobBoost</span>
+                    <span className="text-xs font-bold text-red-600">Avant Rivjob</span>
                     <span className="bg-red-100 text-red-700 text-xs font-extrabold px-2.5 py-1 rounded-full">34 / 100</span>
                   </div>
                   <div className="bg-white p-5 space-y-3">
@@ -147,7 +147,7 @@ export default function PageCVAdapte() {
                       <div className="w-2.5 h-2.5 rounded-full bg-yellow-300" />
                       <div className="w-2.5 h-2.5 rounded-full bg-green-300" />
                     </div>
-                    <span className="text-xs font-bold text-emerald-700">Après JobBoost</span>
+                    <span className="text-xs font-bold text-emerald-700">Après Rivjob</span>
                     <span className="bg-emerald-100 text-emerald-700 text-xs font-extrabold px-2.5 py-1 rounded-full">87 / 100</span>
                   </div>
                   <div className="bg-white p-5 space-y-3">

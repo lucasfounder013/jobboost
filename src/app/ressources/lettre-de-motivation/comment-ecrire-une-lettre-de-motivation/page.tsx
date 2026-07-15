@@ -5,11 +5,11 @@ import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
-  title: "Comment écrire une lettre de motivation en 2026 : méthode, exemples et erreurs | JobBoost",
+  title: "Comment écrire une lettre de motivation en 2026 : méthode, exemples et erreurs | Rivjob",
   description:
     "La méthode en 4 étapes pour écrire une lettre de motivation efficace en 2026. Exemples concrets, erreurs à éviter, et conseils pour décrocher un entretien.",
   ...ogMeta(
-    "Comment écrire une lettre de motivation en 2026 : méthode, exemples et erreurs | JobBoost",
+    "Comment écrire une lettre de motivation en 2026 : méthode, exemples et erreurs | Rivjob",
     "La méthode en 4 étapes pour écrire une lettre de motivation efficace en 2026. Exemples concrets, erreurs à éviter, et conseils pour décrocher un entretien.",
     "/ressources/lettre-de-motivation/comment-ecrire-une-lettre-de-motivation"
   ),
@@ -46,7 +46,7 @@ export default function ArticleCommentEcrireLDM() {
         </div>
 
         <ArticleJsonLd
-          titre="Comment écrire une lettre de motivation en 2026 : méthode, exemples et erreurs | JobBoost"
+          titre="Comment écrire une lettre de motivation en 2026 : méthode, exemples et erreurs | Rivjob"
           description="La méthode en 4 étapes pour écrire une lettre de motivation efficace en 2026. Exemples concrets, erreurs à éviter, et conseils pour décrocher un entretien."
           slug="/ressources/lettre-de-motivation/comment-ecrire-une-lettre-de-motivation"
           datePublication="2026-06-08"
@@ -72,9 +72,9 @@ export default function ArticleCommentEcrireLDM() {
             {/* Méta-ligne */}
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-10 pb-10 border-b border-gray-100">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-extrabold">JB</span>
+                <span className="text-white text-[10px] font-extrabold">RJ</span>
               </div>
-              <span className="font-medium text-gray-700">JobBoost</span>
+              <span className="font-medium text-gray-700">Rivjob</span>
               <span className="text-gray-300">|</span>
               <span>8 juin 2026</span>
               <span className="text-gray-300">|</span>
@@ -329,7 +329,7 @@ export default function ArticleCommentEcrireLDM() {
               Identifiez d&apos;abord les 3 mots-clés ou compétences les plus répétés dans l&apos;offre. Vérifiez qu&apos;ils apparaissent dans votre lettre, dans leur formulation exacte. Puis cherchez une information récente sur l&apos;entreprise (LinkedIn, presse, site) pour nourrir le paragraphe de connexion. L&apos;ensemble de cette personnalisation ne devrait pas prendre plus de 20 minutes pour chaque candidature sérieuse.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              JobBoost analyse la correspondance entre votre CV et une offre et identifie les mots-clés manquants, ce qui accélère aussi la préparation de votre lettre.
+              Rivjob analyse la correspondance entre votre CV et une offre et identifie les mots-clés manquants, ce qui accélère aussi la préparation de votre lettre.
             </p>
 
             <h3 className="text-xl font-semibold text-gray-800 mt-10 mb-4">
@@ -340,11 +340,11 @@ export default function ArticleCommentEcrireLDM() {
             </p>
 
             {/* Section 8 */}
-            <h2 id="ce-que-fait-jobboost" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
-              Ce que fait JobBoost pour votre candidature
+            <h2 id="ce-que-fait-rivjob" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
+              Ce que fait Rivjob pour votre candidature
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Une bonne lettre de motivation commence par une bonne connaissance de l&apos;offre : les compétences attendues, les mots-clés utilisés, les priorités du recruteur. C&apos;est exactement ce que JobBoost fait pour votre CV.
+              Une bonne lettre de motivation commence par une bonne connaissance de l&apos;offre : les compétences attendues, les mots-clés utilisés, les priorités du recruteur. C&apos;est exactement ce que Rivjob fait pour votre CV.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               En analysant la correspondance entre votre CV et une offre d&apos;emploi, il identifie les termes présents dans l&apos;annonce qui manquent dans votre dossier. Ces termes sont aussi ceux que vous devez faire apparaître dans votre lettre de motivation pour que l&apos;ensemble de votre candidature soit cohérent.

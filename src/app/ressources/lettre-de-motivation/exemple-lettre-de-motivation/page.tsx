@@ -5,11 +5,11 @@ import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
-  title: "Exemple lettre de motivation : 5 modèles prêts à utiliser | JobBoost",
+  title: "Exemple lettre de motivation : 5 modèles prêts à utiliser | Rivjob",
   description:
     "Vous cherchez un exemple de lettre de motivation efficace ? Voici 5 modèles concrets et adaptables, pour un CDI, un stage, une reconversion ou une candidature spontanée.",
   ...ogMeta(
-    "Exemple lettre de motivation : 5 modèles prêts à utiliser | JobBoost",
+    "Exemple lettre de motivation : 5 modèles prêts à utiliser | Rivjob",
     "Vous cherchez un exemple de lettre de motivation efficace ? Voici 5 modèles concrets et adaptables, pour un CDI, un stage, une reconversion ou une candidature spontanée.",
     "/ressources/lettre-de-motivation/exemple-lettre-de-motivation"
   ),
@@ -44,7 +44,7 @@ export default function ArticleExempleLettreDeMotivation() {
         </div>
 
         <ArticleJsonLd
-          titre="Exemple lettre de motivation : 5 modèles prêts à utiliser | JobBoost"
+          titre="Exemple lettre de motivation : 5 modèles prêts à utiliser | Rivjob"
           description="Vous cherchez un exemple de lettre de motivation efficace ? Voici 5 modèles concrets et adaptables, pour un CDI, un stage, une reconversion ou une candidature spontanée."
           slug="/ressources/lettre-de-motivation/exemple-lettre-de-motivation"
           datePublication="2026-06-19"
@@ -70,9 +70,9 @@ export default function ArticleExempleLettreDeMotivation() {
             {/* Méta-ligne */}
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-10 pb-10 border-b border-gray-100">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-extrabold">JB</span>
+                <span className="text-white text-[10px] font-extrabold">RJ</span>
               </div>
-              <span className="font-medium text-gray-700">JobBoost</span>
+              <span className="font-medium text-gray-700">Rivjob</span>
               <span className="text-gray-300">|</span>
               <span>19 juin 2026</span>
               <span className="text-gray-300">|</span>
@@ -512,7 +512,7 @@ Bien cordialement,
               {" "}détaille comment le détecter avant de postuler.
             </p>
 
-            {/* CTA JobBoost */}
+            {/* CTA Rivjob */}
             <h2 id="cta" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
               Adaptez votre candidature en quelques minutes
             </h2>
@@ -520,7 +520,7 @@ Bien cordialement,
               Une lettre de motivation efficace s&apos;appuie sur un CV cohérent avec l&apos;offre. Les mots-clés de l&apos;annonce doivent se retrouver des deux côtés : dans le CV pour passer l&apos;ATS, dans la lettre pour convaincre le recruteur humain.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              JobBoost analyse gratuitement la correspondance entre votre CV et une offre d&apos;emploi, et identifie les mots-clés manquants. Ces termes sont exactement ceux à réintégrer dans votre lettre pour que toute la candidature parle d&apos;une seule voix.
+              Rivjob analyse gratuitement la correspondance entre votre CV et une offre d&apos;emploi, et identifie les mots-clés manquants. Ces termes sont exactement ceux à réintégrer dans votre lettre pour que toute la candidature parle d&apos;une seule voix.
             </p>
             <div className="mt-6 mb-6">
               <Link

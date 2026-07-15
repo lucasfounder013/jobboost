@@ -9,7 +9,7 @@ type ArticleJsonLdProps = {
   filAriane: FilAriane[];
 };
 
-const BASE_URL = "https://www.jobboost.fr";
+const BASE_URL = "https://www.rivjob.ai";
 
 export default function ArticleJsonLd({
   titre,
@@ -27,10 +27,10 @@ export default function ArticleJsonLd({
     headline: titre,
     description,
     mainEntityOfPage: { "@type": "WebPage", "@id": url },
-    author: { "@type": "Organization", name: "JobBoost", url: BASE_URL },
+    author: { "@type": "Organization", name: "Rivjob", url: BASE_URL },
     publisher: {
       "@type": "Organization",
-      name: "JobBoost",
+      name: "Rivjob",
       logo: { "@type": "ImageObject", url: `${BASE_URL}/favicon.ico` },
     },
     datePublished: datePublication,

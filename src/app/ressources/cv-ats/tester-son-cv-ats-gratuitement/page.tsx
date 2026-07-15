@@ -5,11 +5,11 @@ import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
-  title: "Comment tester son CV ATS gratuitement | JobBoost",
+  title: "Comment tester son CV ATS gratuitement | Rivjob",
   description:
     "Vous voulez savoir si votre CV passe bien les ATS avant de postuler ? Voici comment le tester gratuitement, et ce qu'il faut vraiment vérifier.",
   ...ogMeta(
-    "Comment tester son CV ATS gratuitement | JobBoost",
+    "Comment tester son CV ATS gratuitement | Rivjob",
     "Vous voulez savoir si votre CV passe bien les ATS avant de postuler ? Voici comment le tester gratuitement, et ce qu'il faut vraiment vérifier.",
     "/ressources/cv-ats/tester-son-cv-ats-gratuitement"
   ),
@@ -41,7 +41,7 @@ export default function ArticleTestCV() {
         </div>
 
         <ArticleJsonLd
-          titre="Comment tester son CV ATS gratuitement | JobBoost"
+          titre="Comment tester son CV ATS gratuitement | Rivjob"
           description="Vous voulez savoir si votre CV passe bien les ATS avant de postuler ? Voici comment le tester gratuitement, et ce qu'il faut vraiment vérifier."
           slug="/ressources/cv-ats/tester-son-cv-ats-gratuitement"
           datePublication="2026-06-12"
@@ -67,9 +67,9 @@ export default function ArticleTestCV() {
             {/* Méta-ligne */}
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-10 pb-10 border-b border-gray-100">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-extrabold">JB</span>
+                <span className="text-white text-[10px] font-extrabold">RJ</span>
               </div>
-              <span className="font-medium text-gray-700">JobBoost</span>
+              <span className="font-medium text-gray-700">Rivjob</span>
               <span className="text-gray-300">|</span>
               <span>12 juin 2026</span>
               <span className="text-gray-300">|</span>
@@ -176,7 +176,7 @@ export default function ArticleTestCV() {
               Vous uploadez votre CV, vous collez le texte de l&apos;offre d&apos;emploi, et l&apos;outil identifie les mots-clés présents dans l&apos;offre qui manquent dans votre CV.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              C&apos;est exactement ce que fait JobBoost.
+              C&apos;est exactement ce que fait Rivjob.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Il analyse la correspondance entre votre CV et une offre précise, vous montre les mots-clés manquants, et vous indique quoi modifier pour améliorer votre visibilité dans l&apos;ATS du recruteur.
@@ -222,7 +222,7 @@ export default function ArticleTestCV() {
               Le test le plus simple est gratuit et prend deux minutes : copiez-collez votre CV dans un bloc-notes et regardez ce qui en ressort.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Pour aller plus loin, un outil comme JobBoost analyse automatiquement la correspondance entre votre CV et une offre précise, gratuitement.
+              Pour aller plus loin, un outil comme Rivjob analyse automatiquement la correspondance entre votre CV et une offre précise, gratuitement.
             </p>
 
             <div className="mt-16 pt-10 border-t border-gray-100">

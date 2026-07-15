@@ -5,11 +5,11 @@ import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
-  title: "Comment finir une lettre de motivation : exemples et formules | JobBoost",
+  title: "Comment finir une lettre de motivation : exemples et formules | Rivjob",
   description:
     "Comment finir une lettre de motivation efficacement ? Formules de politesse, phrases de conclusion, erreurs à éviter : voici ce qui fonctionne vraiment.",
   ...ogMeta(
-    "Comment finir une lettre de motivation : exemples et formules | JobBoost",
+    "Comment finir une lettre de motivation : exemples et formules | Rivjob",
     "Comment finir une lettre de motivation efficacement ? Formules de politesse, phrases de conclusion, erreurs à éviter : voici ce qui fonctionne vraiment.",
     "/ressources/lettre-de-motivation/comment-finir-lettre-de-motivation"
   ),
@@ -48,7 +48,7 @@ export default function ArticleCommentFinirLDM() {
         </div>
 
         <ArticleJsonLd
-          titre="Comment finir une lettre de motivation : exemples et formules | JobBoost"
+          titre="Comment finir une lettre de motivation : exemples et formules | Rivjob"
           description="Comment finir une lettre de motivation efficacement ? Formules de politesse, phrases de conclusion, erreurs à éviter : voici ce qui fonctionne vraiment."
           slug="/ressources/lettre-de-motivation/comment-finir-lettre-de-motivation"
           datePublication="2026-06-19"
@@ -74,9 +74,9 @@ export default function ArticleCommentFinirLDM() {
             {/* Méta-ligne */}
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-10 pb-10 border-b border-gray-100">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-extrabold">JB</span>
+                <span className="text-white text-[10px] font-extrabold">RJ</span>
               </div>
-              <span className="font-medium text-gray-700">JobBoost</span>
+              <span className="font-medium text-gray-700">Rivjob</span>
               <span className="text-gray-300">|</span>
               <span>19 juin 2026</span>
               <span className="text-gray-300">|</span>
@@ -559,7 +559,7 @@ linkedin.com/in/prenom-nom`}</p>
               La meilleure conclusion ne sauve pas une lettre dont le corps ne parle pas au recruteur. Une fin efficace fonctionne parce qu&apos;elle s&apos;appuie sur un CV aligné avec l&apos;offre, un début qui pose votre valeur, et un corps qui prouve la correspondance.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              JobBoost analyse gratuitement la correspondance entre votre CV et une offre d&apos;emploi, et identifie les mots-clés à reprendre dans la lettre. Vous trouverez aussi nos guides{" "}
+              Rivjob analyse gratuitement la correspondance entre votre CV et une offre d&apos;emploi, et identifie les mots-clés à reprendre dans la lettre. Vous trouverez aussi nos guides{" "}
               <Link href="/ressources/lettre-de-motivation/comment-commencer-lettre-de-motivation" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">
                 comment commencer une lettre de motivation
               </Link>

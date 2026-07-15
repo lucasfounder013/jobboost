@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Tarifs | JobBoost",
-  description: "Découvrez les offres JobBoost : 3 analyses CV gratuites, puis passez Pro pour adapter votre CV à chaque offre et multiplier vos entretiens.",
+  title: "Tarifs | Rivjob",
+  description: "Découvrez les offres Rivjob : 3 analyses CV gratuites, puis passez Pro pour adapter votre CV à chaque offre et multiplier vos entretiens.",
 };
 
 export default function PricingLayout({ children }: { children: React.ReactNode }) {

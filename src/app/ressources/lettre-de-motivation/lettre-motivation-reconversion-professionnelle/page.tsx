@@ -5,11 +5,11 @@ import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
-  title: "Lettre de motivation reconversion professionnelle : guide + exemple 2026 | JobBoost",
+  title: "Lettre de motivation reconversion professionnelle : guide + exemple 2026 | Rivjob",
   description:
     "Comment rédiger une lettre de motivation convaincante pour une reconversion professionnelle en 2026. Guide complet avec exemple concret et conseils pratiques.",
   ...ogMeta(
-    "Lettre de motivation reconversion professionnelle : guide + exemple 2026 | JobBoost",
+    "Lettre de motivation reconversion professionnelle : guide + exemple 2026 | Rivjob",
     "Comment rédiger une lettre de motivation convaincante pour une reconversion professionnelle en 2026. Guide complet avec exemple concret et conseils pratiques.",
     "/ressources/lettre-de-motivation/lettre-motivation-reconversion-professionnelle"
   ),
@@ -26,7 +26,7 @@ const TOC = [
   { id: "exemple-complet",           titre: "Exemple complet de lettre de motivation reconversion",               niveau: 2 },
   { id: "adapter-selon-secteur",     titre: "Adapter sa lettre selon le secteur visé",                            niveau: 2 },
   { id: "faq",                       titre: "FAQ",                                                                 niveau: 2 },
-  { id: "jobboost",                  titre: "Ce que fait JobBoost pour votre reconversion",                       niveau: 2 },
+  { id: "rivjob",                  titre: "Ce que fait Rivjob pour votre reconversion",                       niveau: 2 },
 ];
 
 export default function ArticleLettreMotivationReconversion() {
@@ -46,7 +46,7 @@ export default function ArticleLettreMotivationReconversion() {
         </div>
 
         <ArticleJsonLd
-          titre="Lettre de motivation reconversion professionnelle : guide + exemple 2026 | JobBoost"
+          titre="Lettre de motivation reconversion professionnelle : guide + exemple 2026 | Rivjob"
           description="Comment rédiger une lettre de motivation convaincante pour une reconversion professionnelle en 2026. Guide complet avec exemple concret et conseils pratiques."
           slug="/ressources/lettre-de-motivation/lettre-motivation-reconversion-professionnelle"
           datePublication="2026-06-11"
@@ -72,9 +72,9 @@ export default function ArticleLettreMotivationReconversion() {
             {/* Méta-ligne */}
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-10 pb-10 border-b border-gray-100">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-extrabold">JB</span>
+                <span className="text-white text-[10px] font-extrabold">RJ</span>
               </div>
-              <span className="font-medium text-gray-700">JobBoost</span>
+              <span className="font-medium text-gray-700">Rivjob</span>
               <span className="text-gray-300">|</span>
               <span>11 juin 2026</span>
               <span className="text-gray-300">|</span>
@@ -220,7 +220,7 @@ export default function ArticleLettreMotivationReconversion() {
               Exemple complet de lettre de motivation reconversion
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Voici une lettre générée par JobBoost pour Sophie Martin, chef de projet IT depuis 8 ans, qui postule pour un poste de UX Designer junior dans une agence digitale.
+              Voici une lettre générée par Rivjob pour Sophie Martin, chef de projet IT depuis 8 ans, qui postule pour un poste de UX Designer junior dans une agence digitale.
             </p>
             <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 my-8 font-serif text-gray-900">
               {/* En-tête centré */}
@@ -330,15 +330,15 @@ export default function ArticleLettreMotivationReconversion() {
               En substituant la quantité d&apos;expérience par la qualité de la preuve. Vous n&apos;avez pas 5 ans dans le secteur, mais vous avez des projets concrets, des résultats mesurables sur votre formation, et des compétences transférables que les candidats classiques n&apos;ont pas. Mettez en avant ce différentiel positif plutôt que de vous comparer à des profils en poste depuis longtemps.
             </p>
 
-            {/* Section 7 : CTA JobBoost */}
-            <h2 id="jobboost" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
-              Ce que fait JobBoost pour votre reconversion
+            {/* Section 7 : CTA Rivjob */}
+            <h2 id="rivjob" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
+              Ce que fait Rivjob pour votre reconversion
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Rédiger une lettre de motivation reconversion convaincante commence par une analyse précise du poste visé : quels mots-clés reviennent dans les offres du secteur cible ? Quelles compétences sont systématiquement demandées ? Quels termes utilisent les recruteurs que vous ne maîtrisez pas encore ?
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              C&apos;est ce que fait JobBoost pour votre CV. En analysant la correspondance entre votre CV et une offre d&apos;emploi, il identifie les mots-clés présents dans l&apos;annonce qui manquent dans votre dossier. Ces termes sont exactement ceux que vous devez faire apparaître dans votre lettre de motivation pour que l&apos;ensemble de votre candidature soit cohérent et crédible pour le recruteur.
+              C&apos;est ce que fait Rivjob pour votre CV. En analysant la correspondance entre votre CV et une offre d&apos;emploi, il identifie les mots-clés présents dans l&apos;annonce qui manquent dans votre dossier. Ces termes sont exactement ceux que vous devez faire apparaître dans votre lettre de motivation pour que l&apos;ensemble de votre candidature soit cohérent et crédible pour le recruteur.
             </p>
             <div className="mt-6 mb-6">
               <Link

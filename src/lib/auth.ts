@@ -4,7 +4,12 @@ import { pool } from "@/lib/db";
 
 export const auth = betterAuth({
   database: pool,
-  trustedOrigins: ["https://www.jobboost.fr", "https://jobboost.fr"],
+  trustedOrigins: [
+    "https://www.rivjob.ai",
+    "https://rivjob.ai",
+    "https://www.jobboost.fr",
+    "https://jobboost.fr",
+  ],
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,

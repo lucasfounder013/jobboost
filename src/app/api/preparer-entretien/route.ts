@@ -13,7 +13,7 @@ async function scraperUrl(url: string): Promise<string> {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 5000);
     const res = await fetch(url, {
-      headers: { "User-Agent": "Mozilla/5.0 (compatible; JobBoost/1.0)" },
+      headers: { "User-Agent": "Mozilla/5.0 (compatible; Rivjob/1.0)" },
       signal: controller.signal,
     });
     clearTimeout(timeout);

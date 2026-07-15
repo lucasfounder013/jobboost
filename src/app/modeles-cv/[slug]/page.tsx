@@ -7,17 +7,17 @@ import EditeurCV from "./EditeurCV";
 
 const META: Record<TemplateSlug, { title: string; description: string }> = {
   "classique-ats": {
-    title: "Modèle de CV Classique ATS gratuit — PDF & Word | JobBoost",
+    title: "Modèle de CV Classique ATS gratuit — PDF & Word | Rivjob",
     description:
       "Modèle de CV ATS classique, sobre et 100% lisible par les robots de recrutement. Personnalisez-le en ligne et téléchargez-le gratuitement en PDF ou Word.",
   },
   moderne: {
-    title: "Modèle de CV Moderne gratuit — design épuré PDF & Word | JobBoost",
+    title: "Modèle de CV Moderne gratuit — design épuré PDF & Word | Rivjob",
     description:
       "Modèle de CV moderne avec accent couleur, monocolonne, idéal pour les profils tech et créatifs. Téléchargement gratuit PDF ou Word, sans inscription.",
   },
   elegant: {
-    title: "Modèle de CV Élégant gratuit — 2 colonnes PDF & Word | JobBoost",
+    title: "Modèle de CV Élégant gratuit — 2 colonnes PDF & Word | Rivjob",
     description:
       "Modèle de CV élégant en 2 colonnes, serif, parfait pour mettre en avant vos compétences. Personnalisez et téléchargez gratuitement en PDF ou Word.",
   },

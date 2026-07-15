@@ -5,11 +5,11 @@ import ShareButtons from "../quest-ce-qu-un-ats/ShareButtons";
 import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
-  title: "Ce qui se passe vraiment après que vous avez postulé | JobBoost",
+  title: "Ce qui se passe vraiment après que vous avez postulé | Rivjob",
   description:
     "Entre le moment où vous envoyez votre candidature et le premier appel du recruteur, que se passe-t-il vraiment ? Voici les coulisses d'un recrutement, étape par étape.",
   ...ogMeta(
-    "Ce qui se passe vraiment après que vous avez postulé | JobBoost",
+    "Ce qui se passe vraiment après que vous avez postulé | Rivjob",
     "Entre le moment où vous envoyez votre candidature et le premier appel du recruteur, que se passe-t-il vraiment ? Voici les coulisses d'un recrutement, étape par étape.",
     "/ressources/cv-ats/ce-qui-se-passe-apres-avoir-postule"
   ),
@@ -23,7 +23,7 @@ const TOC = [
   { id: "etape-5-preselection", titre: "Étape 5 - la présélection",                         niveau: 2 },
   { id: "etape-6-contact",      titre: "Étape 6 - le premier contact",                      niveau: 2 },
   { id: "ce-que-ca-change",     titre: "Ce que ça change pour votre candidature",           niveau: 2 },
-  { id: "jobboost",             titre: "Ce que fait JobBoost",                               niveau: 2 },
+  { id: "rivjob",             titre: "Ce que fait Rivjob",                               niveau: 2 },
   { id: "conclusion",           titre: "Ce qu'il faut retenir",                              niveau: 2 },
 ];
 
@@ -44,7 +44,7 @@ export default function ArticleCeQuiSePasseApresPostule() {
         </div>
 
         <ArticleJsonLd
-          titre="Ce qui se passe vraiment après que vous avez postulé | JobBoost"
+          titre="Ce qui se passe vraiment après que vous avez postulé | Rivjob"
           description="Entre le moment où vous envoyez votre candidature et le premier appel du recruteur, que se passe-t-il vraiment ? Voici les coulisses d'un recrutement, étape par étape."
           slug="/ressources/cv-ats/ce-qui-se-passe-apres-avoir-postule"
           datePublication="2026-05-30"
@@ -70,9 +70,9 @@ export default function ArticleCeQuiSePasseApresPostule() {
             {/* Méta-ligne */}
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-10 pb-10 border-b border-gray-100">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-extrabold">JB</span>
+                <span className="text-white text-[10px] font-extrabold">RJ</span>
               </div>
-              <span className="font-medium text-gray-700">JobBoost</span>
+              <span className="font-medium text-gray-700">Rivjob</span>
               <span className="text-gray-300">|</span>
               <span>30 mai 2026</span>
               <span className="text-gray-300">|</span>
@@ -256,12 +256,12 @@ export default function ArticleCeQuiSePasseApresPostule() {
               </p>
             </blockquote>
 
-            {/* JobBoost */}
-            <h2 id="jobboost" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
-              Ce que fait JobBoost
+            {/* Rivjob */}
+            <h2 id="rivjob" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
+              Ce que fait Rivjob
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              JobBoost vous aide à franchir l&apos;étape la plus décisive de ce processus, celle où le recruteur tape des mots-clés dans son ATS.
+              Rivjob vous aide à franchir l&apos;étape la plus décisive de ce processus, celle où le recruteur tape des mots-clés dans son ATS.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Il analyse votre CV face à une offre d&apos;emploi et identifie les mots-clés de l&apos;offre qui manquent dans votre CV.

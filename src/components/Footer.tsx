@@ -26,10 +26,10 @@ export default function Footer() {
         <Link href="/politique-cookies" className="hover:text-gray-500 transition-colors">Cookies</Link>
       </div>
       <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1">
-        <a href="mailto:contact@jobboost.fr" className="hover:text-gray-500 transition-colors">contact@jobboost.fr</a>
+        <a href="mailto:contact@rivjob.ai" className="hover:text-gray-500 transition-colors">contact@rivjob.ai</a>
         <span>·</span>
         <a
-          href="https://www.instagram.com/jobboostfr/"
+          href="https://instagram.com/rivjob.ai"
           target="_blank"
           rel="noopener noreferrer"
           onClick={handleInstagramClick}

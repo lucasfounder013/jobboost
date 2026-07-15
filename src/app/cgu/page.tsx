@@ -2,8 +2,8 @@ import Link from "next/link";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "Conditions Générales d'Utilisation | JobBoost",
-  description: "Consultez les CGU de JobBoost : conditions d'accès, droits et obligations des utilisateurs de l'outil d'analyse et d'optimisation de CV.",
+  title: "Conditions Générales d'Utilisation | Rivjob",
+  description: "Consultez les CGU de Rivjob : conditions d'accès, droits et obligations des utilisateurs de l'outil d'analyse et d'optimisation de CV.",
 };
 
 export default function CGU() {
@@ -15,14 +15,14 @@ export default function CGU() {
         <section className="mb-8">
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">1. Accès au service</h2>
           <p className="text-sm text-gray-600 leading-relaxed">
-            Le site jobboost.fr est accessible à tout utilisateur disposant d&apos;un accès internet. Certaines fonctionnalités (sauvegarde des analyses, adaptation de CV) nécessitent la création d&apos;un compte.
+            Le site rivjob.ai est accessible à tout utilisateur disposant d&apos;un accès internet. Certaines fonctionnalités (sauvegarde des analyses, adaptation de CV) nécessitent la création d&apos;un compte.
           </p>
         </section>
 
         <section className="mb-8">
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">2. Description du service</h2>
           <p className="text-sm text-gray-600 leading-relaxed">
-            JobBoost est un service d&apos;analyse de CV basé sur l&apos;intelligence artificielle. Il permet d&apos;évaluer la correspondance entre un CV et une offre d&apos;emploi, et de générer une version adaptée du CV optimisée pour les systèmes ATS.
+            Rivjob est un service d&apos;analyse de CV basé sur l&apos;intelligence artificielle. Il permet d&apos;évaluer la correspondance entre un CV et une offre d&apos;emploi, et de générer une version adaptée du CV optimisée pour les systèmes ATS.
           </p>
         </section>
 
@@ -45,7 +45,7 @@ export default function CGU() {
         <section className="mb-8">
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">4. Compte utilisateur</h2>
           <p className="text-sm text-gray-600 leading-relaxed">
-            L&apos;utilisateur est responsable de la confidentialité de ses identifiants de connexion. En cas de compromission de son compte, il doit en informer immédiatement l&apos;éditeur à <a href="mailto:contact@jobboost.fr" className="text-indigo-600 hover:underline">contact@jobboost.fr</a>.
+            L&apos;utilisateur est responsable de la confidentialité de ses identifiants de connexion. En cas de compromission de son compte, il doit en informer immédiatement l&apos;éditeur à <a href="mailto:contact@rivjob.ai" className="text-indigo-600 hover:underline">contact@rivjob.ai</a>.
           </p>
         </section>
 
@@ -73,7 +73,7 @@ export default function CGU() {
         <section className="mb-8">
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">8. Droit applicable</h2>
           <p className="text-sm text-gray-600 leading-relaxed">
-            Les présentes CGU sont soumises au droit français. Contact : <a href="mailto:contact@jobboost.fr" className="text-indigo-600 hover:underline">contact@jobboost.fr</a>
+            Les présentes CGU sont soumises au droit français. Contact : <a href="mailto:contact@rivjob.ai" className="text-indigo-600 hover:underline">contact@rivjob.ai</a>
           </p>
         </section>
       </main>

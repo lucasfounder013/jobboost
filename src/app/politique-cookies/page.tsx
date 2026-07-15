@@ -2,8 +2,8 @@ import Link from "next/link";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "Politique de cookies | JobBoost",
-  description: "Informations sur les cookies utilisés par JobBoost : cookies essentiels, analytiques et comment les gérer ou les désactiver.",
+  title: "Politique de cookies | Rivjob",
+  description: "Informations sur les cookies utilisés par Rivjob : cookies essentiels, analytiques et comment les gérer ou les désactiver.",
 };
 
 export default function PolitiqueCookies() {
@@ -15,7 +15,7 @@ export default function PolitiqueCookies() {
         <section className="mb-8">
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">Cookies utilisés</h2>
           <p className="text-sm text-gray-600 leading-relaxed mb-4">
-            JobBoost utilise uniquement des cookies strictement nécessaires au fonctionnement du service. Aucun cookie publicitaire, de tracking ou d&apos;analyse tiers n&apos;est déposé.
+            Rivjob utilise uniquement des cookies strictement nécessaires au fonctionnement du service. Aucun cookie publicitaire, de tracking ou d&apos;analyse tiers n&apos;est déposé.
           </p>
           <div className="bg-gray-50 rounded-xl p-5 text-sm text-gray-600 leading-relaxed">
             <p className="font-semibold text-gray-800 mb-2">Cookie de session — <code className="text-indigo-600 text-xs">better-auth.session_token</code></p>
@@ -42,7 +42,7 @@ export default function PolitiqueCookies() {
         <section className="mb-8">
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">Contact</h2>
           <p className="text-sm text-gray-600 leading-relaxed">
-            Pour toute question : <a href="mailto:contact@jobboost.fr" className="text-indigo-600 hover:underline">contact@jobboost.fr</a>
+            Pour toute question : <a href="mailto:contact@rivjob.ai" className="text-indigo-600 hover:underline">contact@rivjob.ai</a>
           </p>
         </section>
       </main>

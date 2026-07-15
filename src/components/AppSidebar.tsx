@@ -52,7 +52,7 @@ export default function AppSidebar({ active, quotas, ouverte, onFermer }: Props)
         <div className="px-5 py-5 border-b border-indigo-900">
           <Link href="/" className="flex items-center gap-2 group">
             <span className="text-lg font-bold tracking-tight text-white group-hover:text-indigo-200 transition-colors">
-              JobBoost
+              Rivjob
             </span>
           </Link>
         </div>
@@ -219,7 +219,7 @@ export default function AppSidebar({ active, quotas, ouverte, onFermer }: Props)
             <p className="text-indigo-400 text-xs truncate mb-3">{session.user.email}</p>
           )}
           <a
-            href="mailto:contact@jobboost.fr"
+            href="mailto:contact@rivjob.ai"
             className="flex items-center gap-2 text-indigo-400 hover:text-indigo-200 text-xs font-medium transition-colors mb-3"
           >
             <svg className="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -5,11 +5,11 @@ import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
-  title: "Comment commencer une lettre de motivation : exemples et erreurs | JobBoost",
+  title: "Comment commencer une lettre de motivation : exemples et erreurs | Rivjob",
   description:
     "Comment commencer une lettre de motivation sans dire \"je me permets de vous contacter\" ? Voici les formules qui fonctionnent, avec des exemples concrets adaptables.",
   ...ogMeta(
-    "Comment commencer une lettre de motivation : exemples et erreurs | JobBoost",
+    "Comment commencer une lettre de motivation : exemples et erreurs | Rivjob",
     "Comment commencer une lettre de motivation sans dire \"je me permets de vous contacter\" ? Voici les formules qui fonctionnent, avec des exemples concrets adaptables.",
     "/ressources/lettre-de-motivation/comment-commencer-lettre-de-motivation"
   ),
@@ -47,7 +47,7 @@ export default function ArticleCommentCommencerLDM() {
         </div>
 
         <ArticleJsonLd
-          titre="Comment commencer une lettre de motivation : exemples et erreurs | JobBoost"
+          titre="Comment commencer une lettre de motivation : exemples et erreurs | Rivjob"
           description={'Comment commencer une lettre de motivation sans dire "je me permets de vous contacter" ? Voici les formules qui fonctionnent, avec des exemples concrets adaptables.'}
           slug="/ressources/lettre-de-motivation/comment-commencer-lettre-de-motivation"
           datePublication="2026-06-19"
@@ -73,9 +73,9 @@ export default function ArticleCommentCommencerLDM() {
             {/* Méta-ligne */}
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-10 pb-10 border-b border-gray-100">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-extrabold">JB</span>
+                <span className="text-white text-[10px] font-extrabold">RJ</span>
               </div>
-              <span className="font-medium text-gray-700">JobBoost</span>
+              <span className="font-medium text-gray-700">Rivjob</span>
               <span className="text-gray-300">|</span>
               <span>19 juin 2026</span>
               <span className="text-gray-300">|</span>
@@ -438,7 +438,7 @@ export default function ArticleCommentCommencerLDM() {
               Les premières phrases qui marchent ont toutes un point commun : elles reprennent le vocabulaire exact de l&apos;offre d&apos;emploi. C&apos;est ce qui crée l&apos;effet de précision et de connexion.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              JobBoost analyse gratuitement la correspondance entre votre CV et une offre, et identifie les mots-clés à reprendre. Ces termes sont la matière première de votre accroche. Vous trouverez aussi nos{" "}
+              Rivjob analyse gratuitement la correspondance entre votre CV et une offre, et identifie les mots-clés à reprendre. Ces termes sont la matière première de votre accroche. Vous trouverez aussi nos{" "}
               <Link href="/ressources/lettre-de-motivation/exemple-lettre-de-motivation" className="text-violet-600 hover:text-violet-800 underline underline-offset-2">
                 5 modèles de lettre de motivation
               </Link>

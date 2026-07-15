@@ -5,11 +5,11 @@ import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
-  title: "Mots-clés CV Comptable : liste complète 2026 | JobBoost",
+  title: "Mots-clés CV Comptable : liste complète 2026 | Rivjob",
   description:
     "Découvrez les 30+ mots-clés indispensables pour un CV Comptable qui passe les filtres ATS en 2026. Liste complète par catégorie + exemples.",
   ...ogMeta(
-    "Mots-clés CV Comptable : liste complète 2026 | JobBoost",
+    "Mots-clés CV Comptable : liste complète 2026 | Rivjob",
     "Découvrez les 30+ mots-clés indispensables pour un CV Comptable qui passe les filtres ATS en 2026. Liste complète par catégorie + exemples.",
     "/ressources/cv-ats/mots-cles-cv-comptable"
   ),
@@ -25,7 +25,7 @@ const TOC = [
   { id: "integrer-mots-cles",      titre: "Comment les intégrer naturellement",           niveau: 2 },
   { id: "erreurs-a-eviter",        titre: "Les erreurs à éviter",                         niveau: 2 },
   { id: "faq",                     titre: "FAQ : ATS et CV Comptable",                    niveau: 2 },
-  { id: "ce-que-fait-jobboost",    titre: "Ce que fait JobBoost",                         niveau: 2 },
+  { id: "ce-que-fait-rivjob",    titre: "Ce que fait Rivjob",                         niveau: 2 },
 ];
 
 export default function ArticleMotsClesComptable() {
@@ -45,7 +45,7 @@ export default function ArticleMotsClesComptable() {
         </div>
 
         <ArticleJsonLd
-          titre="Mots-clés CV Comptable : liste complète 2026 | JobBoost"
+          titre="Mots-clés CV Comptable : liste complète 2026 | Rivjob"
           description="Découvrez les 30+ mots-clés indispensables pour un CV Comptable qui passe les filtres ATS en 2026. Liste complète par catégorie + exemples."
           slug="/ressources/cv-ats/mots-cles-cv-comptable"
           datePublication="2026-06-07"
@@ -71,9 +71,9 @@ export default function ArticleMotsClesComptable() {
             {/* Méta-ligne */}
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-10 pb-10 border-b border-gray-100">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-extrabold">JB</span>
+                <span className="text-white text-[10px] font-extrabold">RJ</span>
               </div>
-              <span className="font-medium text-gray-700">JobBoost</span>
+              <span className="font-medium text-gray-700">Rivjob</span>
               <span className="text-gray-300">|</span>
               <span>7 juin 2026</span>
               <span className="text-gray-300">|</span>
@@ -329,14 +329,14 @@ export default function ArticleMotsClesComptable() {
             </p>
 
             {/* Section 6 */}
-            <h2 id="ce-que-fait-jobboost" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
-              Ce que fait JobBoost pour votre CV Comptable
+            <h2 id="ce-que-fait-rivjob" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
+              Ce que fait Rivjob pour votre CV Comptable
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Cette liste vous donne les mots-clés universels du métier de Comptable. Mais chaque offre d&apos;emploi a ses propres priorités selon la taille de l&apos;entreprise, son logiciel comptable, et le périmètre du poste.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              JobBoost analyse la correspondance entre votre CV et une offre d&apos;emploi spécifique. Il identifie les mots-clés présents dans l&apos;offre qui manquent dans votre CV — ceux que le recruteur tapera dans son ATS pour trouver le bon profil comptable.
+              Rivjob analyse la correspondance entre votre CV et une offre d&apos;emploi spécifique. Il identifie les mots-clés présents dans l&apos;offre qui manquent dans votre CV — ceux que le recruteur tapera dans son ATS pour trouver le bon profil comptable.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               L&apos;objectif : que votre CV apparaisse quand le recruteur cherche un Comptable avec exactement votre périmètre et vos logiciels.

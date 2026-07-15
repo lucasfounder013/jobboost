@@ -1,6 +1,6 @@
 import { MetadataRoute } from "next";
 
-const BASE_URL = "https://www.jobboost.fr";
+const BASE_URL = "https://www.rivjob.ai";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [

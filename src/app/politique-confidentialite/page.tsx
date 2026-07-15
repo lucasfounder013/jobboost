@@ -2,8 +2,8 @@ import Link from "next/link";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "Politique de confidentialité | JobBoost",
-  description: "Découvrez comment JobBoost collecte, utilise et protège vos données personnelles conformément au RGPD.",
+  title: "Politique de confidentialité | Rivjob",
+  description: "Découvrez comment Rivjob collecte, utilise et protège vos données personnelles conformément au RGPD.",
 };
 
 export default function PolitiqueConfidentialite() {
@@ -23,7 +23,7 @@ export default function PolitiqueConfidentialite() {
             <li>CV fourni par l&apos;utilisateur (traitement temporaire en mémoire, non stocké en base de données)</li>
             <li>Résultats d&apos;analyse et CV adaptés (sauvegardés si l&apos;utilisateur est connecté)</li>
             <li>Données de navigation (cookies de session)</li>
-            <li>Données de paiement (gérées exclusivement par Stripe, non accessibles par JobBoost)</li>
+            <li>Données de paiement (gérées exclusivement par Stripe, non accessibles par Rivjob)</li>
           </ul>
         </section>
 
@@ -66,7 +66,7 @@ export default function PolitiqueConfidentialite() {
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">6. Droits de l&apos;utilisateur</h2>
           <p className="text-sm text-gray-600 leading-relaxed">
             Conformément au RGPD, vous disposez d&apos;un droit d&apos;accès, de rectification, d&apos;effacement et de portabilité de vos données. Pour exercer ces droits, contactez-nous à :{" "}
-            <a href="mailto:contact@jobboost.fr" className="text-indigo-600 hover:underline">contact@jobboost.fr</a>
+            <a href="mailto:contact@rivjob.ai" className="text-indigo-600 hover:underline">contact@rivjob.ai</a>
           </p>
         </section>
 

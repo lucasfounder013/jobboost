@@ -199,7 +199,7 @@ export default function DashboardPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <span className="font-bold text-gray-900 text-base">JobBoost</span>
+          <span className="font-bold text-gray-900 text-base">Rivjob</span>
         </div>
 
         <div className="max-w-7xl mx-auto px-6 md:px-8 py-8">

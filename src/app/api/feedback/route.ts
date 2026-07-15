@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 24px;">
-      <h2 style="color: #7C3AED; margin-bottom: 4px;">Nouveau feedback JobBoost</h2>
+      <h2 style="color: #7C3AED; margin-bottom: 4px;">Nouveau feedback Rivjob</h2>
       <p style="color: #6B7280; font-size: 14px; margin-top: 0;">${date}</p>
       <table style="width: 100%; border-collapse: collapse; margin-top: 16px;">
         <tr>
@@ -39,8 +39,8 @@ export async function POST(req: Request) {
 
   try {
     await resend.emails.send({
-      from: "equipe@jobboost.fr",
-      to: "contact@jobboost.fr",
+      from: "equipe@rivjob.ai",
+      to: "contact@rivjob.ai",
       subject: `[Feedback] ${typeLabel[type] ?? type} — ${date}`,
       html,
     });

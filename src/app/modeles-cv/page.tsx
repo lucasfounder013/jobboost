@@ -9,7 +9,7 @@ import SectionsPublic from "@/components/modeles-cv/SectionsPublic";
 import BoutonRetour from "@/components/modeles-cv/BoutonRetour";
 import MesCvsEnregistres from "@/components/modeles-cv/MesCvsEnregistres";
 
-const TITRE = "Modèles de CV gratuits 2026 — PDF & Word à télécharger | JobBoost";
+const TITRE = "Modèles de CV gratuits 2026 — PDF & Word à télécharger | Rivjob";
 const DESCRIPTION =
   "3 modèles de CV gratuits, optimisés ATS, à personnaliser en ligne et télécharger en PDF ou Word. Sans inscription, sans filigrane.";
 
@@ -23,7 +23,7 @@ const BENEFICES = [
   {
     titre: "100% gratuit, sans filigrane",
     description:
-      "Aucune carte bancaire, aucun compte. Téléchargez votre CV en PDF ou Word sans limite, sans logo JobBoost imposé.",
+      "Aucune carte bancaire, aucun compte. Téléchargez votre CV en PDF ou Word sans limite, sans logo Rivjob imposé.",
   },
   {
     titre: "Optimisés pour les ATS",
@@ -46,7 +46,7 @@ const FAQ: QuestionFaq[] = [
   {
     question: "Vos modèles de CV sont-ils vraiment gratuits ?",
     reponse:
-      "Oui, totalement. Aucune inscription, aucune carte bancaire, aucun filigrane sur le PDF final. Vous pouvez télécharger autant de versions que vous voulez. JobBoost se rémunère uniquement sur ses outils premium d'adaptation de CV par IA, pas sur les modèles.",
+      "Oui, totalement. Aucune inscription, aucune carte bancaire, aucun filigrane sur le PDF final. Vous pouvez télécharger autant de versions que vous voulez. Rivjob se rémunère uniquement sur ses outils premium d'adaptation de CV par IA, pas sur les modèles.",
   },
   {
     question: "Les modèles passent-ils les ATS (logiciels de recrutement) ?",
@@ -91,7 +91,7 @@ const JSON_LD = {
       itemListElement: TEMPLATES.map((t, i) => ({
         "@type": "ListItem",
         position: i + 1,
-        url: `https://www.jobboost.fr/modeles-cv/${t.slug}`,
+        url: `https://www.rivjob.ai/modeles-cv/${t.slug}`,
         name: `Modèle de CV ${t.nom}`,
       })),
     },
@@ -171,7 +171,7 @@ export default function ModelesCvPage() {
               Et après ? Adaptez votre CV à chaque offre d&apos;emploi
             </h2>
             <p className="text-indigo-50 mb-6 leading-relaxed">
-              JobBoost analyse votre CV et l&apos;adapte automatiquement à l&apos;offre visée en mettant en avant les bons mots-clés.
+              Rivjob analyse votre CV et l&apos;adapte automatiquement à l&apos;offre visée en mettant en avant les bons mots-clés.
             </p>
             <Link
               href="/"

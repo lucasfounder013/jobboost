@@ -2,8 +2,8 @@ import Link from "next/link";
 import Footer from "@/components/Footer";
 
 export const metadata = {
-  title: "Mentions légales | JobBoost",
-  description: "Mentions légales de JobBoost : éditeur, hébergeur, propriété intellectuelle et responsabilités liées à l'utilisation de l'outil d'optimisation de CV.",
+  title: "Mentions légales | Rivjob",
+  description: "Mentions légales de Rivjob : éditeur, hébergeur, propriété intellectuelle et responsabilités liées à l'utilisation de l'outil d'optimisation de CV.",
 };
 
 export default function MentionsLegales() {
@@ -15,11 +15,11 @@ export default function MentionsLegales() {
         <section className="mb-8">
           <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">Éditeur du site</h2>
           <p className="text-sm text-gray-600 leading-relaxed">
-            Le présent site, accessible à l&apos;adresse <strong>jobboost.fr</strong>, est édité par :<br /><br />
+            Le présent site, accessible à l&apos;adresse <strong>rivjob.ai</strong>, est édité par :<br /><br />
             <strong>Lucas LE DONNE</strong>, entrepreneur individuel (micro-entreprise)<br />
             Exerçant sous le nom commercial <strong>LBM</strong><br />
             Adresse : 100 rue Baudin, 92300 Levallois-Perret, France<br />
-            Email : <a href="mailto:contact@jobboost.fr" className="text-indigo-600 hover:underline">contact@jobboost.fr</a><br />
+            Email : <a href="mailto:contact@rivjob.ai" className="text-indigo-600 hover:underline">contact@rivjob.ai</a><br />
             Numéro SIRET : 99395382700017<br /><br />
             Directeur de la publication : Lucas LE DONNE
           </p>

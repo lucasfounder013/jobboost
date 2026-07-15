@@ -5,11 +5,11 @@ import ShareButtons from "./ShareButtons";
 import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
-  title: "Mots-clés CV Assistant RH : liste complète 2026 | JobBoost",
+  title: "Mots-clés CV Assistant RH : liste complète 2026 | Rivjob",
   description:
     "Découvrez les 30+ mots-clés indispensables pour un CV Assistant RH qui passe les filtres ATS en 2026. Liste complète par catégorie + exemples.",
   ...ogMeta(
-    "Mots-clés CV Assistant RH : liste complète 2026 | JobBoost",
+    "Mots-clés CV Assistant RH : liste complète 2026 | Rivjob",
     "Découvrez les 30+ mots-clés indispensables pour un CV Assistant RH qui passe les filtres ATS en 2026. Liste complète par catégorie + exemples.",
     "/ressources/cv-ats/mots-cles-cv-assistant-rh"
   ),
@@ -45,7 +45,7 @@ export default function ArticleMotsClesAssistantRH() {
         </div>
 
         <ArticleJsonLd
-          titre="Mots-clés CV Assistant RH : liste complète 2026 | JobBoost"
+          titre="Mots-clés CV Assistant RH : liste complète 2026 | Rivjob"
           description="Découvrez les 30+ mots-clés indispensables pour un CV Assistant RH qui passe les filtres ATS en 2026. Liste complète par catégorie + exemples."
           slug="/ressources/cv-ats/mots-cles-cv-assistant-rh"
           datePublication="2026-06-11"
@@ -71,9 +71,9 @@ export default function ArticleMotsClesAssistantRH() {
             {/* Méta-ligne */}
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-10 pb-10 border-b border-gray-100">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-extrabold">JB</span>
+                <span className="text-white text-[10px] font-extrabold">RJ</span>
               </div>
-              <span className="font-medium text-gray-700">JobBoost</span>
+              <span className="font-medium text-gray-700">Rivjob</span>
               <span className="text-gray-300">|</span>
               <span>11 juin 2026</span>
               <span className="text-gray-300">|</span>
@@ -347,7 +347,7 @@ export default function ArticleMotsClesAssistantRH() {
               Lisez attentivement l&apos;offre d&apos;emploi. Les mots qui reviennent plusieurs fois dans la description du poste sont exactement ceux que le recruteur a paramétrés dans son ATS. Identifiez les 5 à 10 termes les plus présents et vérifiez qu&apos;ils apparaissent dans votre CV.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              Pour aller plus loin, JobBoost analyse automatiquement la correspondance entre votre CV et une offre d&apos;emploi spécifique, et identifie les mots-clés présents dans l&apos;offre qui manquent dans votre CV.
+              Pour aller plus loin, Rivjob analyse automatiquement la correspondance entre votre CV et une offre d&apos;emploi spécifique, et identifie les mots-clés présents dans l&apos;offre qui manquent dans votre CV.
             </p>
 
             {/* CTA */}

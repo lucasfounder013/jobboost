@@ -5,11 +5,11 @@ import ShareButtons from "../quest-ce-qu-un-ats/ShareButtons";
 import { ogMeta } from "@/lib/seo";
 
 export const metadata = {
-  title: "Les rubriques indispensables d'un CV en 2026 | JobBoost",
+  title: "Les rubriques indispensables d'un CV en 2026 | Rivjob",
   description:
     "Quelles rubriques mettre sur son CV en 2026 ? Celles que tous les recruteurs cherchent, celles à éviter, et celles qui font vraiment la différence.",
   ...ogMeta(
-    "Les rubriques indispensables d'un CV en 2026 | JobBoost",
+    "Les rubriques indispensables d'un CV en 2026 | Rivjob",
     "Quelles rubriques mettre sur son CV en 2026 ? Celles que tous les recruteurs cherchent, celles à éviter, et celles qui font vraiment la différence.",
     "/ressources/cv-ats/rubriques-indispensables-cv-2026"
   ),
@@ -25,7 +25,7 @@ const TOC = [
   { id: "langues",                     titre: "Les langues",                           niveau: 2 },
   { id: "rubriques-optionnelles",      titre: "Les rubriques optionnelles",            niveau: 2 },
   { id: "ce-quil-faut-retenir",        titre: "Ce qu'il faut retenir",                niveau: 2 },
-  { id: "ce-que-fait-jobboost",        titre: "Ce que fait JobBoost",                 niveau: 2 },
+  { id: "ce-que-fait-rivjob",        titre: "Ce que fait Rivjob",                 niveau: 2 },
 ];
 
 export default function ArticleRubriquesCV() {
@@ -45,7 +45,7 @@ export default function ArticleRubriquesCV() {
         </div>
 
         <ArticleJsonLd
-          titre="Les rubriques indispensables d'un CV en 2026 | JobBoost"
+          titre="Les rubriques indispensables d'un CV en 2026 | Rivjob"
           description="Quelles rubriques mettre sur son CV en 2026 ? Celles que tous les recruteurs cherchent, celles à éviter, et celles qui font vraiment la différence."
           slug="/ressources/cv-ats/rubriques-indispensables-cv-2026"
           datePublication="2026-05-31"
@@ -71,9 +71,9 @@ export default function ArticleRubriquesCV() {
             {/* Méta-ligne */}
             <div className="flex items-center gap-3 text-sm text-gray-500 mb-10 pb-10 border-b border-gray-100">
               <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                <span className="text-white text-[10px] font-extrabold">JB</span>
+                <span className="text-white text-[10px] font-extrabold">RJ</span>
               </div>
-              <span className="font-medium text-gray-700">JobBoost</span>
+              <span className="font-medium text-gray-700">Rivjob</span>
               <span className="text-gray-300">|</span>
               <span>31 mai 2026</span>
               <span className="text-gray-300">|</span>
@@ -281,11 +281,11 @@ export default function ArticleRubriquesCV() {
             </p>
 
             {/* Section 10 */}
-            <h2 id="ce-que-fait-jobboost" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
-              Ce que fait JobBoost
+            <h2 id="ce-que-fait-rivjob" className="text-3xl font-bold text-gray-900 mt-16 mb-5">
+              Ce que fait Rivjob
             </h2>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
-              JobBoost analyse votre CV face à une offre d&apos;emploi et identifie les mots-clés de l&apos;offre qui manquent dans vos rubriques.
+              Rivjob analyse votre CV face à une offre d&apos;emploi et identifie les mots-clés de l&apos;offre qui manquent dans vos rubriques.
             </p>
             <p className="text-gray-700 leading-8 mb-6 text-lg">
               Il vous indique exactement quoi ajuster pour que votre CV soit trouvé par le recruteur qui cherche votre profil.

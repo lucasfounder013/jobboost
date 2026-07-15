@@ -14,23 +14,23 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.jobboost.fr"),
-  title: "Analysez votre CV face à une offre d'emploi | JobBoost",
+  metadataBase: new URL("https://www.rivjob.ai"),
+  title: "Analysez votre CV face à une offre d'emploi | Rivjob",
   description: "Collez votre CV et une offre d'emploi pour obtenir votre score de correspondance, les mots-clés manquants et un CV adapté en quelques secondes.",
   alternates: {
-    canonical: "https://www.jobboost.fr",
+    canonical: "https://www.rivjob.ai",
   },
   openGraph: {
-    title: "Analysez votre CV face à une offre d'emploi | JobBoost",
+    title: "Analysez votre CV face à une offre d'emploi | Rivjob",
     description: "Collez votre CV et une offre d'emploi pour obtenir votre score de correspondance, les mots-clés manquants et un CV adapté en quelques secondes.",
-    url: "https://www.jobboost.fr",
-    siteName: "JobBoost",
+    url: "https://www.rivjob.ai",
+    siteName: "Rivjob",
     locale: "fr_FR",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Analysez votre CV face à une offre d'emploi | JobBoost",
+    title: "Analysez votre CV face à une offre d'emploi | Rivjob",
     description: "Collez votre CV et une offre d'emploi pour obtenir votre score de correspondance, les mots-clés manquants et un CV adapté en quelques secondes.",
   },
   verification: {
@@ -43,11 +43,11 @@ export const metadata: Metadata = {
 const organizationJsonLd = {
   "@context": "https://schema.org",
   "@type": "Organization",
-  name: "JobBoost",
-  url: "https://www.jobboost.fr",
-  logo: "https://www.jobboost.fr/favicon.ico",
-  description: "JobBoost analyse votre CV face à une offre d'emploi et l'adapte automatiquement pour maximiser vos chances d'être retenu.",
-  sameAs: ["https://github.com/lucasfounder013/jobboost"],
+  name: "Rivjob",
+  url: "https://www.rivjob.ai",
+  logo: "https://www.rivjob.ai/favicon.ico",
+  description: "Rivjob analyse votre CV face à une offre d'emploi et l'adapte automatiquement pour maximiser vos chances d'être retenu.",
+  sameAs: ["https://github.com/lucasfounder013/rivjob"],
 };
 
 export default function RootLayout({
