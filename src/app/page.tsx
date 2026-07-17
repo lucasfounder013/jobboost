@@ -705,13 +705,7 @@ export default function PagePrincipale() {
             <h2 className="text-2xl sm:text-3xl font-extrabold text-gray-900 text-center mb-10">Questions fréquentes</h2>
             <div className="flex flex-col divide-y divide-gray-100">
               {FAQ.map(({ q, r }, i) => (
-                <details key={i} className="group py-5 cursor-pointer list-none">
-                  <summary className="flex items-center justify-between gap-4 font-semibold text-gray-900 text-sm sm:text-base select-none list-none">
-                    {q}
-                    <span className="shrink-0 w-5 h-5 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold group-open:rotate-45 transition-transform duration-200">+</span>
-                  </summary>
-                  <p className="hidden group-open:block mt-3 text-gray-500 text-sm leading-relaxed">{r}</p>
-                </details>
+                <FaqItem key={i} question={q} reponse={r} />
               ))}
             </div>
           </div>
@@ -743,6 +737,26 @@ export default function PagePrincipale() {
 
       <Footer />
 
+    </div>
+  );
+}
+
+function FaqItem({ question, reponse }: { question: string; reponse: string }) {
+  const [ouvert, setOuvert] = useState(false);
+  return (
+    <div className="py-5">
+      <button
+        type="button"
+        onClick={() => setOuvert((v) => !v)}
+        aria-expanded={ouvert}
+        className="w-full flex items-center justify-between gap-4 font-semibold text-gray-900 text-sm sm:text-base text-left"
+      >
+        <span>{question}</span>
+        <span className={`shrink-0 w-5 h-5 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold transition-transform duration-200 ${ouvert ? "rotate-45" : ""}`}>+</span>
+      </button>
+      {ouvert && (
+        <p className="mt-3 text-gray-500 text-sm leading-relaxed">{reponse}</p>
+      )}
     </div>
   );
 }
