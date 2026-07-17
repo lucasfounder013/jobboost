@@ -1,206 +1,191 @@
 "use client";
 
-import Link from "next/link";
 import Image from "next/image";
 
 export default function APropos() {
   return (
-    <main className="min-h-screen bg-[#F7F2E9] text-[#2A2419] antialiased selection:bg-amber-200/60">
-      {/* Texture papier subtile */}
-      <div
-        className="fixed inset-0 pointer-events-none opacity-[0.035] mix-blend-multiply"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E\")",
-        }}
-      />
-
-      <article className="relative max-w-2xl mx-auto px-6 sm:px-8 py-20 sm:py-28">
-        {/* En-tête type journal manuscrit */}
-        <header className="mb-16 sm:mb-20">
-          <div
-            className="text-sm tracking-widest uppercase text-[#8B7355] mb-8"
+    <main className="min-h-screen bg-white text-gray-900">
+      {/* Hero — accueil chaleureux */}
+      <section className="bg-gradient-to-b from-indigo-50/70 via-white to-white px-6 pt-20 pb-16">
+        <div className="max-w-2xl mx-auto text-center">
+          <p
+            className="text-3xl sm:text-4xl text-indigo-600 mb-6"
             style={{ fontFamily: "var(--font-manuscrite)" }}
           >
-            <span className="text-2xl normal-case tracking-normal">Une lettre</span>
-          </div>
-
+            Bonjour,
+          </p>
           <h1
-            className="text-4xl sm:text-5xl md:text-6xl leading-[1.05] text-[#1A1510]"
+            className="text-4xl sm:text-5xl md:text-6xl font-normal tracking-tight leading-[1.1] text-gray-900"
             style={{ fontFamily: "var(--font-serif-editorial)" }}
           >
-            Si vous êtes ici,
+            je m&apos;appelle <em className="italic text-indigo-600">Lucas</em>,
             <br />
-            <em className="italic text-[#7A6244]">
-              c&apos;est probablement
-              <br />
-              qu&apos;on vous a ignoré.
-            </em>
+            et voici pourquoi
+            <br />
+            j&apos;ai créé Rivjob.
           </h1>
+        </div>
+      </section>
 
-          <p className="mt-8 text-base sm:text-lg text-[#5C4E3A] leading-relaxed">
-            Une candidature. Puis dix. Puis cinquante. Et pas une réponse.
-            <br />
-            Je sais ce que c&apos;est. Je vais vous raconter pourquoi j&apos;ai créé Rivjob.
-          </p>
-
-          <div className="mt-10 flex items-center gap-3 text-sm text-[#8B7355]">
-            <div className="h-px w-12 bg-[#C4A87A]" />
-            <span
-              className="text-2xl text-[#7A6244]"
-              style={{ fontFamily: "var(--font-manuscrite)" }}
-            >
-              Lucas
-            </span>
-            <div className="h-px flex-1 bg-[#C4A87A]/40" />
+      {/* Section 1 — Qui je suis (photo + bio) */}
+      <section className="px-6 py-16 sm:py-20">
+        <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-[auto_1fr] gap-10 md:gap-14 items-center">
+          <div className="mx-auto md:mx-0">
+            {/* Photo à ajouter dans /public/photos/lucas-ledonne.jpg (format carré, 600×600 min) */}
+            <div className="relative w-56 h-56 sm:w-64 sm:h-64 rounded-3xl overflow-hidden ring-4 ring-indigo-100 shadow-xl bg-gradient-to-br from-indigo-100 to-violet-100">
+              <Image
+                src="/photos/lucas-ledonne.jpg"
+                alt="Lucas Le Donne, créateur de Rivjob"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 224px, 256px"
+              />
+            </div>
           </div>
-        </header>
 
-        {/* Photo polaroid inclinée */}
-        <div className="my-16 sm:my-20 flex justify-center">
-          <div className="relative rotate-[-3deg] hover:rotate-0 transition-transform duration-500">
-            <div className="bg-white p-3 pb-16 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.25)] ring-1 ring-black/5">
-              <div className="relative w-56 h-56 sm:w-72 sm:h-72 bg-[#EFE7D8] overflow-hidden">
-                {/* Photo à ajouter dans /public/photos/lucas-ledonne.jpg */}
-                <Image
-                  src="/photos/lucas-ledonne.jpg"
-                  alt="Lucas Le Donne"
-                  fill
-                  className="object-cover grayscale-[0.15] contrast-[1.02]"
-                  sizes="(max-width: 640px) 224px, 288px"
-                />
-              </div>
-              <p
-                className="absolute bottom-4 left-0 right-0 text-center text-2xl text-[#5C4E3A]"
-                style={{ fontFamily: "var(--font-manuscrite)" }}
-              >
-                Lucas, quelque part en 2026
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-widest text-indigo-600 mb-3">
+              Qui je suis
+            </p>
+            <h2
+              className="text-3xl sm:text-4xl text-gray-900 mb-5 leading-tight"
+              style={{ fontFamily: "var(--font-serif-editorial)" }}
+            >
+              Lucas Le Donne
+            </h2>
+            <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
+              {/* À valider avec Lucas : parcours (âge, formation, ville, métier actuel) */}
+              <p>
+                Je suis le fondateur de Rivjob. Je construis ce projet seul, en France,
+                à taille humaine. Il n&apos;y a pas d&apos;équipe cachée derrière un
+                logo — juste moi, mon ordinateur, et beaucoup de conversations avec les
+                gens qui utilisent l&apos;outil.
+              </p>
+              <p>
+                {/* À valider : ce que tu veux dire de toi (parcours, personnalité) */}
+                Si vous voulez me connaître un peu, la meilleure façon reste de
+                m&apos;écrire directement.
               </p>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Corps du récit */}
-        <div
-          className="prose-personal space-y-8 text-lg leading-[1.85] text-[#2A2419]"
-          style={{ fontFamily: "var(--font-serif-editorial)" }}
-        >
-          <p className="text-2xl leading-relaxed">
-            <span className="float-left text-6xl leading-[0.85] mr-3 mt-2 text-[#7A6244]">B</span>
-            onjour. Je m&apos;appelle Lucas. J&apos;ai créé ce site parce que quelque
-            chose m&apos;a mis en colère.
-          </p>
-
-          {/* À valider : contexte perso du déclic */}
-          <p>
-            Il y a quelques mois, une amie proche cherchait un poste. Compétente, motivée,
-            diplômée. Elle a envoyé plus de <em>quatre-vingts candidatures</em>. Elle a reçu
-            trois réponses. Trois. Pas trois entretiens — trois <em>accusés de réception
-            automatiques</em>.
-          </p>
-
-          <p>
-            Elle m&apos;a demandé si son CV était mauvais. Il ne l&apos;était pas. Il était
-            juste <em>invisible</em>.
-          </p>
-
-          <aside className="my-12 border-l-2 border-[#C4A87A] pl-6 py-2 text-[#5C4E3A]">
-            <p className="italic">
-              Ce que personne ne lui avait dit : avant qu&apos;un humain ne lise son CV,
-              un logiciel décide s&apos;il mérite d&apos;être lu. Ce logiciel s&apos;appelle
-              un ATS. Il filtre. Il classe. Il jette.
+      {/* Section 2 — Pourquoi j'ai créé Rivjob (récit personnel avec stats intégrées) */}
+      <section className="bg-gradient-to-b from-white via-indigo-50/40 to-white border-t border-indigo-100/60 px-6 py-20 sm:py-24">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-sm font-semibold uppercase tracking-widest text-indigo-600 mb-3">
+              L&apos;histoire
             </p>
-          </aside>
-
-          <p>
-            J&apos;ai commencé à creuser. J&apos;ai découvert que la majorité des grandes
-            entreprises françaises utilisent ces filtres. J&apos;ai découvert qu&apos;un
-            recruteur passe en moyenne <em>trente secondes</em> sur un CV — quand il le
-            reçoit. J&apos;ai découvert que la plupart des candidats n&apos;en savaient
-            rien.
-          </p>
-
-          <p>
-            Aux États-Unis, il existait déjà un outil pour aider les candidats à passer
-            ces filtres. Il s&apos;appelle Jobscan. En France, <em>rien</em>. Pas d&apos;équivalent,
-            pas d&apos;alternative pensée pour notre marché, notre langue, nos codes.
-          </p>
-
-          <p className="text-xl">
-            Alors je l&apos;ai construit.
-          </p>
-
-          {/* À valider : ton perso sur la construction */}
-          <p>
-            Rivjob n&apos;est pas une startup avec des levées de fonds et une équipe de
-            trente personnes. C&apos;est un outil que je fais grandir tout seul, à taille
-            humaine, en écoutant chaque utilisateur qui m&apos;écrit.
-          </p>
-
-          <p>
-            L&apos;analyse est gratuite. Sans compte. Sans email. Vous collez votre CV,
-            vous collez l&apos;offre, et vous voyez immédiatement ce qui manque. Si vous
-            voulez ensuite adapter votre CV automatiquement, c&apos;est là que Rivjob gagne
-            un peu d&apos;argent — juste assez pour continuer à exister.
-          </p>
-
-          <aside className="my-12 border-l-2 border-[#C4A87A] pl-6 py-2 text-[#5C4E3A]">
-            <p className="italic">
-              Ce que Rivjob <em>n&apos;est pas</em> : un outil pour tricher. Ce n&apos;est
-              pas fait pour inventer des compétences. C&apos;est fait pour mettre en
-              lumière celles que vous avez déjà, et que le filtre allait rater.
-            </p>
-          </aside>
-
-          <p>
-            Je crois qu&apos;un bon candidat mérite qu&apos;on lise son CV. C&apos;est
-            aussi simple que ça. Le reste — le score, les mots-clés, l&apos;IA — ce ne sont
-            que des outils au service de cette idée.
-          </p>
-
-          <p>
-            Si vous avez une question, une remarque, si quelque chose ne va pas ou si
-            au contraire ça a changé quelque chose pour vous, écrivez-moi. Je réponds moi-même.
-          </p>
-        </div>
-
-        {/* Signature manuscrite */}
-        <div className="mt-16 pt-8">
-          <p className="text-lg text-[#5C4E3A]" style={{ fontFamily: "var(--font-serif-editorial)" }}>
-            Merci d&apos;être passé.
-          </p>
-          <p
-            className="mt-4 text-5xl text-[#3A2E1E] leading-none"
-            style={{ fontFamily: "var(--font-manuscrite)", fontWeight: 600 }}
-          >
-            Lucas
-          </p>
-          <a
-            href="mailto:contact@rivjob.ai"
-            className="mt-6 inline-block text-sm text-[#8B7355] hover:text-[#5C4E3A] underline underline-offset-4 decoration-[#C4A87A]"
-          >
-            contact@rivjob.ai
-          </a>
-        </div>
-
-        {/* CTA très discret — pas de bouton coloré, juste un lien texte */}
-        <footer className="mt-24 pt-10 border-t border-[#D4B896]/40">
-          <p className="text-sm text-[#8B7355] italic mb-3" style={{ fontFamily: "var(--font-serif-editorial)" }}>
-            P.-S.
-          </p>
-          <p className="text-base text-[#3A2E1E] leading-relaxed" style={{ fontFamily: "var(--font-serif-editorial)" }}>
-            Si vous voulez essayer, c&apos;est{" "}
-            <Link
-              href="/analyser"
-              className="text-[#7A6244] underline underline-offset-4 decoration-[#C4A87A] hover:text-[#5C4E3A] transition-colors"
+            <h2
+              className="text-3xl sm:text-4xl text-gray-900 leading-tight"
+              style={{ fontFamily: "var(--font-serif-editorial)" }}
             >
-              par ici
-            </Link>
-            . C&apos;est gratuit, il n&apos;y a même pas besoin de créer un compte pour
-            la première analyse.
-          </p>
-        </footer>
-      </article>
+              Pourquoi j&apos;ai créé Rivjob
+            </h2>
+          </div>
+
+          <div
+            className="space-y-6 text-lg leading-[1.85] text-gray-800"
+            style={{ fontFamily: "var(--font-serif-editorial)" }}
+          >
+            <p>
+              {/* À valider : contexte de ta recherche d'emploi */}
+              Tout est parti d&apos;une expérience très concrète : la mienne. À un
+              moment, j&apos;ai cherché un emploi. Comme des millions de personnes.
+              Et j&apos;ai vite compris quelque chose qui m&apos;a beaucoup surpris.
+            </p>
+
+            <p>
+              Pour maximiser mes chances, il fallait <em>adapter chaque CV à chaque
+              offre</em>. Reprendre les mots exacts de l&apos;annonce, réorganiser
+              les expériences, ajuster le vocabulaire. Ce n&apos;était pas de la
+              triche : c&apos;était simplement montrer, à chaque fois, en quoi mon
+              profil correspondait vraiment au poste.
+            </p>
+
+            <p>
+              Le problème, c&apos;est le <em>temps</em> que ça prenait.
+            </p>
+
+            {/* Stats intégrées dans le récit — à valider avec Lucas */}
+            <p>
+              Je passais entre <strong className="font-semibold text-indigo-700">30 et
+              45 minutes par candidature</strong>. Multiplié par une dizaine de
+              candidatures les bons jours, ça faisait <strong className="font-semibold text-indigo-700">4
+              à 6 heures</strong> quotidiennes juste à retoucher des CV. Du temps que
+              je ne passais ni à me préparer aux entretiens, ni à réseauter, ni à
+              simplement respirer.
+            </p>
+
+            <p>
+              Et pendant que je faisais tout ça manuellement, un détail m&apos;a
+              frappé : de l&apos;autre côté, les recruteurs utilisent des logiciels
+              (les ATS) pour trier les CV automatiquement. En France,{" "}
+              <strong className="font-semibold text-indigo-700">
+                environ 75 % des grandes entreprises
+              </strong>{" "}
+              s&apos;en servent{" "}
+              <span className="text-sm text-gray-500 italic">[à sourcer]</span>. Un
+              CV mal calibré est écarté avant même d&apos;être lu. Et le recruteur y
+              consacre en moyenne <strong className="font-semibold text-indigo-700">30 secondes</strong>{" "}
+              <span className="text-sm text-gray-500 italic">[à sourcer]</span>{" "}
+              quand il arrive jusqu&apos;à lui.
+            </p>
+
+            <p>
+              Autrement dit : <em>d&apos;un côté, un candidat qui passe des heures
+              sur chaque candidature. De l&apos;autre, des machines et 30 secondes.</em>
+            </p>
+
+            <p>
+              Ce déséquilibre m&apos;a paru absurde. Je me suis dit qu&apos;il devait
+              exister un outil pour faire ce travail d&apos;adaptation en quelques
+              secondes, et rendre au candidat le temps qui devrait servir à ce qui
+              compte vraiment.
+            </p>
+
+            <p>
+              J&apos;ai cherché. Aux États-Unis, il existe Jobscan. En France, rien
+              d&apos;équivalent, rien de pensé pour notre langue et nos codes.
+            </p>
+
+            <p className="text-xl">
+              Alors je l&apos;ai construit. C&apos;est <em className="text-indigo-700">Rivjob</em>.
+            </p>
+
+            <p>
+              L&apos;idée est simple : vous collez votre CV et une offre, et en
+              quelques secondes vous voyez ce qui correspond, ce qui manque, ce qu&apos;il
+              faut ajuster. Si vous voulez aller plus loin, l&apos;outil adapte votre
+              CV automatiquement. Ce qui vous prenait 40 minutes en prend 2.
+            </p>
+
+            <p>
+              Le temps que vous gagnez, vous le rendez à ce qui en vaut la peine :
+              vos entretiens, vos rencontres, votre vie.
+            </p>
+          </div>
+
+          {/* Signature */}
+          <div className="mt-16 text-center">
+            <p
+              className="text-4xl text-indigo-600 leading-none"
+              style={{ fontFamily: "var(--font-manuscrite)", fontWeight: 600 }}
+            >
+              Lucas
+            </p>
+            <a
+              href="mailto:contact@rivjob.ai"
+              className="mt-4 inline-block text-sm text-gray-500 hover:text-indigo-600 underline underline-offset-4 decoration-indigo-200 transition-colors"
+            >
+              contact@rivjob.ai
+            </a>
+          </div>
+        </div>
+      </section>
+
     </main>
   );
 }
