@@ -120,29 +120,7 @@ export default function APropos() {
               Je passais entre <strong className="font-semibold text-indigo-700">30 et
               45 minutes par candidature</strong>. Multiplié par une dizaine de
               candidatures les bons jours, ça faisait <strong className="font-semibold text-indigo-700">4
-              à 6 heures</strong> quotidiennes juste à préparer mes dossiers. Autant
-              de temps que je ne passais ni à me préparer aux entretiens, ni à
-              réseauter, ni à souffler un peu.
-            </p>
-
-            <p>
-              Et pendant que je faisais tout ça manuellement, quelque chose m&apos;a
-              frappé : de l&apos;autre côté, les recruteurs utilisent des logiciels
-              (les ATS) pour trier les CV automatiquement. En France,{" "}
-              <strong className="font-semibold text-indigo-700">
-                environ 75 % des grandes entreprises
-              </strong>{" "}
-              s&apos;en servent{" "}
-              <span className="text-sm text-gray-500 italic">[à sourcer]</span>. Un
-              CV mal calibré est écarté avant même d&apos;être lu. Et lorsqu&apos;il
-              parvient enfin à un humain, celui-ci y consacre en moyenne{" "}
-              <strong className="font-semibold text-indigo-700">30 secondes</strong>{" "}
-              <span className="text-sm text-gray-500 italic">[à sourcer]</span>.
-            </p>
-
-            <p>
-              Autrement dit : <em>d&apos;un côté, un candidat qui passe des heures
-              sur ses candidatures. De l&apos;autre, des machines et 30 secondes.</em>
+              à 6 heures</strong> quotidiennes juste à préparer mes dossiers.
             </p>
 
             <p>
@@ -150,11 +128,6 @@ export default function APropos() {
               exister un outil capable de faire ce travail d&apos;adaptation en
               quelques secondes, pour rendre aux candidats du temps à consacrer à ce
               qui compte vraiment.
-            </p>
-
-            <p>
-              J&apos;ai cherché. Aux États-Unis, il existe Jobscan. En France, rien
-              d&apos;équivalent, rien de pensé pour notre langue et nos codes.
             </p>
 
             <p className="text-xl">
