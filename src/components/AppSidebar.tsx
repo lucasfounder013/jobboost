@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { signOut, useSession } from "@/lib/auth-client";
 
 export type QuotasSidebar = {
@@ -30,7 +29,6 @@ type Props = {
 
 export default function AppSidebar({ active, quotas, ouverte, onFermer }: Props) {
   const { data: session } = useSession();
-  const router = useRouter();
 
   const itemActifClasses = "bg-indigo-800 text-white";
   const itemInactifClasses = "text-indigo-200 hover:bg-indigo-800/60 hover:text-white";
@@ -228,7 +226,7 @@ export default function AppSidebar({ active, quotas, ouverte, onFermer }: Props)
             Nous contacter
           </a>
           <button
-            onClick={() => signOut().then(() => router.push("/"))}
+            onClick={() => signOut().then(() => { window.location.href = "/"; })}
             className="flex items-center gap-2 text-indigo-300 hover:text-white text-sm font-medium transition-colors"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

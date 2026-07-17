@@ -710,7 +710,7 @@ export default function PagePrincipale() {
                     {q}
                     <span className="shrink-0 w-5 h-5 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold group-open:rotate-45 transition-transform duration-200">+</span>
                   </summary>
-                  <p className="mt-3 text-gray-500 text-sm leading-relaxed">{r}</p>
+                  <p className="hidden group-open:block mt-3 text-gray-500 text-sm leading-relaxed">{r}</p>
                 </details>
               ))}
             </div>
