@@ -20,6 +20,7 @@ const itemsNav: ItemNav[] = [
   },
   { type: "lien", href: "/modeles-cv", label: "Modèles de CV" },
   { type: "lien", href: "/ressources", label: "Ressources" },
+  { type: "lien", href: "/a-propos", label: "À propos" },
   { type: "lien", href: "/pricing", label: "Tarifs" },
 ];
 
