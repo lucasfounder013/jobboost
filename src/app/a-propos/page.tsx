@@ -20,9 +20,9 @@ export default function APropos() {
           >
             je m&apos;appelle <em className="italic text-indigo-600">Lucas</em>,
             <br />
-            et voici pourquoi
+            et je suis le fondateur
             <br />
-            j&apos;ai créé Rivjob.
+            de Rivjob.
           </h1>
         </div>
       </section>
@@ -54,17 +54,23 @@ export default function APropos() {
               Lucas Le Donne
             </h2>
             <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
-              {/* À valider avec Lucas : parcours (âge, formation, ville, métier actuel) */}
               <p>
-                Je suis le fondateur de Rivjob. Je construis ce projet seul, en France,
-                à taille humaine. Il n&apos;y a pas d&apos;équipe cachée derrière un
-                logo — juste moi, mon ordinateur, et beaucoup de conversations avec les
-                gens qui utilisent l&apos;outil.
+                J&apos;ai créé Rivjob <em>en parallèle de mes études</em>, à la suite
+                de ma propre expérience pour trouver du travail. Je construis ce projet
+                seul, en France, à taille humaine — il n&apos;y a pas d&apos;équipe
+                cachée derrière un logo.
               </p>
               <p>
-                {/* À valider : ce que tu veux dire de toi (parcours, personnalité) */}
-                Si vous voulez me connaître un peu, la meilleure façon reste de
-                m&apos;écrire directement.
+                Si vous voulez voir mon parcours en détail, il est sur{" "}
+                <a
+                  href="https://www.linkedin.com/in/lucas-le-donné-71a8682a7/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-indigo-600 hover:text-indigo-700 underline underline-offset-4 decoration-indigo-200 font-medium"
+                >
+                  LinkedIn
+                </a>
+                . Sinon, le plus simple reste de m&apos;écrire directement.
               </p>
             </div>
           </div>
