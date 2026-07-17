@@ -33,7 +33,7 @@ export default function APropos() {
           <div className="mx-auto md:mx-0">
             <div className="relative w-56 h-56 sm:w-64 sm:h-64 rounded-3xl overflow-hidden ring-4 ring-indigo-100 shadow-xl bg-gradient-to-br from-indigo-100 to-violet-100">
               <Image
-                src="/photos/lucas-ledonne.png"
+                src="/photos/lucas-ledonne.jpg"
                 alt="Lucas Le Donne, créateur de Rivjob"
                 fill
                 className="object-cover"
