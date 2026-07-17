@@ -1,4 +1,20 @@
 import type { Metadata } from "next";
+import { Instrument_Serif, Caveat } from "next/font/google";
+
+const serifEditorial = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  variable: "--font-serif-editorial",
+  display: "swap",
+});
+
+const manuscrite = Caveat({
+  subsets: ["latin"],
+  weight: ["400", "600"],
+  variable: "--font-manuscrite",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "À propos de Rivjob — Lucas Le Donne, créateur",
@@ -15,5 +31,9 @@ export const metadata: Metadata = {
 };
 
 export default function AProposLayout({ children }: { children: React.ReactNode }) {
-  return children;
+  return (
+    <div className={`${serifEditorial.variable} ${manuscrite.variable}`}>
+      {children}
+    </div>
+  );
 }
