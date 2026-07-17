@@ -31,14 +31,14 @@ export default function APropos() {
       <section className="px-6 py-16 sm:py-20">
         <div className="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-[auto_1fr] gap-10 md:gap-14 items-center">
           <div className="mx-auto md:mx-0">
-            {/* Photo à ajouter dans /public/photos/lucas-ledonne.jpg (format carré, 600×600 min) */}
             <div className="relative w-56 h-56 sm:w-64 sm:h-64 rounded-3xl overflow-hidden ring-4 ring-indigo-100 shadow-xl bg-gradient-to-br from-indigo-100 to-violet-100">
               <Image
-                src="/photos/lucas-ledonne.jpg"
+                src="/photos/lucas-ledonne.png"
                 alt="Lucas Le Donne, créateur de Rivjob"
                 fill
                 className="object-cover"
                 sizes="(max-width: 640px) 224px, 256px"
+                priority
               />
             </div>
           </div>
