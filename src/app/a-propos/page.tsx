@@ -55,10 +55,9 @@ export default function APropos() {
             </h2>
             <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
               <p>
-                J&apos;ai créé Rivjob <em>en parallèle de mes études</em>, à la suite
-                de ma propre expérience pour trouver du travail. Je construis ce projet
-                seul, en France, à taille humaine — il n&apos;y a pas d&apos;équipe
-                cachée derrière un logo.
+                Je suis ingénieur, et j&apos;ai créé Rivjob <em>en parallèle de mes
+                études</em>, à la suite de ma propre expérience de recherche
+                d&apos;emploi.
               </p>
               <p>
                 Si vous voulez voir mon parcours en détail, il est sur{" "}
@@ -104,11 +103,12 @@ export default function APropos() {
             </p>
 
             <p>
-              Pour maximiser mes chances, il fallait <em>adapter chaque CV à chaque
-              offre</em>. Reprendre les mots exacts de l&apos;annonce, réorganiser
-              les expériences, ajuster le vocabulaire. Ce n&apos;était pas de la
-              triche : c&apos;était simplement montrer, à chaque fois, en quoi mon
-              profil correspondait vraiment au poste.
+              Pour maximiser mes chances, il fallait envoyer des dizaines, voire des
+              centaines de candidatures, tout en <em>adaptant chaque CV à chaque
+              offre</em> pour me démarquer des autres candidats. Résultat : je
+              passais mes journées à écrire des CV, à rédiger des lettres de
+              motivation, à envoyer des relances et à suivre mes candidatures sur un
+              fichier Excel à rallonge.
             </p>
 
             <p>
@@ -120,13 +120,13 @@ export default function APropos() {
               Je passais entre <strong className="font-semibold text-indigo-700">30 et
               45 minutes par candidature</strong>. Multiplié par une dizaine de
               candidatures les bons jours, ça faisait <strong className="font-semibold text-indigo-700">4
-              à 6 heures</strong> quotidiennes juste à retoucher des CV. Du temps que
-              je ne passais ni à me préparer aux entretiens, ni à réseauter, ni à
-              simplement respirer.
+              à 6 heures</strong> quotidiennes juste à préparer mes dossiers. Autant
+              de temps que je ne passais ni à me préparer aux entretiens, ni à
+              réseauter, ni à souffler un peu.
             </p>
 
             <p>
-              Et pendant que je faisais tout ça manuellement, un détail m&apos;a
+              Et pendant que je faisais tout ça manuellement, quelque chose m&apos;a
               frappé : de l&apos;autre côté, les recruteurs utilisent des logiciels
               (les ATS) pour trier les CV automatiquement. En France,{" "}
               <strong className="font-semibold text-indigo-700">
@@ -134,22 +134,22 @@ export default function APropos() {
               </strong>{" "}
               s&apos;en servent{" "}
               <span className="text-sm text-gray-500 italic">[à sourcer]</span>. Un
-              CV mal calibré est écarté avant même d&apos;être lu. Et le recruteur y
-              consacre en moyenne <strong className="font-semibold text-indigo-700">30 secondes</strong>{" "}
-              <span className="text-sm text-gray-500 italic">[à sourcer]</span>{" "}
-              quand il arrive jusqu&apos;à lui.
+              CV mal calibré est écarté avant même d&apos;être lu. Et lorsqu&apos;il
+              parvient enfin à un humain, celui-ci y consacre en moyenne{" "}
+              <strong className="font-semibold text-indigo-700">30 secondes</strong>{" "}
+              <span className="text-sm text-gray-500 italic">[à sourcer]</span>.
             </p>
 
             <p>
               Autrement dit : <em>d&apos;un côté, un candidat qui passe des heures
-              sur chaque candidature. De l&apos;autre, des machines et 30 secondes.</em>
+              sur ses candidatures. De l&apos;autre, des machines et 30 secondes.</em>
             </p>
 
             <p>
               Ce déséquilibre m&apos;a paru absurde. Je me suis dit qu&apos;il devait
-              exister un outil pour faire ce travail d&apos;adaptation en quelques
-              secondes, et rendre au candidat le temps qui devrait servir à ce qui
-              compte vraiment.
+              exister un outil capable de faire ce travail d&apos;adaptation en
+              quelques secondes, pour rendre aux candidats du temps à consacrer à ce
+              qui compte vraiment.
             </p>
 
             <p>
