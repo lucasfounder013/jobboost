@@ -142,6 +142,12 @@ export default function APropos() {
             </p>
 
             <p>
+              Rivjob vous offre : de la <em>clarté</em> sur vos candidatures, de
+              l&apos;<em>efficacité</em> dans vos démarches, et de la{" "}
+              <em>confiance</em> au moment de postuler.
+            </p>
+
+            <p>
               Le temps que vous gagnez, vous le rendez à ce qui en vaut la peine :
               vos entretiens, vos rencontres, votre vie.
             </p>
