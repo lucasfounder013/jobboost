@@ -192,11 +192,11 @@ export default function PagePrincipale() {
                 actif={effetBriquesActif}
                 topOffsetPx={88}
                 numero="1/4"
-                titre="Voyez enfin ce que les robots voient."
-                corps="Votre score de correspondance sur 100, la liste exacte des mots-clés attendus par l'ATS, et les lacunes qui vous pénalisent. En 30 secondes, vous savez précisément pourquoi ça bloque et quoi corriger."
+                titre="Voyez enfin ce que le recruteur voit."
+                corps="Un ATS n'est pas un juge, c'est une base de données. Le recruteur y cherche ses candidats en tapant des mots-clés dans une barre de recherche, exactement comme sur Google. Rivjob compare votre CV à l'offre, calcule votre correspondance sur 100 et liste les mots exacts qu'il cherchera. En 30 secondes, vous savez ce qui manque pour qu'il tombe sur vous."
                 visual={
                   <div className="bg-gradient-to-br from-indigo-50 to-violet-50 rounded-2xl p-8 sm:p-12 md:min-h-[480px] flex flex-col justify-center">
-                    <p className="text-center text-xs font-bold text-indigo-400 uppercase tracking-widest mb-8">Rapport d&apos;analyse ATS</p>
+                    <p className="text-center text-xs font-bold text-indigo-400 uppercase tracking-widest mb-8">Correspondance CV / offre</p>
                     <div className="flex items-center justify-center gap-8 mb-10">
                       <div className="text-center">
                         <p className="text-xs font-bold text-red-500 uppercase tracking-wide mb-2">Avant</p>
@@ -220,7 +220,7 @@ export default function PagePrincipale() {
                         </span>
                       ))}
                     </div>
-                    <p className="text-center text-sm text-gray-400 mt-8">6 mots-clés ATS ajoutés</p>
+                    <p className="text-center text-sm text-gray-400 mt-8">6 mots-clés de l&apos;offre ajoutés</p>
                   </div>
                 }
               />
