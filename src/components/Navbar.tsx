@@ -14,6 +14,7 @@ const itemsNav: ItemNav[] = [
     type: "groupe",
     label: "Outils",
     enfants: [
+      { href: "/", label: "Analyse de CV" },
       { href: "/outils/lettre-motivation", label: "Lettre de motivation" },
       { href: "/outils/recherche-email", label: "Recherche d'email" },
     ],

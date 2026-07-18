@@ -118,39 +118,8 @@ export default function PagePrincipale() {
           </div>
         </section>
 
-        {/* ══════════════ VIDÉO DÉMO ══════════════ */}
-        <section id="demo" className="bg-white px-6 pt-4 pb-14">
-          <Reveal className="max-w-5xl mx-auto">
-            {/* Chrome de navigateur */}
-            <div className="rounded-t-xl bg-gray-100 border border-b-0 border-gray-200 px-4 py-2.5 flex items-center gap-3">
-              <div className="flex items-center gap-1.5">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-300" />
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-300" />
-                <span className="w-2.5 h-2.5 rounded-full bg-emerald-300" />
-              </div>
-              <div className="flex-1 flex justify-center">
-                <span className="bg-white rounded-full px-4 py-1 text-xs text-gray-400 ring-1 ring-gray-200">
-                  www.rivjob.ai
-                </span>
-              </div>
-            </div>
-
-            {/* Placeholder démo */}
-            <div className="relative rounded-b-xl overflow-hidden border border-gray-200 aspect-video bg-gray-900">
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-indigo-600 to-violet-700 text-white">
-                <span className="w-16 h-16 rounded-full bg-white/15 backdrop-blur flex items-center justify-center">
-                  <svg className="w-7 h-7 translate-x-0.5" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M8 5v14l11-7z" />
-                  </svg>
-                </span>
-                <p className="text-sm font-medium text-white/80">Démo vidéo à venir</p>
-              </div>
-            </div>
-          </Reveal>
-        </section>
-
         {/* Barre de preuve */}
-        <section className="bg-white border-t border-gray-100 px-6 pb-16">
+        <section className="bg-white border-t border-gray-100 px-6 py-16">
           <div className="max-w-lg mx-auto flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-gray-500 font-medium">
             <span><span className="font-extrabold text-gray-900">+2 400</span> CV analysés</span>
             <span className="hidden sm:inline text-gray-300">·</span>
