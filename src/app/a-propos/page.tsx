@@ -34,7 +34,7 @@ export default function APropos() {
             <div className="relative w-56 h-56 sm:w-64 sm:h-64 rounded-3xl overflow-hidden ring-4 ring-indigo-100 shadow-xl bg-gradient-to-br from-indigo-100 to-violet-100">
               <Image
                 src="/photos/lucas-ledonne.jpg"
-                alt="Lucas Le Donne, créateur de Rivjob"
+                alt="Lucas le Donné, créateur de Rivjob"
                 fill
                 className="object-cover"
                 sizes="(max-width: 640px) 224px, 256px"
@@ -51,13 +51,13 @@ export default function APropos() {
               className="text-3xl sm:text-4xl text-gray-900 mb-5 leading-tight"
               style={{ fontFamily: "var(--font-serif-editorial)" }}
             >
-              Lucas Le Donne
+              Lucas le Donné
             </h2>
             <div className="space-y-4 text-lg text-gray-700 leading-relaxed">
               <p>
                 Je suis ingénieur, et j&apos;ai créé Rivjob <em>en parallèle de mes
-                études</em>, à la suite de ma propre expérience de recherche
-                d&apos;emploi.
+                études</em>, à la suite de ma propre expérience de recherche d&apos;un
+                stage de fin d&apos;études.
               </p>
               <p>
                 Si vous voulez voir mon parcours en détail, il est sur{" "}
@@ -96,10 +96,10 @@ export default function APropos() {
             style={{ fontFamily: "var(--font-serif-editorial)" }}
           >
             <p>
-              {/* À valider : contexte de ta recherche d'emploi */}
               Tout est parti d&apos;une expérience très concrète : la mienne. À un
-              moment, j&apos;ai cherché un emploi. Comme des millions de personnes.
-              Et j&apos;ai vite compris quelque chose qui m&apos;a beaucoup surpris.
+              moment, j&apos;ai cherché un stage de fin d&apos;études. Comme des
+              milliers d&apos;étudiants chaque année. Et j&apos;ai vite compris
+              quelque chose qui m&apos;a beaucoup surpris.
             </p>
 
             <p>
