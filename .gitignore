@@ -39,3 +39,12 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# vidéos marketing (HyperFrames — hors build Next.js)
+/videos-marketing/
+
+# skills HyperFrames (installés localement via `npx skills add`)
+/.agents/
+/agent/
+/.claude/skills/
+/skills-lock.json
