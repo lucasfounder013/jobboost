@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import Footer from "@/components/Footer";
+import DemoPlayer from "@/components/DemoPlayer";
 
 const NB_BRIQUES = 4;
 
@@ -136,16 +137,7 @@ export default function PagePrincipale() {
             </div>
 
             {/* Vidéo démo */}
-            <video
-              className="w-full rounded-b-xl border border-gray-200 aspect-video bg-gray-900"
-              src="/videos/demo-rivjob-v2.mp4"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              aria-label="Démonstration de Rivjob"
-            />
+            <DemoPlayer src="/videos/demo-rivjob-v2.mp4" />
           </Reveal>
         </section>
 
