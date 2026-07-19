@@ -336,9 +336,9 @@ export default function RessourcesPage() {
                 <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-full bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center flex-shrink-0">
-                      <span className="text-white text-[10px] font-extrabold">RJ</span>
+                      <span className="text-white text-[10px] font-extrabold">LL</span>
                     </div>
-                    <span className="text-xs font-semibold text-gray-700">Rivjob</span>
+                    <span className="text-xs font-semibold text-gray-700">Lucas L.</span>
                   </div>
                   <span className="text-xs text-gray-400">{article.date}</span>
                 </div>
