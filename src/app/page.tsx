@@ -151,49 +151,6 @@ export default function PagePrincipale() {
           </div>
         </section>
 
-        {/* ══════════════ PROBLÈME / AGITATION ══════════════ */}
-        <section className="bg-white border-t border-gray-100 px-6 py-16">
-          <Reveal className="max-w-3xl mx-auto text-center">
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-gray-900 mb-12">
-              Vous envoyez des candidatures. Vous ne recevez que du silence.
-            </h2>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 text-left mb-12">
-              {[
-                {
-                  titre: "Aucune réponse, aucune explication.",
-                  desc: "Votre profil correspond, pourtant rien. Vous ne savez même pas si un humain a vu votre CV.",
-                  icone: "M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
-                },
-                {
-                  titre: "Réécrire son CV pour chaque offre prend des heures.",
-                  desc: "Alors vous envoyez le même partout. Et les ATS le classent derrière ceux qui utilisent les bons mots-clés.",
-                  icone: "M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z",
-                },
-                {
-                  titre: "Votre recherche part dans tous les sens.",
-                  desc: "Un tableur par-ci, des brouillons par-là. Impossible de savoir qui relancer, ni quand.",
-                  icone: "M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7",
-                },
-              ].map(({ titre, desc, icone }) => (
-                <div key={titre} className="bg-gray-50/60 rounded-2xl ring-1 ring-gray-200 shadow-sm p-6">
-                  <span className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-indigo-50 mb-4">
-                    <svg className="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={icone} />
-                    </svg>
-                  </span>
-                  <p className="font-bold text-gray-900 text-base mb-2">{titre}</p>
-                  <p className="text-gray-500 text-sm leading-relaxed">{desc}</p>
-                </div>
-              ))}
-            </div>
-
-            <p className="text-gray-700 font-semibold text-base sm:text-lg">
-              Ce n&apos;est pas votre profil le problème. C&apos;est la façon dont votre candidature est lue et pilotée.
-            </p>
-          </Reveal>
-        </section>
-
         {/* ══════════════ LE PARCOURS — 4 BRIQUES ══════════════ */}
         <section className="bg-gray-50/60 border-t border-gray-100 px-6 py-16">
           <div className="max-w-6xl mx-auto">
@@ -261,54 +218,6 @@ export default function PagePrincipale() {
 
             </div>
           </div>
-        </section>
-
-        {/* ══════════════ DIFFÉRENCIATION — UN SEUL OUTIL ══════════════ */}
-        <section className="bg-white border-t border-gray-100 px-6 py-16">
-          <Reveal className="max-w-4xl mx-auto">
-            <div className="text-center mb-10">
-              <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-gray-900 mb-3">
-                Un outil. Toute votre recherche d&apos;emploi.
-              </h2>
-              <p className="text-gray-500 text-base max-w-xl mx-auto">
-                Arrêtez de jongler entre ChatGPT, Word, un tableur et douze onglets. Rivjob fait le travail de bout en bout, avec un score objectif que ChatGPT ne vous donnera jamais.
-              </p>
-            </div>
-
-            <div className="overflow-x-auto rounded-2xl ring-1 ring-gray-200 shadow-sm">
-              <table className="w-full text-sm text-left border-collapse">
-                <thead>
-                  <tr className="bg-gray-50 border-b border-gray-100">
-                    <th className="p-4 font-semibold text-gray-500"></th>
-                    <th className="p-4 font-semibold text-gray-500 whitespace-nowrap">À la main</th>
-                    <th className="p-4 font-semibold text-gray-500 whitespace-nowrap">ChatGPT</th>
-                    <th className="p-4 font-bold text-indigo-700 bg-indigo-50 whitespace-nowrap">Rivjob</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {[
-                    ["Score de correspondance objectif", "✕", "✕", "✅ /100"],
-                    ["Mots-clés ATS structurés", "✕", "Approximatif", "✅ Liste exacte"],
-                    ["CV adapté par offre", "Des heures", "Copier-coller à chaque fois", "✅ 1 clic"],
-                    ["Suivi de toutes vos candidatures", "Tableur", "✕", "✅ Kanban intégré"],
-                    ["Email du recruteur", "✕", "✕", "✅"],
-                    ["Relances au bon moment", "De mémoire", "✕", "✅ Suggérées à J+7"],
-                  ].map(([ligne, main, chatgpt, rivjob]) => (
-                    <tr key={ligne}>
-                      <td className="p-4 font-medium text-gray-900">{ligne}</td>
-                      <td className="p-4 text-gray-400">{main}</td>
-                      <td className="p-4 text-gray-400">{chatgpt}</td>
-                      <td className="p-4 font-semibold text-gray-900 bg-indigo-50/50">{rivjob}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <p className="text-center text-gray-500 text-sm mt-8">
-              À partir de <span className="font-bold text-gray-900">4,99 €/mois</span>. Moins cher qu&apos;un café par semaine, pour la période la plus décisive de votre carrière.
-            </p>
-          </Reveal>
         </section>
 
         {/* ══════════════ PREUVE SOCIALE (chiffres) ══════════════ */}

@@ -104,7 +104,7 @@ export default function DemoPlayer({ src, poster }: Props) {
         <button
           type="button"
           onClick={unmute}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-gray-900/90 hover:bg-gray-900 text-white text-sm font-semibold px-5 py-3 rounded-full shadow-lg backdrop-blur-sm transition-colors flex items-center gap-2"
+          className="absolute top-4 left-1/2 -translate-x-1/2 bg-gray-900/90 hover:bg-gray-900 text-white text-sm font-semibold px-5 py-3 rounded-full shadow-lg backdrop-blur-sm transition-colors flex items-center gap-2 z-10"
           aria-label="Rétablir le son"
         >
           <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
