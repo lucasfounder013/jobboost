@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, useScroll, useTransform, type MotionValue } from "framer-motion";
 import Footer from "@/components/Footer";
 import DemoPlayer from "@/components/DemoPlayer";
+import DemoClip from "@/components/DemoClip";
 
 const NB_BRIQUES = 4;
 
@@ -217,35 +218,7 @@ export default function PagePrincipale() {
                 numero="1/4"
                 titre="Voyez enfin ce que le recruteur voit."
                 corps="Un ATS n'est pas un juge, c'est une base de données. Le recruteur y cherche ses candidats en tapant des mots-clés dans une barre de recherche, exactement comme sur Google. Rivjob compare votre CV à l'offre, calcule votre correspondance sur 100 et liste les mots exacts qu'il cherchera. En 30 secondes, vous savez ce qui manque pour qu'il tombe sur vous."
-                visual={
-                  <div className="bg-gradient-to-br from-indigo-50 to-violet-50 rounded-2xl p-8 sm:p-12 md:min-h-[480px] flex flex-col justify-center">
-                    <p className="text-center text-xs font-bold text-indigo-400 uppercase tracking-widest mb-8">Correspondance CV / offre</p>
-                    <div className="flex items-center justify-center gap-8 mb-10">
-                      <div className="text-center">
-                        <p className="text-xs font-bold text-red-500 uppercase tracking-wide mb-2">Avant</p>
-                        <p className="text-5xl font-extrabold text-red-400">34</p>
-                      </div>
-                      <svg className="w-9 h-9 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                      <div className="text-center">
-                        <p className="text-xs font-bold text-emerald-600 uppercase tracking-wide mb-2">Après</p>
-                        <p className="text-6xl font-extrabold text-emerald-600">91</p>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap justify-center gap-2.5">
-                      {["Agile", "KPI", "JIRA", "Roadmap", "Change management", "Tableau de bord"].map((kw) => (
-                        <span key={kw} className="inline-flex items-center gap-1.5 text-sm font-semibold text-emerald-700 bg-white ring-1 ring-emerald-200 rounded-full px-4 py-2">
-                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                          </svg>
-                          {kw}
-                        </span>
-                      ))}
-                    </div>
-                    <p className="text-center text-sm text-gray-400 mt-8">6 mots-clés de l&apos;offre ajoutés</p>
-                  </div>
-                }
+                visual={<DemoClip src="/videos/clips/demo-analyse.mp4" label="Analyse CV / offre" />}
               />
 
               {/* ── Brique 2/4 — L'adaptation ── */}
@@ -258,26 +231,7 @@ export default function PagePrincipale() {
                 titre="Un CV adapté à chaque offre. En un clic."
                 corps="Rivjob reformule votre CV avec le vocabulaire de l'offre : mots-clés intégrés, formulations optimisées, mise en forme lisible par les ATS. Il réorganise et reformule ce que vous avez fait, il n'invente jamais rien."
                 micro="Vos expériences, vos chiffres, vos diplômes. Juste mieux racontés."
-                visual={
-                  <div className="bg-gray-50/60 rounded-2xl p-6 sm:p-8 md:min-h-[480px] flex flex-col justify-center gap-4">
-                    <div className="bg-white rounded-xl ring-1 ring-gray-200 shadow-sm p-5">
-                      <p className="text-sm text-gray-400 line-through mb-2">Aidé à l&apos;amélioration des processus internes.</p>
-                      <p className="text-base text-gray-900 font-medium">Piloté la refonte de 3 processus internes, -40 % de délais.</p>
-                    </div>
-                    <div className="bg-white rounded-xl ring-1 ring-gray-200 shadow-sm p-5">
-                      <p className="text-sm text-gray-400 line-through mb-2">Utilisé des stratégies synergiques.</p>
-                      <p className="text-base text-gray-900 font-medium">Animé 8 équipes cross-fonctionnelles via JIRA.</p>
-                    </div>
-                    <div className="bg-white rounded-xl ring-1 ring-gray-200 shadow-sm p-5">
-                      <p className="text-sm text-gray-400 line-through mb-2">Aidé à l&apos;organisation des plannings.</p>
-                      <p className="text-base text-gray-900 font-medium">Coordonné les livrables de 12 sprints Agile.</p>
-                    </div>
-                    <div className="bg-white rounded-xl ring-1 ring-gray-200 shadow-sm p-5">
-                      <p className="text-sm text-gray-400 line-through mb-2">Responsable de la gestion de projets.</p>
-                      <p className="text-base text-gray-900 font-medium">Piloté 3 projets de refonte digitale (250 K€ chacun).</p>
-                    </div>
-                  </div>
-                }
+                visual={<DemoClip src="/videos/clips/demo-adaptation.mp4" label="Adaptation du CV" />}
               />
 
               {/* ── Brique 3/4 — Le pilotage (Kanban) ── */}
@@ -290,95 +244,7 @@ export default function PagePrincipale() {
                 titre="Toutes vos candidatures. Un seul tableau de bord."
                 corps="Chaque offre devient une carte : à postuler, envoyée, à relancer, entretien. Depuis chaque carte, adaptez votre CV pour cette offre, générez la lettre, trouvez l'email du recruteur, préparez l'entretien. Fini le tableur, votre recherche d'emploi a enfin un cockpit."
                 micro="Relance automatique suggérée après 7 jours sans réponse."
-                visual={
-                  <div className="bg-gray-50/60 rounded-2xl p-6 sm:p-8 md:min-h-[480px] flex flex-col justify-center">
-                    {/* Maquette statique du Kanban */}
-                    <div className="flex gap-4 overflow-x-auto pb-2">
-                      {[
-                        {
-                          titre: "Souhaitée",
-                          accent: "bg-gray-300",
-                          badge: "bg-gray-100 text-gray-600",
-                          icone: "M12 6v6l4 2",
-                          cartes: [{ poste: "Chef de projet digital", entreprise: "Acme Solutions", relance: undefined as string | undefined }],
-                        },
-                        {
-                          titre: "Postulée",
-                          accent: "bg-indigo-400",
-                          badge: "bg-indigo-100 text-indigo-600",
-                          icone: "M9 5l7 7-7 7",
-                          cartes: [
-                            { poste: "Product Manager", entreprise: "Nova Tech", relance: undefined as string | undefined },
-                            { poste: "Chargée de communication", entreprise: "Studio Lumen", relance: undefined as string | undefined },
-                          ],
-                        },
-                        {
-                          titre: "Entretien",
-                          accent: "bg-violet-400",
-                          badge: "bg-violet-100 text-violet-600",
-                          icone: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.9 7.9 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
-                          cartes: [{ poste: "Coordinatrice projet digital", entreprise: "StartupXYZ", relance: "Relance 14 juil." as string | undefined }],
-                        },
-                        {
-                          titre: "Offre",
-                          accent: "bg-emerald-400",
-                          badge: "bg-emerald-100 text-emerald-700",
-                          icone: "M5 13l4 4L19 7",
-                          cartes: [{ poste: "Chef de projet digital", entreprise: "Vertex Group", relance: undefined as string | undefined }],
-                        },
-                      ].map((col) => (
-                        <div key={col.titre} className="shrink-0 w-56 flex flex-col">
-                          <div className={`${col.accent} h-1.5 rounded-t-xl`} />
-                          <div className="flex-1 rounded-b-xl bg-white ring-1 ring-gray-200">
-                            <div className="px-3.5 py-3.5 flex items-center gap-2">
-                              <span className={`inline-flex items-center justify-center w-7 h-7 rounded-lg ${col.badge}`}>
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={col.icone} />
-                                </svg>
-                              </span>
-                              <span className="text-xs font-bold uppercase tracking-wider text-gray-800">{col.titre}</span>
-                              <span className="text-xs text-gray-400 font-medium">{col.cartes.length}</span>
-                            </div>
-                            <div className="px-3 pb-3.5 flex flex-col gap-2">
-                              {col.cartes.map((carte) => (
-                                <div key={carte.poste} className="bg-white rounded-xl px-3 py-2.5 ring-1 ring-gray-200 shadow-sm">
-                                  <p className="text-sm font-semibold text-gray-900 leading-tight">{carte.poste}</p>
-                                  <div className="flex items-center gap-1.5 mt-1.5">
-                                    <span className="inline-flex items-center justify-center w-4 h-4 rounded bg-violet-100 text-violet-700 text-[10px] font-bold">
-                                      {carte.entreprise.charAt(0)}
-                                    </span>
-                                    <span className="text-xs text-gray-500 truncate">{carte.entreprise}</span>
-                                  </div>
-                                  {carte.relance && (
-                                    <div className="mt-1.5 inline-flex items-center gap-1 text-[11px] font-semibold text-amber-700 bg-amber-50 rounded px-1.5 py-0.5">
-                                      <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                      </svg>
-                                      {carte.relance}
-                                    </div>
-                                  )}
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Carte ouverte — aperçu des actions */}
-                    <div className="mt-5 bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-5">
-                      <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1.5">Carte ouverte</p>
-                      <p className="text-base font-bold text-gray-900 mb-3">Coordinatrice projet digital · StartupXYZ</p>
-                      <div className="flex flex-wrap gap-2">
-                        {["Adapter le CV", "Générer la lettre", "Révéler l'email", "Préparer l'entretien"].map((action) => (
-                          <span key={action} className="text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg px-2.5 py-1.5">
-                            {action}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                }
+                visual={<DemoClip src="/videos/clips/demo-dashboard.mp4" label="Tableau de bord" />}
               />
 
               {/* ── Brique 4/4 — Le suivi ── */}
@@ -390,43 +256,7 @@ export default function PagePrincipale() {
                 numero="4/4"
                 titre="Ne laissez plus une candidature sans suite."
                 corps="Rivjob vous dit qui relancer et quand, génère votre lettre de motivation en cohérence avec le CV adapté, et vous prépare aux questions d'entretien du poste. Chaque candidature va au bout, pas seulement les trois premières."
-                visual={
-                  <div className="bg-gray-50/60 rounded-2xl p-6 sm:p-8 md:min-h-[480px] flex flex-col justify-center gap-4">
-                    <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6 flex items-start gap-4">
-                      <span className="shrink-0 w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </span>
-                      <div>
-                        <p className="text-base font-semibold text-gray-900">Relance suggérée</p>
-                        <p className="text-sm text-gray-500 mt-1">StartupXYZ · 7 jours sans réponse. Un mail de relance est prêt.</p>
-                      </div>
-                    </div>
-                    <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6 flex items-start gap-4">
-                      <span className="shrink-0 w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4-.8L3 20l1.3-3.9A7.9 7.9 0 013 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                        </svg>
-                      </span>
-                      <div>
-                        <p className="text-base font-semibold text-gray-900">Préparation d&apos;entretien</p>
-                        <p className="text-sm text-gray-500 mt-1">Vertex Group · 5 questions probables générées pour ce poste.</p>
-                      </div>
-                    </div>
-                    <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-6 flex items-start gap-4">
-                      <span className="shrink-0 w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center">
-                        <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </span>
-                      <div>
-                        <p className="text-base font-semibold text-gray-900">Lettre de motivation prête</p>
-                        <p className="text-sm text-gray-500 mt-1">Générée automatiquement en cohérence avec le CV adapté.</p>
-                      </div>
-                    </div>
-                  </div>
-                }
+                visual={<DemoClip src="/videos/clips/demo-suivi.mp4" label="Contact recruteur + suivi" />}
               />
 
             </div>
