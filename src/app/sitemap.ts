@@ -65,6 +65,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    // Certifications
+    {
+      url: `${BASE_URL}/ressources/certifications/certifications-gratuites-2026`,
+      lastModified: new Date("2026-07-23"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     // Articles CV ATS
     {
       url: `${BASE_URL}/ressources/cv-ats/quest-ce-qu-un-ats`,

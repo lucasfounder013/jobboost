@@ -6,6 +6,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 25,
+    categorie: "Certifications",
+    titre: "5 certifications gratuites pour booster son CV en 2026",
+    extrait:
+      "5 certifications Google reconnues, accessibles gratuitement sur Coursera. Ce qu'elles valent vraiment sur un CV, et la méthode pour obtenir le certificat sans payer.",
+    slug: "/ressources/certifications/certifications-gratuites-2026",
+    date: "23 juillet 2026",
+  },
+  {
     id: 24,
     categorie: "Lettre de motivation",
     titre: "Comment finir une lettre de motivation : exemples et formules",
@@ -223,12 +232,13 @@ const articles = [
   },
 ];
 
-const CATEGORIES = ["Toutes", "CV & ATS", "Lettre de motivation", "Candidature spontanée"];
+const CATEGORIES = ["Toutes", "CV & ATS", "Lettre de motivation", "Candidature spontanée", "Certifications"];
 
 const COULEURS_CATEGORIE: Record<string, string> = {
   "CV & ATS": "bg-violet-50 text-violet-700",
   "Lettre de motivation": "bg-violet-50 text-violet-700",
   "Candidature spontanée": "bg-violet-50 text-violet-700",
+  "Certifications": "bg-violet-50 text-violet-700",
 };
 
 export default function RessourcesPage() {
