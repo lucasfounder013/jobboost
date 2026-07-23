@@ -14,17 +14,26 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: false,
   },
+  socialProviders: {
+    google: {
+      clientId: process.env.GOOGLE_CLIENT_ID as string,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+    },
+  },
   user: {
     additionalFields: {
+      // Optionnels depuis la simplification du formulaire d'inscription (email + mot de passe uniquement)
       firstName: {
         type: "string",
         fieldName: "first_name",
         input: true,
+        required: false,
       },
       lastName: {
         type: "string",
         fieldName: "last_name",
         input: true,
+        required: false,
       },
       credits: {
         type: "number",

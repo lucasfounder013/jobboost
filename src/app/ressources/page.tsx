@@ -6,6 +6,15 @@ import Footer from "@/components/Footer";
 
 const articles = [
   {
+    id: 26,
+    categorie: "IA & Emploi",
+    titre: "Utiliser Claude pour décrocher votre prochain emploi : 3 prompts pour refondre votre CV",
+    extrait:
+      "Audit complet, réécriture optimisée ATS et test face au recruteur : les 3 prompts Claude essentiels pour refondre votre CV, pas à pas.",
+    slug: "/ressources/ia/utiliser-claude-pour-decrocher-un-emploi",
+    date: "23 juillet 2026",
+  },
+  {
     id: 25,
     categorie: "Certifications",
     titre: "5 certifications gratuites pour booster son CV en 2026",
@@ -232,13 +241,14 @@ const articles = [
   },
 ];
 
-const CATEGORIES = ["Toutes", "CV & ATS", "Lettre de motivation", "Candidature spontanée", "Certifications"];
+const CATEGORIES = ["Toutes", "CV & ATS", "Lettre de motivation", "Candidature spontanée", "Certifications", "IA & Emploi"];
 
 const COULEURS_CATEGORIE: Record<string, string> = {
   "CV & ATS": "bg-violet-50 text-violet-700",
   "Lettre de motivation": "bg-violet-50 text-violet-700",
   "Candidature spontanée": "bg-violet-50 text-violet-700",
   "Certifications": "bg-violet-50 text-violet-700",
+  "IA & Emploi": "bg-violet-50 text-violet-700",
 };
 
 export default function RessourcesPage() {

@@ -75,6 +75,7 @@ npm run lint   # Vérifier le code
 - `NEXT_PUBLIC_APP_URL` — URL de l'app (http://localhost:3000 en dev)
 - `ANTHROPIC_API_KEY` — clé Claude API (côté serveur uniquement)
 - `BETTER_AUTH_URL` — URL de base de l'app (= `NEXT_PUBLIC_APP_URL`, évite le warning Better-Auth au démarrage)
+- `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` — OAuth Google (login "Continuer avec Google"). Redirect URI à déclarer dans Google Cloud Console : `{BETTER_AUTH_URL}/api/auth/callback/google`
 
 ## Common Mistakes to Avoid
 - Ne jamais exposer les clés API côté client

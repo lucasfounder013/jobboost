@@ -18,6 +18,23 @@ export default function PageConnexion() {
   const [motDePasse, setMotDePasse] = useState("");
   const [erreur, setErreur] = useState("");
   const [chargement, setChargement] = useState(false);
+  const [chargementGoogle, setChargementGoogle] = useState(false);
+
+  async function connexionGoogle() {
+    setErreur("");
+    setChargementGoogle(true);
+    const cible = localStorage.getItem("pendingAnalysis") ? "/analyses" : "/";
+    const { error } = await signIn.social({
+      provider: "google",
+      callbackURL: cible,
+      newUserCallbackURL: localStorage.getItem("pendingAnalysis") ? "/analyses" : "/dashboard",
+    });
+    // En cas de succès, le navigateur est redirigé vers Google — on ne repasse pas ici
+    if (error) {
+      setErreur("Impossible de contacter Google. Veuillez réessayer.");
+      setChargementGoogle(false);
+    }
+  }
 
   async function soumettreFormulaire(e: React.FormEvent) {
     e.preventDefault();
@@ -56,6 +73,27 @@ export default function PageConnexion() {
           <h1 className="text-2xl font-bold text-gray-900 mb-1">Bon retour 👋</h1>
           <p className="text-sm text-gray-500 mb-8">Connectez-vous à votre compte.</p>
 
+          <button
+            type="button"
+            onClick={connexionGoogle}
+            disabled={chargementGoogle || chargement}
+            className="w-full flex items-center justify-center gap-3 bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 py-2.5 rounded-xl font-semibold text-sm shadow-sm disabled:opacity-60 disabled:cursor-not-allowed transition-all"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.66-.22-2.45H12v4.64h6.46a5.52 5.52 0 0 1-2.4 3.62v3h3.88c2.27-2.09 3.58-5.17 3.58-8.81z" />
+              <path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.94-2.91l-3.88-3c-1.07.72-2.45 1.15-4.06 1.15-3.13 0-5.78-2.11-6.72-4.95H1.27v3.1A12 12 0 0 0 12 24z" />
+              <path fill="#FBBC05" d="M5.28 14.29A7.22 7.22 0 0 1 4.9 12c0-.8.14-1.57.38-2.29V6.6H1.27a12 12 0 0 0 0 10.8l4.01-3.11z" />
+              <path fill="#EA4335" d="M12 4.77c1.76 0 3.34.61 4.59 1.8l3.44-3.44A11.98 11.98 0 0 0 12 0 12 12 0 0 0 1.27 6.6l4.01 3.11C6.22 6.88 8.87 4.77 12 4.77z" />
+            </svg>
+            {chargementGoogle ? "Redirection vers Google..." : "Continuer avec Google"}
+          </button>
+
+          <div className="flex items-center gap-3 my-6">
+            <div className="flex-1 h-px bg-gray-200" />
+            <span className="text-xs text-gray-400">ou par email</span>
+            <div className="flex-1 h-px bg-gray-200" />
+          </div>
+
           <form onSubmit={soumettreFormulaire} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -85,7 +123,7 @@ export default function PageConnexion() {
 
             <button
               type="submit"
-              disabled={chargement}
+              disabled={chargement || chargementGoogle}
               className="w-full bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white py-2.5 rounded-xl font-bold text-sm shadow-md shadow-indigo-200/60 disabled:opacity-60 disabled:cursor-not-allowed transition-all"
             >
               {chargement ? "Connexion..." : "Se connecter"}

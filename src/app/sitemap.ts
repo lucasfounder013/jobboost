@@ -65,6 +65,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.7,
     },
+    // IA & Emploi
+    {
+      url: `${BASE_URL}/ressources/ia/utiliser-claude-pour-decrocher-un-emploi`,
+      lastModified: new Date("2026-07-23"),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
     // Certifications
     {
       url: `${BASE_URL}/ressources/certifications/certifications-gratuites-2026`,
