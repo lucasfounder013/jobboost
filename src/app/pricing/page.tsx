@@ -152,12 +152,9 @@ export default function PagePricing() {
         <LienRetourDashboard />
         <section className="max-w-5xl mx-auto px-6 py-20 text-center">
           <p className="text-xs font-semibold uppercase tracking-widest text-indigo-500 mb-4">Tarifs</p>
-          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900 mb-4">
+          <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-gray-900 mb-12">
             Un seul paiement. Un accès à vie.
           </h1>
-          <p className="text-gray-500 text-lg max-w-xl mx-auto mb-12">
-            Commencez gratuitement, ou débloquez tout Rivjob pour toujours au prix de 2 mois d&apos;abonnement.
-          </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 items-stretch">
 
