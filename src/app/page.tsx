@@ -12,7 +12,7 @@ const NB_BRIQUES = 4;
 const FAQ = [
   {
     q: "Rivjob est-il vraiment gratuit ?",
-    r: "L'analyse de votre CV est gratuite : score de correspondance et aperçu des mots-clés manquants, sans carte bancaire. Il suffit de créer un compte gratuit en 30 secondes. L'adaptation complète du CV, les lettres et le suivi Kanban font partie des plans payants, à partir de 4,99 €/mois (Starter) ou 9,99 €/mois (Pro), sans engagement.",
+    r: "L'analyse de votre CV est gratuite : score de correspondance et aperçu des mots-clés manquants, sans carte bancaire. Il suffit de créer un compte gratuit en 30 secondes. L'adaptation complète du CV, les lettres et le suivi Kanban font partie des plans payants : abonnement mensuel à 17,99 € (résiliable à tout moment) ou accès à vie à 29,99 € (paiement unique).",
   },
   {
     q: "Est-ce que l'IA va inventer des choses sur mon CV ?",

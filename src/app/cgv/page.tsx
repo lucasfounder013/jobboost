@@ -32,16 +32,19 @@ export default function CGV() {
             Les prix sont indiqués en euros TTC. Le service propose :
           </p>
           <ul className="mt-2 text-sm text-gray-600 leading-relaxed list-disc list-inside space-y-1">
-            <li>Une version gratuite : 3 analyses CV (sans adaptation de CV)</li>
-            <li>Abonnement Starter : <strong>4,99 € / mois</strong></li>
-            <li>Abonnement Pro : <strong>9,99 € / mois</strong></li>
+            <li>Une version gratuite : 3 analyses de CV (sans adaptation ni lettre de motivation)</li>
+            <li>Abonnement mensuel : <strong>17,99 € / mois</strong></li>
+            <li>Accès à vie (paiement unique) : <strong>29,99 €</strong></li>
           </ul>
         </section>
 
         <section className="mb-8">
-          <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">4. Abonnement</h2>
+          <h2 className="text-sm font-bold text-gray-900 uppercase tracking-widest mb-3">4. Abonnement et accès à vie</h2>
           <p className="text-sm text-gray-600 leading-relaxed">
-            Les abonnements sont à reconduction automatique. L&apos;utilisateur peut résilier à tout moment depuis son espace abonnement ou via le portail Stripe. La résiliation prend effet à la fin de la période en cours. Toute période entamée est due et ne peut donner lieu à remboursement.
+            L&apos;abonnement mensuel est à reconduction automatique. L&apos;utilisateur peut résilier à tout moment depuis son espace abonnement ou via le portail Stripe. La résiliation prend effet à la fin de la période en cours. Toute période entamée est due et ne peut donner lieu à remboursement.
+          </p>
+          <p className="text-sm text-gray-600 leading-relaxed mt-2">
+            L&apos;accès à vie est un paiement unique donnant un accès illimité au service pour toute la durée d&apos;existence de la plateforme. Il n&apos;est pas remboursable après activation (voir article 6).
           </p>
           <p className="text-sm text-gray-600 leading-relaxed mt-2">
             L&apos;éditeur se réserve le droit de suspendre ou de limiter l&apos;accès au service en cas d&apos;utilisation abusive ou frauduleuse.

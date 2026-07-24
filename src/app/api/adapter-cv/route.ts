@@ -24,34 +24,41 @@ export async function POST(req: NextRequest) {
   }
 
   const { rows: rowsUser } = await pool.query(
-    'SELECT is_subscribed, plan_type, credits FROM "user" WHERE id = $1',
+    'SELECT is_subscribed, is_lifetime, plan_type, credits FROM "user" WHERE id = $1',
     [session.user.id]
   );
-  const planType: string | null = rowsUser[0]?.plan_type ?? null;
+  const estLifetime: boolean = rowsUser[0]?.is_lifetime ?? false;
 
   let creditsRestants: number | null = null;
   let locked = false;
 
-  // Décrémentation atomique : échoue si credits = 0
-  const { rowCount, rows: rowsCredits } = await pool.query(
-    'UPDATE "user" SET credits = credits - 1 WHERE id = $1 AND credits > 0 RETURNING credits',
-    [session.user.id]
-  );
-
-  if (rowCount === 0) {
-    const estAbonne: boolean = rowsUser[0]?.is_subscribed ?? false;
-    if (estAbonne) {
-      const limite = planType === "pro" ? "50" : "10";
-      return NextResponse.json(
-        { error: `Limite mensuelle de ${limite} adaptations atteinte. Elle sera réinitialisée à votre prochain renouvellement.` },
-        { status: 403 }
-      );
-    }
-    // Gratuit : on génère quand même pour montrer un aperçu flou (conversion)
-    locked = true;
-    creditsRestants = 0;
+  if (estLifetime) {
+    // Accès à vie : pas de décrément, log usage
+    pool.query(
+      `INSERT INTO lifetime_usage_log (user_id, operation_type) VALUES ($1, 'adaptation')`,
+      [session.user.id]
+    ).catch(e => console.error("[adapter-cv] Erreur log lifetime:", e.message));
   } else {
-    creditsRestants = rowsCredits[0].credits;
+    // Décrémentation atomique : échoue si credits = 0
+    const { rowCount, rows: rowsCredits } = await pool.query(
+      'UPDATE "user" SET credits = credits - 1 WHERE id = $1 AND credits > 0 RETURNING credits',
+      [session.user.id]
+    );
+
+    if (rowCount === 0) {
+      const estAbonne: boolean = rowsUser[0]?.is_subscribed ?? false;
+      if (estAbonne) {
+        return NextResponse.json(
+          { error: "Limite mensuelle de 15 adaptations atteinte. Elle sera réinitialisée à votre prochain renouvellement." },
+          { status: 403 }
+        );
+      }
+      // Gratuit : on génère quand même pour montrer un aperçu flou (conversion)
+      locked = true;
+      creditsRestants = 0;
+    } else {
+      creditsRestants = rowsCredits[0].credits;
+    }
   }
 
   const motsClesListe =
@@ -157,8 +164,8 @@ ${offre}`;
   }
 
   if (parsed === null) {
-    // Échec définitif : rendre le crédit s'il a été décrémenté (utilisateur non locked)
-    if (!locked) {
+    // Échec définitif : rendre le crédit s'il a été décrémenté (utilisateur non locked, non lifetime)
+    if (!locked && !estLifetime) {
       await pool.query(
         'UPDATE "user" SET credits = credits + 1 WHERE id = $1',
         [session.user.id]

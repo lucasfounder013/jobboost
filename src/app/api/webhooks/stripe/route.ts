@@ -4,7 +4,11 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { PostHog } from "posthog-node";
 
-
+// Quotas mensuels du plan "monthly"
+const MONTHLY_SCANS = 30;
+const MONTHLY_CREDITS = 15;
+const MONTHLY_LM = 15;
+const MONTHLY_RH = 3;
 
 function phCapture(distinctId: string, event: string, properties?: Record<string, unknown>) {
   const client = new PostHog(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
@@ -35,25 +39,33 @@ export async function POST(req: NextRequest) {
     case "checkout.session.completed": {
       const checkoutSession = event.data.object as Stripe.Checkout.Session;
       const userId = checkoutSession.metadata?.userId;
-      const plan = checkoutSession.metadata?.plan ?? "starter";
-      const subscriptionId = checkoutSession.subscription as string;
+      const plan = checkoutSession.metadata?.plan;
 
-      if (userId && subscriptionId) {
-        try {
+      if (!userId || !plan) break;
+
+      try {
+        if (plan === "lifetime" && checkoutSession.mode === "payment") {
+          // Paiement unique — accès à vie, quotas ignorés (bypass dans les routes API)
           await pool.query(
-            `UPDATE "user" SET is_subscribed = true, stripe_subscription_id = $1, plan_type = $2,
-              scans = CASE WHEN $2 = 'starter' THEN 15 ELSE 50 END,
-              credits = CASE WHEN $2 = 'starter' THEN 10 ELSE 50 END,
-              lm_credits = CASE WHEN $2 = 'starter' THEN 10 ELSE 50 END,
-              rh_credits = CASE WHEN $2 = 'starter' THEN 2 ELSE 10 END
-             WHERE id = $3`,
-            [subscriptionId, plan, userId]
+            `UPDATE "user" SET is_lifetime = true, plan_type = 'lifetime', lifetime_purchased_at = now()
+             WHERE id = $1`,
+            [userId]
           );
-          await phCapture(userId, "subscription_created", { plan, subscription_id: subscriptionId });
-        } catch (err) {
-          console.error("[webhook] Erreur mise à jour utilisateur après paiement :", err);
-          return NextResponse.json({ error: "Erreur DB lors de l'activation." }, { status: 500 });
+          await phCapture(userId, "lifetime_purchased", { amount: checkoutSession.amount_total });
+        } else if (plan === "monthly" && checkoutSession.mode === "subscription") {
+          const subscriptionId = checkoutSession.subscription as string;
+          if (!subscriptionId) break;
+          await pool.query(
+            `UPDATE "user" SET is_subscribed = true, stripe_subscription_id = $1, plan_type = 'monthly',
+              scans = $2, credits = $3, lm_credits = $4, rh_credits = $5
+             WHERE id = $6`,
+            [subscriptionId, MONTHLY_SCANS, MONTHLY_CREDITS, MONTHLY_LM, MONTHLY_RH, userId]
+          );
+          await phCapture(userId, "subscription_created", { plan: "monthly", subscription_id: subscriptionId });
         }
+      } catch (err) {
+        console.error("[webhook] Erreur mise à jour utilisateur après paiement :", err);
+        return NextResponse.json({ error: "Erreur DB lors de l'activation." }, { status: 500 });
       }
       break;
     }
@@ -64,8 +76,11 @@ export async function POST(req: NextRequest) {
         'SELECT id, plan_type FROM "user" WHERE stripe_subscription_id = $1',
         [subscription.id]
       );
+      // Ne pas toucher is_lifetime : un user lifetime qui aurait aussi eu un abo garde son accès à vie
       await pool.query(
-        'UPDATE "user" SET is_subscribed = false, stripe_subscription_id = NULL, plan_type = NULL WHERE stripe_subscription_id = $1',
+        `UPDATE "user" SET is_subscribed = false, stripe_subscription_id = NULL,
+          plan_type = CASE WHEN is_lifetime THEN 'lifetime' ELSE NULL END
+         WHERE stripe_subscription_id = $1`,
         [subscription.id]
       );
       if (rows[0]) {
@@ -89,14 +104,12 @@ export async function POST(req: NextRequest) {
       const invoice = event.data.object as Stripe.Invoice;
       const subId = (invoice as unknown as { subscription: string }).subscription;
       if (subId) {
+        // Reset quotas mensuels UNIQUEMENT pour le plan monthly
         await pool.query(
           `UPDATE "user" SET
-            scans = CASE WHEN plan_type = 'starter' THEN 15 ELSE 50 END,
-            credits = CASE WHEN plan_type = 'starter' THEN 10 ELSE 50 END,
-            lm_credits = CASE WHEN plan_type = 'starter' THEN 10 ELSE 50 END,
-            rh_credits = CASE WHEN plan_type = 'starter' THEN 2 ELSE 10 END
-           WHERE stripe_subscription_id = $1 AND is_subscribed = true`,
-          [subId]
+            scans = $1, credits = $2, lm_credits = $3, rh_credits = $4
+           WHERE stripe_subscription_id = $5 AND is_subscribed = true AND plan_type = 'monthly'`,
+          [MONTHLY_SCANS, MONTHLY_CREDITS, MONTHLY_LM, MONTHLY_RH, subId]
         );
       }
       break;
@@ -125,7 +138,9 @@ export async function POST(req: NextRequest) {
           console.error("[webhook] Erreur void facture après échec paiement :", err);
         }
         await pool.query(
-          'UPDATE "user" SET is_subscribed = false, stripe_subscription_id = NULL, plan_type = NULL WHERE stripe_subscription_id = $1',
+          `UPDATE "user" SET is_subscribed = false, stripe_subscription_id = NULL,
+            plan_type = CASE WHEN is_lifetime THEN 'lifetime' ELSE NULL END
+           WHERE stripe_subscription_id = $1`,
           [subId]
         );
         if (rows[0]) {

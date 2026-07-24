@@ -8,8 +8,9 @@ export type QuotasSidebar = {
   credits: number;
   lmCredits: number;
   rhCredits: number;
-  planType: "starter" | "pro" | null;
+  planType: "monthly" | "lifetime" | null;
   estAbonne: boolean;
+  estLifetime: boolean;
 };
 
 export type AppSidebarActive =
@@ -68,11 +69,22 @@ export default function AppSidebar({ active, quotas, ouverte, onFermer }: Props)
           </Link>
 
           {quotas && (() => {
-            const { planType, scans, credits, lmCredits, rhCredits, estAbonne } = quotas;
-            const limiteScans = planType === "pro" ? 50 : planType === "starter" ? 15 : 3;
-            const limiteCredits = planType === "pro" ? 50 : planType === "starter" ? 10 : 0;
-            const limiteLm = planType === "pro" ? 50 : planType === "starter" ? 10 : 0;
-            const limiteRh = planType === "pro" ? 10 : planType === "starter" ? 2 : 3;
+            const { planType, scans, credits, lmCredits, rhCredits, estAbonne, estLifetime } = quotas;
+
+            // Lifetime : affichage simplifié « Illimité »
+            if (estLifetime) {
+              return (
+                <div className="bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl px-3 py-3 flex flex-col gap-1 text-center">
+                  <p className="text-xs font-bold uppercase tracking-widest text-white">Accès à vie</p>
+                  <p className="text-xs text-indigo-100">Utilisation illimitée</p>
+                </div>
+              );
+            }
+
+            const limiteScans = planType === "monthly" ? 30 : 3;
+            const limiteCredits = planType === "monthly" ? 15 : 0;
+            const limiteLm = planType === "monthly" ? 15 : 0;
+            const limiteRh = planType === "monthly" ? 3 : 0;
             return (
               <div className="bg-indigo-900/50 rounded-xl px-3 py-2 flex flex-col gap-1">
                 <div className="flex items-center justify-between text-xs">
@@ -109,7 +121,7 @@ export default function AppSidebar({ active, quotas, ouverte, onFermer }: Props)
                     <span className="font-bold text-white">{lmCredits} crédit</span>
                   </div>
                 )}
-                {rhCredits > 0 && (
+                {limiteRh > 0 && (
                   <div className="flex items-center justify-between text-xs mt-0.5">
                     <span className="text-indigo-300">Trouver un mail pro</span>
                     <span className="font-bold text-white">{rhCredits}/{limiteRh}</span>
@@ -120,7 +132,7 @@ export default function AppSidebar({ active, quotas, ouverte, onFermer }: Props)
                     href="/pricing"
                     className="mt-1 text-center text-xs font-semibold text-indigo-300 hover:text-white bg-indigo-800/60 hover:bg-indigo-700/60 rounded-lg py-1.5 transition-colors"
                   >
-                    Passer à l&apos;abonnement →
+                    Débloquer Rivjob →
                   </Link>
                 )}
               </div>

@@ -171,7 +171,7 @@ function DashboardInner() {
   const [creditsRestants, setCreditsRestants] = useState<number | null>(null);
   const [scansRestants, setScansRestants] = useState<number | null>(null);
   const [estAbonne, setEstAbonne] = useState(false);
-  const [planType, setPlanType] = useState<"starter" | "pro" | null>(null);
+  const [planType, setPlanType] = useState<"monthly" | "lifetime" | null>(null);
   const [exportEnCoursAnalyse, setExportEnCoursAnalyse] = useState<"pdf" | "docx" | null>(null);
   const [analyseId, setAnalyseId] = useState<string | null>(null);
   const [nomPosteEnregistre, setNomPosteEnregistre] = useState("");
@@ -326,7 +326,7 @@ function DashboardInner() {
         setAnalyses(data.analyses ?? []);
         setCvsAdaptes(data.cvsAdaptes ?? []);
         setEntretiens(data.entretiens ?? []);
-        const pt = data.planType as "starter" | "pro" | null ?? null;
+        const pt = data.planType as "monthly" | "lifetime" | null ?? null;
         setPlanType(pt);
         setRhCreditsRestants(data.rhCredits ?? 0);
         setEstAbonne(!!data.estAbonne);
@@ -901,6 +901,7 @@ function DashboardInner() {
                 rhCredits: rhCreditsRestants ?? 0,
                 planType,
                 estAbonne,
+                estLifetime: planType === "lifetime",
               }
         }
       />
@@ -1426,28 +1427,7 @@ function DashboardInner() {
               <p className="text-gray-400 text-sm mt-1">Générez une roadmap personnalisée pour décrocher le poste.</p>
             </div>
 
-            {planType !== "pro" ? (
-              /* CTA upgrade Pro */
-              <div className="bg-white rounded-2xl ring-1 ring-gray-200 shadow-sm p-10 flex flex-col items-center text-center gap-5">
-                <div className="w-14 h-14 rounded-2xl bg-indigo-50 flex items-center justify-center">
-                  <svg className="w-7 h-7 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                  </svg>
-                </div>
-                <div>
-                  <p className="text-lg font-bold text-gray-900">Fonctionnalité réservée au plan Pro</p>
-                  <p className="text-gray-500 text-sm mt-2 max-w-sm">
-                    La préparation d&apos;entretien est incluse dans le plan Pro. Pitch, questions probables, questions à poser et message de relance générés par l&apos;IA.
-                  </p>
-                </div>
-                <Link
-                  href="/pricing"
-                  className="bg-gradient-to-r from-indigo-500 to-violet-500 hover:from-indigo-400 hover:to-violet-400 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-lg shadow-indigo-200/60 transition-all"
-                >
-                  Voir les abonnements →
-                </Link>
-              </div>
-            ) : resultatEntretien ? (
+            {resultatEntretien ? (
               /* Résultat */
               <div className="flex flex-col gap-6">
                 <div className="flex items-center justify-between">
@@ -2525,10 +2505,10 @@ function DashboardInner() {
               </h2>
               <p className="text-gray-500 text-sm leading-relaxed">
                 {modaleUpgrade === "scans"
-                  ? "Vous avez utilisé vos 3 analyses gratuites. Passez à un abonnement pour analyser autant de CV que vous le souhaitez."
+                  ? "Vous avez utilisé vos 3 analyses gratuites. Choisissez votre plan pour continuer — accès à vie à 29,99€ ou abonnement mensuel à 17,99€."
                   : modaleUpgrade === "lm"
-                  ? "Vos 3 crédits gratuits de lettre de motivation ont été utilisés. Passez à un abonnement pour générer des lettres illimitées."
-                  : "Votre crédit d'adaptation CV gratuit a été utilisé. Passez à un abonnement pour adapter votre CV en illimité."}
+                  ? "La génération de lettres de motivation fait partie des plans payants. Passez à l'accès à vie (29,99€) ou au mensuel (17,99€) pour en générer."
+                  : "L'adaptation de CV fait partie des plans payants. Passez à l'accès à vie (29,99€) ou au mensuel (17,99€) pour l'utiliser."}
               </p>
             </div>
             <div className="w-full flex flex-col gap-2.5">

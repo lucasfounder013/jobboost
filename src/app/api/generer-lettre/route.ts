@@ -32,25 +32,31 @@ export async function POST(req: NextRequest) {
 
   // Vérification crédits LM
   const { rows: rowsUser } = await pool.query(
-    'SELECT is_subscribed, plan_type FROM "user" WHERE id = $1',
+    'SELECT is_subscribed, is_lifetime, plan_type FROM "user" WHERE id = $1',
     [session.user.id]
   );
-  const planType: string | null = rowsUser[0]?.plan_type ?? null;
+  const estLifetime: boolean = rowsUser[0]?.is_lifetime ?? false;
   let lmCreditsRestants: number | null = null;
 
-  const { rowCount, rows: rowsLm } = await pool.query(
-    'UPDATE "user" SET lm_credits = lm_credits - 1 WHERE id = $1 AND lm_credits > 0 RETURNING lm_credits',
-    [session.user.id]
-  );
-  if (rowCount === 0) {
-    const estAbonne: boolean = rowsUser[0]?.is_subscribed ?? false;
-    const limite = planType === "pro" ? "50" : planType === "starter" ? "10" : null;
-    const msg = estAbonne && limite
-      ? `Limite mensuelle de ${limite} lettres de motivation atteinte. Elle sera réinitialisée à votre prochain renouvellement.`
-      : "Vous n'avez plus de crédits pour générer une lettre de motivation. Passez à un abonnement.";
-    return NextResponse.json({ error: msg }, { status: 403 });
+  if (estLifetime) {
+    pool.query(
+      `INSERT INTO lifetime_usage_log (user_id, operation_type) VALUES ($1, 'lettre')`,
+      [session.user.id]
+    ).catch(e => console.error("[generer-lettre] Erreur log lifetime:", e.message));
+  } else {
+    const { rowCount, rows: rowsLm } = await pool.query(
+      'UPDATE "user" SET lm_credits = lm_credits - 1 WHERE id = $1 AND lm_credits > 0 RETURNING lm_credits',
+      [session.user.id]
+    );
+    if (rowCount === 0) {
+      const estAbonne: boolean = rowsUser[0]?.is_subscribed ?? false;
+      const msg = estAbonne
+        ? "Limite mensuelle de 15 lettres de motivation atteinte. Elle sera réinitialisée à votre prochain renouvellement."
+        : "Vous n'avez plus de crédits pour générer une lettre de motivation. Passez à un abonnement.";
+      return NextResponse.json({ error: msg }, { status: 403 });
+    }
+    lmCreditsRestants = rowsLm[0].lm_credits;
   }
-  lmCreditsRestants = rowsLm[0].lm_credits;
 
   // Appel Claude
   const message = await anthropic.messages.create({

@@ -11,8 +11,8 @@ export async function POST(req: NextRequest) {
   try {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
     const PRICE_IDS: Record<string, string> = {
-      starter: process.env.STRIPE_PRICE_ID_STARTER!,
-      pro: process.env.STRIPE_PRICE_ID_PRO!,
+      monthly: process.env.STRIPE_PRICE_ID_MONTHLY!,
+      lifetime: process.env.STRIPE_PRICE_ID_LIFETIME!,
     };
     const session = await auth.api.getSession({ headers: await headers() });
     if (!session) {
@@ -25,10 +25,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Plan invalide." }, { status: 400 });
     }
 
+    const mode: "payment" | "subscription" = plan === "lifetime" ? "payment" : "subscription";
+
     const { rows } = await pool.query(
-      'SELECT stripe_customer_id FROM "user" WHERE id = $1',
+      'SELECT stripe_customer_id, is_lifetime FROM "user" WHERE id = $1',
       [session.user.id]
     );
+    // Un user déjà lifetime ne doit pas pouvoir racheter — retour direct au dashboard
+    if (rows[0]?.is_lifetime) {
+      return NextResponse.json({ error: "Vous disposez déjà de l'accès à vie." }, { status: 400 });
+    }
     let customerId: string = rows[0]?.stripe_customer_id;
 
     if (!customerId) {
@@ -50,7 +56,7 @@ export async function POST(req: NextRequest) {
     try {
       checkoutSession = await stripe.checkout.sessions.create({
         customer: customerId,
-        mode: "subscription",
+        mode,
         line_items: [{ price: priceId, quantity: 1 }],
         success_url: `${baseUrl}/success`,
         cancel_url: `${baseUrl}/analyses`,
@@ -67,7 +73,7 @@ export async function POST(req: NextRequest) {
       );
       checkoutSession = await stripe.checkout.sessions.create({
         customer: newCustomer.id,
-        mode: "subscription",
+        mode,
         line_items: [{ price: priceId, quantity: 1 }],
         success_url: `${baseUrl}/success`,
         cancel_url: `${baseUrl}/analyses`,

@@ -161,21 +161,35 @@ export async function POST(req: NextRequest) {
   }
   let rhCreditsRestants: number | null = null;
   let estGratuit = false;
+  let estLifetime = false;
 
   if (mode !== "domaine") {
-    const { rowCount, rows } = await pool.query(
-      'UPDATE "user" SET rh_credits = rh_credits - 1 WHERE id = $1 AND rh_credits > 0 RETURNING rh_credits',
+    const { rows: rowsUser } = await pool.query(
+      'SELECT is_lifetime FROM "user" WHERE id = $1',
       [session.user.id]
     );
-    if (rowCount === 0) {
-      if (mode === "personne") {
-        // Utilisateur gratuit : recherche autorisée mais email flouté côté client
-        estGratuit = true;
-      } else {
-        return NextResponse.json({ error: "Vous n'avez plus de crédits email ce mois-ci." }, { status: 403 });
-      }
+    estLifetime = rowsUser[0]?.is_lifetime ?? false;
+
+    if (estLifetime) {
+      pool.query(
+        `INSERT INTO lifetime_usage_log (user_id, operation_type) VALUES ($1, 'rh')`,
+        [session.user.id]
+      ).catch(e => console.error("[trouver-rh] Erreur log lifetime:", e.message));
     } else {
-      rhCreditsRestants = rows[0].rh_credits;
+      const { rowCount, rows } = await pool.query(
+        'UPDATE "user" SET rh_credits = rh_credits - 1 WHERE id = $1 AND rh_credits > 0 RETURNING rh_credits',
+        [session.user.id]
+      );
+      if (rowCount === 0) {
+        if (mode === "personne") {
+          // Utilisateur gratuit : recherche autorisée mais email flouté côté client
+          estGratuit = true;
+        } else {
+          return NextResponse.json({ error: "Vous n'avez plus de crédits email ce mois-ci." }, { status: 403 });
+        }
+      } else {
+        rhCreditsRestants = rows[0].rh_credits;
+      }
     }
   }
 
@@ -226,7 +240,7 @@ export async function POST(req: NextRequest) {
     }
   } catch (err) {
     const message = err instanceof Error ? err.message : "Erreur inconnue";
-    if (mode !== "domaine" && !estGratuit) {
+    if (mode !== "domaine" && !estGratuit && !estLifetime) {
       await pool.query('UPDATE "user" SET rh_credits = rh_credits + 1 WHERE id = $1', [session.user.id]);
     }
     return NextResponse.json({ error: message }, { status: 500 });

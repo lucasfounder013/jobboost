@@ -50,6 +50,11 @@ export const auth = betterAuth({
         defaultValue: false,
         fieldName: "is_subscribed",
       },
+      isLifetime: {
+        type: "boolean",
+        defaultValue: false,
+        fieldName: "is_lifetime",
+      },
       stripeCustomerId: {
         type: "string",
         fieldName: "stripe_customer_id",
@@ -60,7 +65,7 @@ export const auth = betterAuth({
       },
       lmCredits: {
         type: "number",
-        defaultValue: 3,
+        defaultValue: 0,
         fieldName: "lm_credits",
       },
       rhCredits: {

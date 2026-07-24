@@ -63,6 +63,7 @@ export default function DashboardPage() {
           rhCredits: data.rhCredits ?? 0,
           planType: data.planType ?? null,
           estAbonne: !!data.estAbonne,
+          estLifetime: !!data.estLifetime,
         });
       })
       .catch(() => {});

@@ -28,27 +28,34 @@ export async function POST(req: NextRequest) {
 
   // Vérification et décompte des scans (source de vérité : DB)
   const { rows } = await pool.query(
-    'SELECT scans, is_subscribed, plan_type FROM "user" WHERE id = $1',
+    'SELECT scans, is_subscribed, is_lifetime, plan_type FROM "user" WHERE id = $1',
     [session.user.id]
   );
   const utilisateur = rows[0];
-  const planType: string | null = utilisateur?.plan_type ?? null;
+  const estLifetime: boolean = utilisateur?.is_lifetime ?? false;
   let scansRestants: number | null = null;
 
-  // Décrémenter atomiquement — échoue si scans = 0
-  const { rowCount, rows: rowsMaj } = await pool.query(
-    'UPDATE "user" SET scans = scans - 1 WHERE id = $1 AND scans > 0 RETURNING scans',
-    [session.user.id]
-  );
-  if (rowCount === 0) {
-    const estAbonne: boolean = utilisateur?.is_subscribed ?? false;
-    const limite = planType === "pro" ? "50" : planType === "starter" ? "15" : null;
-    const msg = estAbonne && limite
-      ? `Limite mensuelle de ${limite} analyses atteinte. Elle sera réinitialisée à votre prochain renouvellement.`
-      : "Vous avez utilisé vos 3 analyses gratuites. Passez à un abonnement pour continuer.";
-    return NextResponse.json({ error: msg }, { status: 403 });
+  if (estLifetime) {
+    // Accès à vie : pas de décrément, log usage
+    pool.query(
+      `INSERT INTO lifetime_usage_log (user_id, operation_type) VALUES ($1, 'analyse')`,
+      [session.user.id]
+    ).catch(e => console.error("[analyser] Erreur log lifetime:", e.message));
+  } else {
+    // Décrémenter atomiquement — échoue si scans = 0
+    const { rowCount, rows: rowsMaj } = await pool.query(
+      'UPDATE "user" SET scans = scans - 1 WHERE id = $1 AND scans > 0 RETURNING scans',
+      [session.user.id]
+    );
+    if (rowCount === 0) {
+      const estAbonne: boolean = utilisateur?.is_subscribed ?? false;
+      const msg = estAbonne
+        ? "Limite mensuelle de 30 analyses atteinte. Elle sera réinitialisée à votre prochain renouvellement."
+        : "Vous avez utilisé vos 3 analyses gratuites. Passez à un abonnement pour continuer.";
+      return NextResponse.json({ error: msg }, { status: 403 });
+    }
+    scansRestants = rowsMaj[0].scans;
   }
-  scansRestants = rowsMaj[0].scans;
 
   const message = await anthropic.messages.create({
     model: "claude-haiku-4-5-20251001",
