@@ -9,7 +9,6 @@ const FEATURES_GRATUIT = [
   "Dashboard complet",
   "3 analyses de CV",
   "Préparation aux entretiens",
-  "Recherche d'offres selon le CV",
 ];
 
 const FEATURES_MENSUEL = [

@@ -11,7 +11,6 @@ const FEATURES_GRATUIT = [
   "Dashboard complet",
   "3 analyses de CV",
   "Préparation aux entretiens",
-  "Recherche d'offres selon le CV",
 ];
 
 const FEATURES_MENSUEL = [
@@ -218,7 +217,7 @@ export default function PagePricing() {
               },
               {
                 q: "Pourquoi le mensuel est-il plus cher que le lifetime ?",
-                r: "Ce n'est pas plus cher : c'est un autre modèle. Le mensuel à 17,99€ existe pour les personnes qui ne veulent pas s'engager d'un coup — dès le 2e mois, l'accès à vie devient économiquement plus intéressant."
+                r: "Ce n'est pas plus cher : c'est un autre modèle. Le mensuel à 17,99€ existe pour les personnes qui ne veulent pas s'engager d'un coup. Dès le 2e mois, l'accès à vie devient économiquement plus intéressant."
               },
               {
                 q: "Les 3 analyses gratuites sont-elles renouvelées ?",
@@ -230,7 +229,7 @@ export default function PagePricing() {
               },
               {
                 q: "Mes données sont-elles sécurisées ?",
-                r: "Oui. Le contenu de votre CV n'est jamais stocké en base de données — il transite uniquement en mémoire pendant l'analyse."
+                r: "Oui. Le contenu de votre CV n'est jamais stocké en base de données. Il transite uniquement en mémoire pendant l'analyse."
               },
             ].map(({ q, r }) => (
               <div key={q} className="bg-white rounded-xl ring-1 ring-gray-200 p-5 text-left">
